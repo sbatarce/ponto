@@ -1,0 +1,49 @@
+# arquivos compilados #
+#######################
+*.class
+
+# logs e arquivos sql #
+#######################
+*.log
+*.sqlite
+
+# frameworks, ferramentas e CMS #
+#################################
+
+# biometria frameworkless configs
+/partes/ambiente.php
+/siges/ambiente.php
+
+vendor/
+/config.php
+sites/*/*settings*.php
+/COPYRIGHT.txt
+/INSTALL*.txt
+/LICENSE.txt
+
+# arquivos de editores e IDEs   #
+#################################
+*.swp
+*.swo
+.project
+.metadata
+.classpath
+nbproject/
+
+# arquivos gerados pelo sistema #
+#################################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+thumbs.db
+Thumbs.db
+desktop.ini
+*.lnk
+/composer.lock
+
+tests/_output/*
+node_modules/
+./dist
+

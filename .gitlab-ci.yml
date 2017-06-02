@@ -1,0 +1,33 @@
+variables:
+  PROJECT: "sisponto"
+  DEPLOYABLE: "target"
+
+stages:
+  - build
+
+build_and_dev_deploy:
+  stage: build
+  script:
+    - export AMBIENTE=$(echo $DEV_AMBIENTE)
+    - export USUARIO=$(echo $DEV_USUARIO)
+    - export SENHA=$(echo $DEV_SENHA)
+    - node ~/.npm/bin/jackhammer-builder $DEPLOYABLE
+    - ssh $SSH_USER@$DEV_SSH_HOST rm -rf $DOCROOT/$PROJECT/*
+    - scp -r $DEPLOYABLE/. $SSH_USER@$DEV_SSH_HOST:$DOCROOT/$PROJECT/
+    - ssh $SSH_USER@$DEV_SSH_HOST sudo chown $SSH_USER:apache $DOCROOT/$PROJECT -R
+  only:
+    - master
+
+build_and_producao_deploy:
+  stage: build
+  script:
+    - export AMBIENTE=$(echo $PRODUCAO_AMBIENTE)
+    - export USUARIO=$(echo $PRODUCAO_USUARIO)
+    - export SENHA=$(echo $PRODUCAO_SENHA)
+    - node ~/.npm/bin/jackhammer-builder $DEPLOYABLE
+    - ssh $SSH_USER@$PRODUCAO_SSH_HOST rm -rf $DOCROOT/$PROJECT/*
+    - scp -r $DEPLOYABLE/. $SSH_USER@$PRODUCAO_SSH_HOST:$DOCROOT/$PROJECT/
+    - ssh $SSH_USER@$PRODUCAO_SSH_HOST sudo chown $SSH_USER:apache $DOCROOT/$PROJECT -R
+  only:
+    - producao
+

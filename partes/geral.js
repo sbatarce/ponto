@@ -1,0 +1,391 @@
+//	geral.js		rotinas de uso geral
+
+var user;
+
+function repserviceA( metodo, funcao, ip, mac, sistema )
+  {
+    var resul = { };
+    var host = window.location.hostname;
+    if( host == "egov.santos.sp.gov.br" )
+      host = "vmp-webserv03.santos.sp.gov.br";
+    var url = "http://" + host +
+        "/cgi-bin/RepService.cgi/" + funcao;
+  var hea = { };
+  if( adhea != null && adhea != undefined )
+    hea = adhea;
+  hea["IDAPAL"] = idapal;
+  hea["REPSIS"] = sistema;
+  $.ajax(
+    {
+    headers: hea,
+    url: url,
+    type: metodo,
+    contentType: "application/json",
+    datatype: 'json',
+    async: false,
+    success: function( resp, textStatus, jqXHR )
+      {
+      resul.resp = resp;
+      resul.status = "OK";
+      },
+    error: function( responseData, textStatus, errorThrown )
+      {
+      resul.status = responseData.status;
+      if( responseData.responseText != undefined )
+        resul.erro = responseData.responseText
+      else
+        resul.erro = textStatus;
+      }
+    } );
+  return resul;
+  }
+
+function repservice( metodo, funcao, idapal, sistema, adhea )
+  {
+  var resul = { };
+  var url = "http://" + window.location.hostname +
+      "/cgi-bin/RepService.cgi/" + funcao;
+  var hea = { };
+  if( adhea != null && adhea != undefined )
+    hea = adhea;
+  hea["IDAPAL"] = idapal;
+  hea["REPSIS"] = sistema;
+  $.ajax(
+    {
+    headers: hea,
+    url: url,
+    type: metodo,
+    contentType: "application/json",
+    datatype: 'json',
+    async: false,
+    success: function( resp, textStatus, jqXHR )
+      {
+      resul.resp = resp;
+      resul.status = "OK";
+      },
+    error: function( responseData, textStatus, errorThrown )
+      {
+      resul.status = responseData.status;
+      if( responseData.responseText != undefined )
+        resul.erro = responseData.responseText
+      else
+        resul.erro = textStatus;
+      }
+    } );
+  return resul;
+  }
+
+function normIPAddr( IP )
+  {
+  var ix = 0;
+  while( 1 )
+    {
+      var ch = IP.substr( ix, 1 );
+      if( ch != "0" )
+        break;
+      IP = IP.substr( 0, ix ) + ' ' + IP.substr( ix + 1 );
+      ix++;
+    }
+  IP = IP.trim();
+  while( 1 )
+    {
+      if( IP.indexOf( ".000" ) >= 0 )
+        {
+          IP = IP.replace( ".000", "." );
+          continue;
+        }
+      if( IP.indexOf( ".00" ) >= 0 )
+        {
+          IP = IP.replace( ".00", "." );
+          continue;
+        }
+      if( IP.indexOf( ".0" ) >= 0 )
+        {
+          IP = IP.replace( ".0", "." );
+          continue;
+        }
+      if( IP.indexOf( ".." ) >= 0 )
+        {
+          IP = IP.replace( "..", ".#." );
+          continue;
+        }
+      break;
+    }
+  IP = IP.replace( /#/g, "0" );
+  if( IP.charAt( IP.length - 1 ) == "." )
+    IP += "0";
+  return IP;
+  }
+
+function Titulo( titu )
+  {
+  document.getElementById( "titu" ).innerHTML = titu;
+  }
+
+function titulo( titu )
+  {
+  document.getElementById( "titu" ).innerHTML = titu;
+  }
+
+function Deslogar()
+  {
+  $( "#menupri" ).collapse( 'hide' );
+  $( "#menu" ).hide();
+  matarCookie( "biouser" );
+  matarCookie( "biopass" );
+  window.location.href = "index.php";
+  }
+
+function remoto( url )
+  {
+  var resul = { };
+  $.ajax(
+    {
+    type: 'POST',
+    dataType: "json",
+    async: false,
+    url: url,
+    success: function( resp, textStatus, jqXHR )
+      {
+      resul = resp;
+      },
+    error: function( responseData, textStatus, errorThrown )
+      {
+      resul.status = textStatus + " - " + responseData.responseText;
+      resul.erro = errorThrown;
+      }
+    });
+  return resul;
+  }
+
+function Select( query, parms )
+  {
+  var resul = remoto( "partes/queries.php?query=" + query + parms );
+  if( resul.status != "OK" )
+    {
+      alert( "Erro obtendo dados " + resul.erro );
+      return null;
+    }
+  return resul;
+  }
+//	função de deleção em DB
+function Delete( query, parms )
+  {
+  var url = "partes/updates.php?query=" + query + parms;
+  var resul = remoto( url );
+  if( resul.status != "OK" )
+    {
+      alert( "Erro obtendo dados " + resul.erro );
+      return false;
+    }
+  return true;
+  }
+//	função de Update em DB
+function Update( query, parms )
+  {
+  var resul = remoto( "partes/updates.php?query=" + query + parms );
+  if( resul.status != "OK" )
+    {
+    alert( "Erro alterando dados dados " + resul.erro );
+    return false;
+    }
+  return true;
+  }
+//	função de insersão em DB 
+function Insert( query, parms, sequence )
+  {
+  var url = "partes/inserts.php?query=" + query + parms;
+  if( sequence != null || sequence != undefined )
+    url += "&sequence=" + sequence;
+  return remoto( url );
+  }
+
+function criarCookie( name, value, horas )
+  {
+  if( horas )
+    {
+      var date = new Date();
+      date.setTime( date.getTime() + ( horas * 60 * 60 * 1000 ) );
+      var expires = "; expires=" + date.toGMTString();
+    }
+  else
+    var expires = "";
+  var fixedName = '<%= Request["formName"] %>';
+  document.cookie = name + "=" + value + expires + "; path=/";
+  }
+function matarCookie( name )
+  {
+  criarCookie( name, "", -1 );
+  }
+//	le cookies e retorna um dos valores								
+function obterCookie( name )
+  {
+  var nameEQ = name + "=";
+  var todos = document.cookie;
+  var separ = todos.split( ';' );
+  for( var i = 0; i < separ.length; i++ )
+    {
+    var c = separ[i];
+    while( c.charAt( 0 ) == ' ' )
+      c = c.substring( 1, c.length );
+    if( c.indexOf( nameEQ ) == 0 )
+      return c.substring( nameEQ.length, c.length );
+    }
+  return null;
+  }
+
+function logout()
+  {
+  eraseCookie( "user" );
+  eraseCookie( "pass" );
+  }
+
+function getUser(  )
+  {
+  user = readCookie( "user" );
+  if( user == null )
+    {
+    window.location.href = "index.html";
+    return;
+    }
+  }
+
+function SelOptions( url )
+  {
+    var resul = "";
+    $.ajax(
+      {
+      type: 'GET',
+      async: false,
+      crossDomain: true,
+      url: url,
+      success: function( resp, textStatus, jqXHR )
+        {
+        resul = resp;
+        },
+      error: function( responseData, textStatus, errorThrown )
+        {
+        alert( "Erro obtendo Options: " + textStatus );
+        }
+      } );
+    return resul;
+  }
+
+//	carrega os dados de uma Select2
+function SelInit( sel, url, id, text, func, minlen )
+  {
+  var min;
+  if( minlen == undefined || minlen == null )
+    min = 0;
+  else
+    min = minlen;
+  $.ajax(
+    {
+    type: 'GET',
+    url: "partes/" + url,
+    success: function( data )
+      {
+      json = eval( data );
+      $( sel ).select2(
+        {
+        minimumInputLength: min,
+        minimumResultsForSearch: 10,
+        data: json,
+        initSelection: function( element, callback )
+          {
+          callback( { id: id, text: text } );
+          }
+        })
+      .on( "change", function( e )
+        {
+        if( func != undefined && func != null )
+          func( "change", e.val );
+        } );
+      },
+    error: function( responseData, textStatus, errorThrown )
+      {
+      alert( "erro acessando dados " + textStatus +
+          "/" + errorThrown );
+      }
+    });
+  }
+
+///	campos e linhas
+///	IniLinha		cria uma DIV apropriada a inserir uma linha
+///		classe é um ou mais nomes de classes a associar à DIV
+function IniLinha( classe )
+  {
+  if( classe == null )
+    return "<div class='row linha' style='margin-top: 10px'>";
+  else
+    return "<div class='row linha " + classe + "' style='margin-top: 10px'>";
+  }
+  
+function FimLinha()
+  {
+  return "</div>";
+  }
+  
+function CampoLabel( campo )
+  {
+  var cmp = "";
+  if( campo.label && campo.label.length > 0 )
+    {
+    if( campo.nocmp && campo.nocmp.length > 0 )
+      {
+      cmp +=	"<label for='"+campo.nocmp+"' style='margin-left: 20px;'>"+campo.label+"</label>";
+      }
+    }
+  cmp += "<input type='text' style='margin-left: 10px; width: "+campo.width+";' class='input-small";
+  if( campo.inpclass && campo.inpclass.length > 0 )
+    cmp += " " + campo.inpclass;			//	adiciona a classe
+  cmp += "'";												//	fecha o class do input
+  if( campo.valor && campo.valor.length > 0 )
+    cmp += " value='" + campo.valor + "' vaorig='" + campo.valor + "'";
+  else
+    cmp += " value='' vaorig=''";
+  if( campo.nocmp && campo.nocmp.length > 0 )
+    cmp += " nocmp='" + campo.nocmp + "'";
+  if( campo.extra && campo.extra.length > 0 )
+    cmp += " " + campo.extra;
+  cmp += "/>";
+  return cmp;
+  }
+  
+///	CampoTexto		cria o HTML adequado ao Bootstrap de campo input
+///		campo
+///			{
+///			divclass		classe da DIV externa ao campo
+///			width				tamanho da DIV. usar na forma de %
+///			titulo			título do campo
+///			inpclass		classe do input do campo
+///			valor				valor inicial do campo
+///			nocmp				nome do campo
+///			extra				atributo(s) extra a colocar no input do campo
+///			}
+function CampoTexto( campo )
+  {
+  var cmp = "<div";
+  if( campo.divclass && campo.divclass.length > 0 )
+    cmp += " class='" + campo.divclass + "'";
+  if( campo.width && campo.width.length > 0 )
+    cmp += " style='width:" + campo.width + ";'";
+  cmp += ">";
+  
+  if( campo.titulo && campo.titulo.length > 0 )
+    cmp += " " + campo.titulo;
+  cmp += "<input type='text' style='width: 100%;' class='form-control input-xs";
+  if( campo.inpclass && campo.inpclass.length > 0 )
+    cmp += " " + campo.inpclass;			//	adiciona a classe
+  cmp += "'";												//	fecha o class do input
+  if( campo.valor && campo.valor.length > 0 )
+    cmp += " value='" + campo.valor + "' vaorig='" + campo.valor + "'";
+  else
+    cmp += " value='' vaorig=''";
+  if( campo.nocmp && campo.nocmp.length > 0 )
+    cmp += " nocmp='" + campo.nocmp + "'";
+  if( campo.extra && campo.extra.length > 0 )
+    cmp += " " + campo.extra;
+  cmp += "></div>";
+  return cmp;
+  }

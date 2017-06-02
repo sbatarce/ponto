@@ -1,0 +1,31 @@
+{
+    "jsCssVersioning" : false,
+    "jshint" : false,
+    "replace" : [
+        {
+            "origin" : "partes/ambiente-modelo.php",
+            "destination" : "partes/ambiente.php",
+            "variables":[
+                "AMBIENTE",
+                "USUARIO",
+                "SENHA"
+            ]
+        }
+    ],
+    "fileDirectories":[
+        "assets",
+        "autAusencias.php",
+        "autCadFunc.php",
+        "autPenden.php",
+        "autRegimes.php",
+        "autTodosFunc.php",
+        "bootstrap-3.3.1",
+        "bootstrap-datepicker",
+        "funAcesso.php",
+        "imagens",
+        "index.php",
+        "padrao.php",
+        "partes",
+        "usaDatepickerMelhor.php"
+    ]
+}
