@@ -39,14 +39,14 @@ if( $qry == "teste" )
 //	query=funcindex&autid=funi_id
 if( $qry == "funcindex" )
 	{
-	if( !isset( $_GET["autid"] ) )
+	if( !isset( $_GET["autsshd"] ) )
 		{
 		echo	'{ "data": [{"erro": "parametro autid obrigatorio"}] }';
 		return;
 		}
-	$autid = $_GET["autid"];
+	$autsshd = $_GET["autsshd"];
 	$sql	=	
-		"SELECT FUNI.FUNI_ID AS IDFUNC, VUPU.UOR_DLSIGLAUNIDADE AS UNIDADE, 
+		"SELECT FUNI.FUNI_ID AS IDFUNC, FUNI.PMS_IDPMSPESSOA AS SSHDFUNC, VUPU.UOR_DLSIGLAUNIDADE AS UNIDADE, 
        (SELECT VPSS.NOME FROM SAU.VWPESSOA_SSHD VPSS
          WHERE VPSS.REGISTRO_FUNCIONAL_ATIVO = 1 AND
                VPSS.IUN = FUNI.PMS_IDPMSPESSOA AND
@@ -84,7 +84,7 @@ if( $qry == "funcindex" )
 								FDTR.FDTR_DTREFERENCIA BETWEEN UOFM.UOFM_DTREFERENCIA AND SYSDATE AND
 								FDTR.FRTR_ID = FRTR.FRTR_ID
 		WHERE SYSDATE BETWEEN FUAU.FUAU_DTINICIO AND NVL(FUAU.FUAU_DTFIM, TO_DATE('31/12/3000', 'DD/MM/YYYY')) AND
-					FUNIA.PMS_IDPMSPESSOA = 'Q0000289' AND
+					FUNIA.PMS_IDPMSPESSOA = '$autsshd' AND
 					UOFM.UOFM_ID = (SELECT UOFMF.UOFM_ID FROM 
 													(SELECT UOFMI.UOFM_ID, FUAUI.PMS_IDSAUUOR, UOFMI.UOFM_DTREFERENCIA
 														FROM BIOMETRIA.UOFM_UORFECHAMENTOMENSAL UOFMI

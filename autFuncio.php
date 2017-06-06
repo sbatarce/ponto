@@ -674,7 +674,7 @@ include 'partes/Scripts.php';
 			dtfim = $.datepicker.formatDate("yymmdd", dt );
 			if( del != 0 )
 				tableDestroy();
-			AjaxSource	=	"partes/tableData.php?query=funaces&sshd=" + sshd.toUpperCase() + 
+			AjaxSource	=	"partes/tableData.php?query=funaces&sshd=" + sshdfunc.toUpperCase() + 
 												"&dtini="+dtini+"&dtfim="+dtfim;
 			inicializa.init();
 			}
@@ -739,6 +739,19 @@ include 'partes/Scripts.php';
 				dtfim = $.datepicker.formatDate("yymmdd", dt );
 				setAjax(1);
 				});
+		/*
+		$("#dtini").change( 
+		function( dat )
+			{
+			console.log(dat.date);
+			setAjax( 1 );
+			} );
+		$("#dtfim").change( 
+		function()
+			{
+			setAjax( 1 );
+			} );
+		*/
 	
 	/////////////// PRINCIPAL ////////////////////////
 	$('#eddt_new').hide();
@@ -774,10 +787,31 @@ include 'partes/Scripts.php';
 						};
 		var sshd = obterCookie( "user" );
 		if( sshd == null )
+			window.location = "index.php";
+			
+		var idfunc = obterCookie( "idfunc" );
+		if( idfunc == null )
 			{
-			Deslogar();
+			window.history.back();
+			window.location = "index.php";
 			}
 
+		var nofunc = obterCookie( "nofunc" );
+		if( nofunc == null )
+			{
+			window.history.back();
+			window.location = "index.php";
+			}
+
+		var sshdfunc = obterCookie( "sshdfunc" );
+		if( sshdfunc == null )
+			{
+			window.history.back();
+			window.location = "index.php";
+			}
+			
+		$("#titwidget").html( "Ponto de " + nofunc );
+			
 		//	acerta as datas
 		var hoje = new Date();
 		var dtfim = $.datepicker.formatDate("yymmdd", hoje );
@@ -787,7 +821,7 @@ include 'partes/Scripts.php';
 		var dtini = $.datepicker.formatDate("yymmdd", hoje );
 
 		//	obtem FUNI_ID
-		var parms = "&sshd=" + sshd;
+		var parms = "&sshd=" + sshdfunc;
 		var resu = Select( "funiid", parms );
 		if( resu == null )
 			throw new Error("Problemas de acesso ao banco de dados. Por favor, tente mais tarde.");
@@ -861,14 +895,7 @@ include 'partes/Scripts.php';
 			"defaultContent": " ",
 			"render": function( data, type, full )
 				{
-				if( full.TSDT_ID == "" || full.TSDT_ID == "1" || full.TSDT_ID == "4" )
-					var act	=	"<a href='javascript:hshow(\"" + full.DATA + "\",\"" + 
-									full.FDTR_ID + "\",\"" +
-									full.HORARIOS + "\",\"" + full.OPERACOES + "\",\"" + 
-									full.ORIGENS +"\",\"" + full.FDTEIDS +"\");' " +
-									"title=\"mostrar horarios\" >";
-				else
-					var act	=	"<a>";
+				var act	=	"<a>";
 				if( data == "" )
 					{
 					act += "<b>sem registros</b></a>";
@@ -979,12 +1006,7 @@ include 'partes/Scripts.php';
 						resu += seps[ix];
 						}
 					}
-				if( full.TSDT_ID == "" || full.TSDT_ID == "1" || full.TSDT_ID == "4" )
-					var act	=	"<a href='javascript:dshow(\"" + full.FDTR_ID + "\",\"" +  
-										full.FDTM_ID + "\",\"" + data + "\");' " +
-									"title=\"criar/complementar diálogo\" >";
-				else
-					var act	=	"<a>";
+				var act	=	"<a>";
 					
 				if( data == "" )
 					act += "sem conteúdo</a>";

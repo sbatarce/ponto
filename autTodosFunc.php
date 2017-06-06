@@ -18,12 +18,6 @@ include 'partes/Cabec.php';
 include 'partes/pageheader.php';
 include 'partes/pagebody.php';
 ?>
-		<div class='row input-append date linha' style='margin-bottom: 10px; margin-left:4px'>
-			Período de<input type="text" size="10" id="dtini" 
-											 style="margin-left: 20px; margin-right: 20px; "/>
-			a <input type="text" size="10" id="dtfim" 
-							 style="margin-left: 20px; margin-right: 20px; "/>
-		</div>
 										<table class="table table-striped table-hover table-bordered" id="eddt">
 											<thead><tr role="row"></tr></thead>
 											<tfoot><tr role="row"></tr></tfoot>
@@ -100,6 +94,15 @@ include 'partes/Scripts.php';
 			else
 				return hh+":"+mm;
 			}
+			
+		//	chama o detalhe de um funcionário escolhido
+		function detfunc( id, nome, sshd )
+			{
+			criarCookie( "idfunc", id );
+			criarCookie( "nofunc", nome );
+			criarCookie( "sshdfunc", sshd );
+			window.location = "autFuncio.php";
+			}
 
 		//	tratamento inicial das datas e inicialização do datatables
 		function setAjax( del )
@@ -107,7 +110,7 @@ include 'partes/Scripts.php';
 			//
 			if( del != 0 )
 				tableDestroy();
-			AjaxSource	=	"partes/tableData.php?query=funcindex&autid=" + iduser;
+			AjaxSource	=	"partes/tableData.php?query=funcindex&autsshd=" + sshd;
 			inicializa.init();
 			}
 			
@@ -149,17 +152,7 @@ include 'partes/Scripts.php';
 			{
 			Deslogar();
 			}
-		var url = "partes/queries.php?query=funiid&sshd=" + sshd;
-		var resu = remoto( url );
-		if( resu == null )
-			{
-			alert( "Falha na obtenção dos dados do funcionário. Por Favor, tente mais tarde")
-			}
-		if( resu.linhas < 1 )
-			{
-			alert( "Falha na obtenção dos dados do funcionário. Por Favor, tente mais tarde")
-			}
-		var iduser = resu.dados[0].FUNI_ID;		
+		$("#eddt_new").hide();
 		//	tabelas de definição da tabela de presenças
 		var dataatual;
 		var fdtrid;
@@ -186,45 +179,7 @@ include 'partes/Scripts.php';
 		//	prepara a definiçao das colunas
 		var colDefs	=	[];
 		var	col	=	-1;
-		/*
-		var aux	=
-			{
-			"tipo": "x",
-			"editavel": false,
-			"vanovo": "",
-			"width": "8%",
-			"aTargets": [ ++col ],
-			"mData": "TSDT_ID",
-			"sTitle":"Situação",
-			"defaultContent": " ",
-			"render": function( data, type, full )
-				{
-				var res = "";
-				if( data == "" )
-					{
-					res = "<button type='button' class='btn btn-default  btn-md'>OK</button>";
-					}
-				if( data == "1" )
-					{
-					res = "<button type='button' class='btn btn-primary  btn-md'>Penden</button>";
-					}
-				if( data == "2" )
-					{
-					res = "<button type='button' class='btn btn-success  btn-md'>Aceita</button>";
-					}
-				if( data == "3" )
-					{
-					res = "<button type='button' class='btn btn-danger  btn-md'>Negada</button>";
-					}
-				if( data == "4" )
-					{
-					res = "<button type='button' class='btn btn-warning  btn-md'>Análise</button>";
-					}
-				return res;
-				}
-			};
-		colDefs.push( aux );
-		*/
+
 		aux	=
 			{
 			"tipo": "x",
@@ -263,6 +218,14 @@ include 'partes/Scripts.php';
 			"mData": "NOFUNC",
 			"sTitle":"Funcionário",
 			"defaultContent": " ",
+			"render": function( data, type, full )
+				{
+				var act	=	"<a href='javascript:detfunc( \"" + full.IDFUNC + 
+								"\", \""+ data + "\", \"" + full.SSHDFUNC + 
+								"\" )' title=\"detalhes do funcionário\" >" +
+								data + "</a>";
+				return act;
+				}
 			};
 		colDefs.push( aux );
 		
