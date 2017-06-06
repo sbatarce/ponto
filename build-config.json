@@ -18,6 +18,7 @@
         "autCadFunc.php",
         "autPenden.php",
         "autRegimes.php",
+        "autFuncio.php",
         "autTodosFunc.php",
         "bootstrap-3.3.1",
         "bootstrap-datepicker",
