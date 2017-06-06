@@ -4,12 +4,11 @@ var user;
 
 function repserviceA( metodo, funcao, ip, mac, sistema )
   {
-    var resul = { };
-    var host = window.location.hostname;
-    if( host == "egov.santos.sp.gov.br" )
-      host = "vmp-webserv03.santos.sp.gov.br";
-    var url = "http://" + host +
-        "/cgi-bin/RepService.cgi/" + funcao;
+  var resul = { };
+  var host = window.location.hostname;
+  if( host == "egov.santos.sp.gov.br" )
+    host = "vmp-webserv03.santos.sp.gov.br";
+  var url = "http://" + host + "/cgi-bin/RepService.cgi/" + funcao;
   var hea = { };
   if( adhea != null && adhea != undefined )
     hea = adhea;

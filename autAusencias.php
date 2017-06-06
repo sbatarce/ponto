@@ -219,7 +219,7 @@ include 'partes/Scripts.php';
 				sshdfunc = resu.dados[0].SSHD;
 				if( sshdfunc == sshd )
 					{
-					alert( "Não é permitido autorizar ausências para sí.")
+					alert( "Não é permitido autorizar ausências para si mesmo.")
 					return;
 					}
 				$("#dados").show();

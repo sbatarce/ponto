@@ -2,6 +2,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
     <title>Ponto do funcionário</title>
+		
+		.table thead>tr>th {text-align: center;}
 <?php
 include 'partes/Head.php';
 ?>
@@ -103,13 +105,9 @@ include 'partes/Scripts.php';
 		function setAjax( del )
 			{
 			//
-			var dt = $("#dtini").datepicker("getDate");
-			dtini = $.datepicker.formatDate("yymmdd", dt );
-			dt = $("#dtfim").datepicker("getDate");
-			dtfim = $.datepicker.formatDate("yymmdd", dt );
 			if( del != 0 )
 				tableDestroy();
-			AjaxSource	=	"partes/tableData.php?query=funaces&dtini="+dtini+"&dtfim="+dtfim;
+			AjaxSource	=	"partes/tableData.php?query=funcindex&autid=" + iduser;
 			inicializa.init();
 			}
 			
@@ -146,6 +144,22 @@ include 'partes/Scripts.php';
 				setAjax(1);
 				});
 		/////////////// PRINCIPAL ////////////////////////
+		var sshd = obterCookie( "user" );
+		if( sshd == null )
+			{
+			Deslogar();
+			}
+		var url = "partes/queries.php?query=funiid&sshd=" + sshd;
+		var resu = remoto( url );
+		if( resu == null )
+			{
+			alert( "Falha na obtenção dos dados do funcionário. Por Favor, tente mais tarde")
+			}
+		if( resu.linhas < 1 )
+			{
+			alert( "Falha na obtenção dos dados do funcionário. Por Favor, tente mais tarde")
+			}
+		var iduser = resu.dados[0].FUNI_ID;		
 		//	tabelas de definição da tabela de presenças
 		var dataatual;
 		var fdtrid;
@@ -166,25 +180,13 @@ include 'partes/Scripts.php';
 						"Mensagens": "",
 						"Totais": ""
 						};
-		var sshd = obterCookie( "user" );
-		if( sshd == null )
-			{
-			Deslogar();
-			}
-
-		//	acerta as datas
-		var hoje = new Date();
-		var dtfim = $.datepicker.formatDate("yymmdd", hoje );
-		$("#dtfim").val( $.datepicker.formatDate("dd/mm/yy", hoje ) );
-		hoje.setDate(1);
-		$("#dtini").val( $.datepicker.formatDate("dd/mm/yy", hoje ));
-		var dtini = $.datepicker.formatDate("yymmdd", hoje );
 
 		//	monta o datatables
 		var	order	=	[];											//	sem classificação 
 		//	prepara a definiçao das colunas
 		var colDefs	=	[];
 		var	col	=	-1;
+		/*
 		var aux	=
 			{
 			"tipo": "x",
@@ -222,16 +224,17 @@ include 'partes/Scripts.php';
 				}
 			};
 		colDefs.push( aux );
-		
+		*/
 		aux	=
 			{
 			"tipo": "x",
+			"bVisible": false,
 			"editavel": false,
 			"vanovo": "",
-			"width": "7%",
+			"width": "0%",
 			"aTargets": [ ++col ],
-			"mData": "DATA",
-			"sTitle":"Data",
+			"mData": "IDFUNC",
+			"sTitle":"id",
 			"defaultContent": " "
 			};
 		colDefs.push( aux );
@@ -239,91 +242,54 @@ include 'partes/Scripts.php';
 		aux	=
 			{
 			"tipo": "x",
-			"editavel": false,
-			"vanovo": "",
-			"width": "17%",
-			"aTargets": [ ++col ],
-			"mData": "NOME",
-			"sTitle":"Funcionário",
-			"defaultContent": " "
-			};
-		colDefs.push( aux );
-		
-		aux	=
-			{
-			"tipo": "x",
+			//"sClass": "noCentro",
 			"editavel": false,
 			"vanovo": "",
 			"width": "15%",
 			"aTargets": [ ++col ],
-			"mData": "HORARIOS",
-			"sTitle":"Registros",
+			"mData": "UNIDADE",
+			"sTitle":"Unidade",
+			"defaultContent": " "
+			};
+		colDefs.push( aux );
+		
+		aux	=
+			{
+			"tipo": "x",
+			"editavel": false,
+			"vanovo": "",
+			"width": "20%",
+			"aTargets": [ ++col ],
+			"mData": "NOFUNC",
+			"sTitle":"Funcionário",
 			"defaultContent": " ",
-			"render": function( data, type, full )
-				{
-				if( full.TSDT_ID == "" || full.TSDT_ID == "1" || full.TSDT_ID == "4" )
-					var act	=	"<a href='javascript:hshow(\"" + full.DATA + "\",\"" + 
-									full.FDTR_ID + "\",\"" +
-									full.HORARIOS + "\",\"" + full.OPERACOES + "\",\"" + 
-									full.ORIGENS +"\",\"" + full.FDTEIDS +"\");' " +
-									"title=\"mostrar horarios\" >";
-				else
-					var act	=	"<a>";
-				if( data == "" )
-					{
-					act += "<b>sem registros</b></a>";
-					return act;
-					}
-				var lin1 = "";
-				var lin2 = "";
-				var orgs = full.ORIGENS.split(";");
-				var opes = full.OPERACOES.split(";");
-				var hors = full.HORARIOS.split(";");
-				for( var i=0; i<hors.length; i++ )
-					{
-					var aux = "<font color='";
-					if( orgs[i] == "1" )
-						aux	+= "green";
-					if( orgs[i] == "2" )
-						aux	+= "red";
-					if( orgs[i] == "3" )
-						aux	+= "yellow";
-
-					if( opes[i] == "2" )
-						{
-						if( lin2 != "" )
-							aux += "'>-" + hors[i] + "</font>";
-						else
-							aux += "'>" + hors[i] + "</font>";
-						lin2 += aux;
-						}
-					else
-						{
-						if( lin1 != "" )
-							aux += "'>-" + hors[i] + "</font>";
-						else
-							aux += "'>" + hors[i] + "</font>";
-						lin1 += aux;
-						}
-					}
-				if( lin1 != "" && lin2 != "" )
-					{
-					act +=	"<b>Válidos:</b>" + lin1 + "<br>" + 
-									"<b>Excluidos:</b>" + lin2;
-					}
-				if( lin1 != "" && lin2 == "" )
-					{
-					act += "<b>Válidos:</b>" + lin1;
-					}
-				if( lin1 == "" && lin2 != "" )
-					{
-					act += "<b>Excluidos:</b>" + lin2;
-					}
-				act += "</a>";
-
-				return act;
-				}
-			
+			};
+		colDefs.push( aux );
+		
+		aux	=
+			{
+			"tipo": "x",
+			"editavel": true,
+			"vanovo": "",
+			"width": "15%",
+			"aTargets": [ ++col ],
+			"mData": "DTUFECHAMENTO",
+			"sTitle":"Data Fechamento",
+			"defaultContent": " ",
+			};
+		colDefs.push( aux );
+		
+		aux	=
+			{
+			"className": "dt-center",
+			"tipo": "x",
+			"editavel": true,
+			"vanovo": "",
+			"width": "10%",
+			"aTargets": [ ++col ],
+			"mData": "QTOK",
+			"sTitle":"OK",
+			"defaultContent": " ",
 			};
 		colDefs.push( aux );
 		
@@ -334,26 +300,9 @@ include 'partes/Scripts.php';
 			"vanovo": "",
 			"width": "10%",
 			"aTargets": [ ++col ],
-			"mData": "TIPOMENSAGEM",
-			"sTitle":"Mensagens",
+			"mData": "QTPENDENTE",
+			"sTitle":"Pendentes",
 			"defaultContent": " ",
-			"render": function( data, type, full )
-				{
-				if( data == "" )
-					return data;
-				var seps = data.split( ";" );
-				var resu;
-				if( seps.length > 0 )
-					{
-					resu = seps[0];
-					for( var ix=1; ix<seps.length; ix++ )
-						{
-						resu += "<br>";
-						resu += seps[ix];
-						}
-					}
-				return resu;
-				}
 			};
 		colDefs.push( aux );
 		
@@ -362,75 +311,10 @@ include 'partes/Scripts.php';
 			"tipo": "x",
 			"editavel": true,
 			"vanovo": "",
-			"width": "25%",
+			"width": "10%",
 			"aTargets": [ ++col ],
-			"mData": "FDTM_DLMENS",
-			"sTitle":"Diálogo",
-			"defaultContent": " ",
-			"render": function( data, type, full )
-				{
-				var seps = data.split( ";" );
-				var resu;
-				if( seps.length > 0 )
-					{
-					resu = seps[0];
-					for( var ix=1; ix<seps.length; ix++ )
-						{
-						resu += "<br>";
-						resu += seps[ix];
-						}
-					}
-				if( full.TSDT_ID == "" || full.TSDT_ID == "1" || full.TSDT_ID == "4" )
-					var act	=	"<a href='javascript:dshow(\"" + full.FDTR_ID + "\",\"" +  
-										full.FDTM_ID + "\",\"" + data + "\");' " +
-									"title=\"criar/complementar diálogo\" >";
-				else
-					var act	=	"<a>";
-					
-				if( data == "" )
-					act += "sem conteúdo</a>";
-				else
-					act += resu + "</a>";
-				return act;
-				}
-			};
-		colDefs.push( aux );
-		
-		aux	=
-			{
-			"tipo": "x",
-			"editavel": true,
-			"vanovo": "",
-			"width": "8%",
-			"aTargets": [ ++col ],
-			"mData": "AUTORIZADAS",
-			"sTitle":"Correções",
-			"defaultContent": " ",
-			"render": function( data, type, full )
-				{
-				var aux = "";
-				if( full.AUTORIZADAS == "" )
-					aux += "Aut: 0<br>";
-				else
-					aux += "Aut:" + full.AUTORIZADAS + "<br";
-				if( full.CORRECAO == "" )
-					aux += "Cor: 0";
-				else
-					aux += "Cor:" + full.CORRECAO;
-				return aux;
-				}
-			};
-		colDefs.push( aux );
-		
-		aux	=
-			{
-			"tipo": "x",
-			"editavel": true,
-			"vanovo": "",
-			"width": "5%",
-			"aTargets": [ ++col ],
-			"mData": "TOTAL",
-			"sTitle":"No dia",
+			"mData": "QTACEITO",
+			"sTitle":"Aceitas",
 			"defaultContent": " "
 			};
 		colDefs.push( aux );
@@ -440,32 +324,26 @@ include 'partes/Scripts.php';
 			"tipo": "x",
 			"editavel": true,
 			"vanovo": "",
-			"width": "5%",
+			"width": "10%",
 			"aTargets": [ ++col ],
-			"mData": "SALDO",
-			"sTitle":"Saldo",
+			"mData": "QTNEGADO",
+			"sTitle":"Negadas",
 			"defaultContent": " ",
-			"render": function( data, type, full )
-				{
-				var calc;
-				//acum	+=	Number(data) - 480;
-				var hh	=	Math.floor(Math.abs(Number(data))/60);
-				var mm	=	Math.abs(Number(data))%60;
-				if( mm > 9 )
-					calc = hh + ":" + mm;
-				else
-					calc = hh + ":0" + mm;
-				if( Number(data) >= 0 )
-					return "<font color=blue>"+calc+"</font>";
-				else
-					return "<font color=red>"+calc+"</font>";
-				}
 			};
 		colDefs.push( aux );
-		//	linhas da tabela a mostra por tela
-		dlen		=	"22";
-		lens    = [[5, 15, 22, 30, -1],
-							[5, 15, 22, 30, "todos"]];
+		
+		aux	=
+			{
+			"tipo": "x",
+			"editavel": true,
+			"vanovo": "",
+			"width": "10%",
+			"aTargets": [ ++col ],
+			"mData": "QTANALISE",
+			"sTitle":"Em Análise",
+			"defaultContent": " ",
+			};
+		colDefs.push( aux );
 		
 		///////////////////////////////////////////////////////////////////////
 

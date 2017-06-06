@@ -234,10 +234,6 @@ include 'partes/Scripts.php';
 			var cmp;
 			var wdcmp = "8%"
 			var lin = IniLinha("form-group");
-			/*
-			lin +=	"<label style='font-size: 16px; margin-left:30px' >" +
-							"Horários médios do último fechamento</label>";
-			*/
 			cmp	=	
 				{
 				label: "Horários médios do último fechamento em",
@@ -300,10 +296,7 @@ include 'partes/Scripts.php';
 			lin	+=	FimLinha();
 			
 			lin += IniLinha("form-group");
-			/*
-			lin +=	"<label style='font-size: 16px; margin-left:30px' >" +
-							"mais recente</label>";
-							*/
+
 			cmp	=	
 				{
 				label: "Horários médios do periodo de",
