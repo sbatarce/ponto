@@ -54,7 +54,8 @@ if( $qry == "indial" )
 	$fdtrid	=	$_GET["fdtrid"];
 	$msg	=	$_GET["msg"];
 
-	$sql	=	"INSERT INTO BIOMETRIA.FDTM_FUNCDIATRABALHOMENSAGEM 
+	$sql	=	"INSERT INTO BIOMETRIA.FDTM_FUNCDIATRABALHOMENSAGEM
+						( FDTM_ID, FDTR_ID, FDTM_TPFUNCAUT, FDTM_DLMENS, FDTM_DTMENS, FDTM_STEMAIL )
             VALUES( BIOMETRIA.SQ_FDTM.NEXTVAL, $fdtrid, 'F', '$msg', sysdate, 0  )";
 	}
 //	insert FDTE
@@ -87,8 +88,10 @@ if( $qry == "infdte" )
 	$hora = $_GET["hora"];
 						
 	$sql	=	"INSERT INTO BIOMETRIA.FDTE_FUNCDIATRABALHOREGISTRO
-							VALUES( BIOMETRIA.SQ_FDTE.NEXTVAL, $fdtrid, $operid, $origid, NULL, 
-								TO_DATE( '$hora', 'DD/MM/YYYY HH24:mi' ) )";
+						( FDTE_ID, FDTR_ID, TORG_ID, TORE_ID, REPR_ID, FDTE_DTHORARIO )
+						VALUES( BIOMETRIA.SQ_FDTE.NEXTVAL, $fdtrid, $operid, $origid, 
+										NULL, 
+										TO_DATE( '$hora', 'DD/MM/YYYY HH24:mi' ) )";
 	}
 //	insert FAAU
 if( $qry == "infaau" )
@@ -131,10 +134,11 @@ if( $qry == "infaau" )
 	$dtfim = $_GET["dtfim"];
 	$mins = $_GET["mins"];
 						
-	$sql	=	"insert into BIOMETRIA.FAAU_FUNCAUSENCIAAUTORIZADA VALUES( 
-						BIOMETRIA.SQ_FAAU.NEXTVAL, $funiid, $taauid, $fuauid, 
-						TO_DATE( '$dtini', 'YYYYMMDD' ), 
-						TO_DATE( '$dtfim', 'YYYYMMDD' ), $mins )";
+	$sql	=	"insert into BIOMETRIA.FAAU_FUNCAUSENCIAAUTORIZADA 
+						( FAAU_ID, FUNI_ID, TAAU_ID, FUAU_ID, FAAU_DTINI, FAAU_DTFIM, FAAU_NITMPDIARIO )
+						VALUES( BIOMETRIA.SQ_FAAU.NEXTVAL, $funiid, $taauid, $fuauid, 
+										TO_DATE( '$dtini', 'YYYYMMDD' ), 
+										TO_DATE( '$dtfim', 'YYYYMMDD' ), $mins )";
 	}
 //	insert FUCO
 if( $qry == "infuco" )
@@ -173,8 +177,9 @@ if( $qry == "infuco" )
 	$mins = $_GET["mins"];
 						
 	$sql	=	"INSERT INTO BIOMETRIA.FUCO_FUNCCORRECAOHORAS
-						VALUES( BIOMETRIA.SQ_FUCO.NEXTVAL, $funiid, $fuauid, 
-						TO_DATE( '$dtref', 'YYYYMMDD' ), '$dbcr', $mins )";
+						( FUCO_ID, FUNI_ID, FUAU_ID, FUCO_DTREFERENCIA, FUCO_DCDBCR, FUCO_NITMP )
+						VALUES(	BIOMETRIA.SQ_FUCO.NEXTVAL, $funiid, $fuauid, 
+										TO_DATE( '$dtref', 'YYYYMMDD' ), '$dbcr', $mins )";
 	}
 ////////////////////////////////////////////////////////////////////////////////
 if( isset( $_GET["debug"] ) )
