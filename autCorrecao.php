@@ -17,12 +17,6 @@ include 'partes/pageheader.php';
 include 'partes/pagebody.php';
 ?>
 		<div class='row input-append date linha' style='margin-bottom: 10px; margin-left:4px'>
-			Período de<input type="text" size="10" id="dtini" 
-											 style="margin-left: 20px; margin-right: 20px; "/>
-			a <input type="text" size="10" id="dtfim" 
-							 style="margin-left: 20px; margin-right: 20px; "/>
-			Saldo <input type="text" size="10" id="sldant" 
-							 style="margin-left: 20px; "/>
 		</div>
 										<table class="table table-striped table-hover table-bordered" id="eddt">
 											<thead><tr role="row"></tr></thead>
@@ -38,7 +32,7 @@ include 'partes/pagebody.php';
 			</div> <!-- /Page Container -->
 		</div> <!-- Main Container -->
 		
-		<!-- modal de modificação de presenças -->
+		<!-- modal de retificação de horários: adiciona e exclui horários do dia -->
 		<div id="modpresen" class="modal fade bs-modal-sm" role="dialog"
 				aria-labelledby="mySmallModalLabel" aria-hidden="true"
 				style="width: 500px; max-width: 500px;" >
@@ -81,8 +75,7 @@ include 'partes/pagebody.php';
 		</div>
 	</div>
 			
-	<!-- modal de entrada de nova presença -->
-
+	<!-- modal de entrada de novo horário -->
 	<div id="novapres" class="modal fade bs-modal-sm" role="dialog"
 			aria-labelledby="mySmallModalLabel" aria-hidden="true"
 			style="width: 500px; max-width: 500px;" >
@@ -113,8 +106,7 @@ include 'partes/pagebody.php';
 		</div>
 	</div>
 			
-		<!-- modal de diálogo -->
-
+		<!-- modal de entrada de diálogo: adiciona uma ou mais mensagens de diálogo -->
 		<div id="moddialogo" class="modal fade bs-modal-sm" role="dialog"
 				aria-labelledby="mySmallModalLabel" aria-hidden="true"
 				style="width: 500px; max-width: 500px;" >
@@ -157,41 +149,6 @@ include 'partes/pagebody.php';
 				</div>
 		</div>
 	</div>
-
-	<!-- modal de entrada de diálogo -->
-
-	<div id="moddialog" class="modal fade bs-modal-sm" role="dialog"
-			aria-labelledby="mySmallModalLabel" aria-hidden="true"
-			style="width: 500px; max-width: 500px;" >
-		<div class="modal-dialog modal-sm" style="width: 500px; max-width: 500px;">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal" aria-hidden="true"
-									onclick="javascript:cancelAssoc()">
-									&times;
-					</button>
-					<h4 class="modal-title">Associaçao de sistema a usuario</h4>
-				</div>
-				<div class="modal-body" id="bdymodal">
-					<div class='row linha' style='margin-top: 10px; margin-left:30px;'>
-						<h5>Sistema</h5>
-						<input	style='width:90%;' class='input-small syss' 
-										id="slsys" title="escolha o sistema a associar com o usuário"/>
-					</div>
-				</div>
-				<div class="modal-footer">
-				<center>
-					<button type="button" class="btn btn-primary"
-									onclick="javascript:AssocOK()">
-									OK
-					</button>
-					<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-				</center>
-				</div>
-			</div>
-		</div>
-	</div>
-			
 		
 <?php
 include 'partes/Scripts.php';
@@ -674,7 +631,7 @@ include 'partes/Scripts.php';
 			dtfim = $.datepicker.formatDate("yymmdd", dt );
 			if( del != 0 )
 				tableDestroy();
-			AjaxSource	=	"partes/tableData.php?query=funaces&sshd=" + sshdfunc.toUpperCase() + 
+			AjaxSource	=	"partes/tableData.php?query=funaces&sshd=" + sshd.toUpperCase() + 
 												"&dtini="+dtini+"&dtfim="+dtfim;
 			inicializa.init();
 			}
@@ -739,19 +696,6 @@ include 'partes/Scripts.php';
 				dtfim = $.datepicker.formatDate("yymmdd", dt );
 				setAjax(1);
 				});
-		/*
-		$("#dtini").change( 
-		function( dat )
-			{
-			console.log(dat.date);
-			setAjax( 1 );
-			} );
-		$("#dtfim").change( 
-		function()
-			{
-			setAjax( 1 );
-			} );
-		*/
 	
 	/////////////// PRINCIPAL ////////////////////////
 	$('#eddt_new').hide();
@@ -787,33 +731,10 @@ include 'partes/Scripts.php';
 						};
 		var sshd = obterCookie( "user" );
 		if( sshd == null )
-			window.location = "index.php";
-			
-		var idfunc = obterCookie( "idfunc" );
-		if( idfunc == null )
 			{
-			window.history.back();
-			window.location = "index.php";
+			Deslogar();
 			}
 
-		var nofunc = obterCookie( "nofunc" );
-		if( nofunc == null )
-			{
-			window.history.back();
-			window.location = "index.php";
-			}
-
-		var sshdfunc = obterCookie( "sshdfunc" );
-		if( sshdfunc == null )
-			{
-			window.history.back();
-			window.location = "index.php";
-			}
-			
-		matarCookie( "sshdfunc" );
-			
-		$("#titwidget").html( "Ponto de " + nofunc );
-			
 		//	acerta as datas
 		var hoje = new Date();
 		var dtfim = $.datepicker.formatDate("yymmdd", hoje );
@@ -823,7 +744,7 @@ include 'partes/Scripts.php';
 		var dtini = $.datepicker.formatDate("yymmdd", hoje );
 
 		//	obtem FUNI_ID
-		var parms = "&sshd=" + sshdfunc;
+		var parms = "&sshd=" + sshd;
 		var resu = Select( "funiid", parms );
 		if( resu == null )
 			throw new Error("Problemas de acesso ao banco de dados. Por favor, tente mais tarde.");
@@ -897,7 +818,14 @@ include 'partes/Scripts.php';
 			"defaultContent": " ",
 			"render": function( data, type, full )
 				{
-				var act	=	"<a>";
+				if( full.TSDT_ID == "" || full.TSDT_ID == "1" || full.TSDT_ID == "4" )
+					var act	=	"<a href='javascript:hshow(\"" + full.DATA + "\",\"" + 
+									full.FDTR_ID + "\",\"" +
+									full.HORARIOS + "\",\"" + full.OPERACOES + "\",\"" + 
+									full.ORIGENS +"\",\"" + full.FDTEIDS +"\");' " +
+									"title=\"mostrar horarios\" >";
+				else
+					var act	=	"<a>";
 				if( data == "" )
 					{
 					act += "<b>sem registros</b></a>";
@@ -1008,7 +936,12 @@ include 'partes/Scripts.php';
 						resu += seps[ix];
 						}
 					}
-				var act	=	"<a>";
+				if( full.TSDT_ID == "" || full.TSDT_ID == "1" || full.TSDT_ID == "4" )
+					var act	=	"<a href='javascript:dshow(\"" + full.FDTR_ID + "\",\"" +  
+										full.FDTM_ID + "\",\"" + data + "\");' " +
+									"title=\"criar/complementar diálogo\" >";
+				else
+					var act	=	"<a>";
 					
 				if( data == "" )
 					act += "sem conteúdo</a>";
@@ -1027,7 +960,7 @@ include 'partes/Scripts.php';
 			"width": "25%",
 			"aTargets": [ ++col ],
 			"mData": "AUTORIZADAS",
-			"sTitle":"Autorizações e correções",
+			"sTitle":"",
 			"defaultContent": " ",
 			"render": function( data, type, full )
 				{

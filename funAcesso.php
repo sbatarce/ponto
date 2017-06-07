@@ -38,7 +38,7 @@ include 'partes/pagebody.php';
 			</div> <!-- /Page Container -->
 		</div> <!-- Main Container -->
 		
-		<!-- modal de modificação de presenças -->
+		<!-- modal de retificação de horários: adiciona e exclui horários do dia -->
 		<div id="modpresen" class="modal fade bs-modal-sm" role="dialog"
 				aria-labelledby="mySmallModalLabel" aria-hidden="true"
 				style="width: 500px; max-width: 500px;" >
@@ -81,8 +81,7 @@ include 'partes/pagebody.php';
 		</div>
 	</div>
 			
-	<!-- modal de entrada de nova presença -->
-
+	<!-- modal de entrada de novo horário -->
 	<div id="novapres" class="modal fade bs-modal-sm" role="dialog"
 			aria-labelledby="mySmallModalLabel" aria-hidden="true"
 			style="width: 500px; max-width: 500px;" >
@@ -113,8 +112,7 @@ include 'partes/pagebody.php';
 		</div>
 	</div>
 			
-		<!-- modal de diálogo -->
-
+		<!-- modal de entrada de diálogo: adiciona uma ou mais mensagens de diálogo -->
 		<div id="moddialogo" class="modal fade bs-modal-sm" role="dialog"
 				aria-labelledby="mySmallModalLabel" aria-hidden="true"
 				style="width: 500px; max-width: 500px;" >
@@ -157,41 +155,6 @@ include 'partes/pagebody.php';
 				</div>
 		</div>
 	</div>
-
-	<!-- modal de entrada de diálogo -->
-
-	<div id="moddialog" class="modal fade bs-modal-sm" role="dialog"
-			aria-labelledby="mySmallModalLabel" aria-hidden="true"
-			style="width: 500px; max-width: 500px;" >
-		<div class="modal-dialog modal-sm" style="width: 500px; max-width: 500px;">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal" aria-hidden="true"
-									onclick="javascript:cancelAssoc()">
-									&times;
-					</button>
-					<h4 class="modal-title">Associaçao de sistema a usuario</h4>
-				</div>
-				<div class="modal-body" id="bdymodal">
-					<div class='row linha' style='margin-top: 10px; margin-left:30px;'>
-						<h5>Sistema</h5>
-						<input	style='width:90%;' class='input-small syss' 
-										id="slsys" title="escolha o sistema a associar com o usuário"/>
-					</div>
-				</div>
-				<div class="modal-footer">
-				<center>
-					<button type="button" class="btn btn-primary"
-									onclick="javascript:AssocOK()">
-									OK
-					</button>
-					<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-				</center>
-				</div>
-			</div>
-		</div>
-	</div>
-			
 		
 <?php
 include 'partes/Scripts.php';

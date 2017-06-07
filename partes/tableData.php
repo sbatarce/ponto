@@ -97,7 +97,11 @@ if( $qry == "funcindex" )
 							UOFM.UOFM_DTREFERENCIA
 		ORDER BY  UNIDADE, QTPENDENTE DESC";
 	}
-//
+//	pendencias( sshd, dtini, dtfim, ok, pen, ana, ace, neg, sshdfunc )
+//	sshd								sshd do autorizador
+//	dtini/dtfim					período
+//	ok/pen/ana/ace/neg	status desejados
+//	sshdfunc						seleciona apenas este funcionário
 if( $qry == "pendencias" )
 	{
 	if( !isset( $_GET["sshd"] ) )
@@ -115,6 +119,10 @@ if( $qry == "pendencias" )
 		echo	'{ "data": [{"erro": "parametro dtfim obrigatorio"}] }';
 		return;
 		}
+	if( !isset( $_GET["sshdfunc"] ) )
+		$sshdfunc = $_GET["sshdfunc"];
+	else
+		$sshdfunc = null;
 	if( isset( $_GET["ok"] ) )
 		$ok = true;
 	else
@@ -183,6 +191,7 @@ if( $qry == "pendencias" )
 	$dtini = $_GET["dtini"];
 	$dtfim = $_GET["dtfim"];
 	$sshd = $_GET["sshd"];
+	$sshdfunc = $_GET["sshdfunc"];
 	$sql	=	"SELECT		FUNI.FUNI_ID, FDTR.FDTR_ID, FDTR.TSDT_ID, FUNI.PMS_IDPMSPESSOA as SSHD, PESS.NOME,
 										to_char( FDTR.FDTR_DTREFERENCIA, 'DD/MM/YYYY' ) as DATA,
 										to_char( FDTR.FDTR_DTREFERENCIA, 'YYYYMMDD' ) as ISODATE,
@@ -221,9 +230,11 @@ if( $qry == "pendencias" )
 															TO_DATE('$dtini', 'YYYYMMDD') AND TO_DATE('$dtfim', 'YYYYMMDD') + 1 
                           $stts
 							LEFT JOIN   BIOMETRIA.FDTM_FUNCDIATRABALHOMENSAGEM FDTM ON
-													FDTM.FDTR_ID = FDTR.FDTR_ID
-							WHERE       FUNI.PMS_IDPMSPESSOA <> '$sshd'";
-
+													FDTM.FDTR_ID = FDTR.FDTR_ID ";
+	if( $sshdfunc == null )
+		$sql .=	"WHERE       FUNI.PMS_IDPMSPESSOA <> '$sshd'";
+	else
+		$sql .= "WHERE       FUNI.PMS_IDPMSPESSOA = '$sshdfunc'";
 	}
 //
 if( $qry == "funaces" )

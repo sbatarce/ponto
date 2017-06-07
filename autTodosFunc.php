@@ -95,6 +95,13 @@ include 'partes/Scripts.php';
 				return hh+":"+mm;
 			}
 			
+		//	chama a página de pendências do funcionário
+		function pendencias( sshd )
+			{
+			criarCookie( "sshdfunc", sshd );
+			window.location = "autPenden.php";
+			}
+			
 		//	chama o detalhe de um funcionário escolhido
 		function detfunc( id, nome, sshd )
 			{
@@ -194,13 +201,48 @@ include 'partes/Scripts.php';
 			};
 		colDefs.push( aux );
 		
-		aux	=
+		var aux	=
 			{
 			"tipo": "x",
-			//"sClass": "noCentro",
 			"editavel": false,
 			"vanovo": "",
 			"width": "15%",
+			"aTargets": [ ++col ],
+			"sTitle":"Ações",
+			"defaultContent": " ",
+			"render": function( data, type, full )
+				{
+				res = "";
+				res += "<a href='javascript:pendencias(\"" + full.SSHDFUNC + "\");' ";
+				res += "<button type='button' title='Verificar pendências do funcionário' ";
+				res += "class='btn btn-warning  btn-md'>PEN</button></a>";
+				
+				res += "<a href='javascript:ausencias(\"" + full.SSHDFUNC + "\");' ";
+				res += "<button type='button' title='Autorizar ausências' ";
+				res += "class='btn btn-success  btn-md'>AUS</button></a>";
+				
+				res += "<a href='javascript:correcoes(\"" + full.SSHDFUNC + "\");' ";
+				res += "<button type='button' title='Corrigir saldo para mais ou para menos' ";
+				res += "class='btn btn-danger  btn-md'>COR</button></a>";
+/*
+				res += "<button type='button' title='Autorizar ausências' ";
+				res += "onclick='javascript:ausencias('" + full.SSHDFUNC + "') ";
+				res += "class='btn btn-success  btn-md'>Aus</button>";
+				res += "<button type='button' title='Corrigir saldo para mais ou para menos' "
+				res += "onclick='javascript:correcoes('" + full.SSHDFUNC + "') ";
+				res += "class='btn btn-danger  btn-md'>Corr</button>";
+*/
+				return res;
+				}
+			};
+		colDefs.push( aux );
+		
+		aux	=
+			{
+			"tipo": "x",
+			"editavel": false,
+			"vanovo": "",
+			"width": "10%",
 			"aTargets": [ ++col ],
 			"mData": "UNIDADE",
 			"sTitle":"Unidade",
@@ -213,7 +255,7 @@ include 'partes/Scripts.php';
 			"tipo": "x",
 			"editavel": false,
 			"vanovo": "",
-			"width": "20%",
+			"width": "25%",
 			"aTargets": [ ++col ],
 			"mData": "NOFUNC",
 			"sTitle":"Funcionário",
@@ -234,10 +276,10 @@ include 'partes/Scripts.php';
 			"tipo": "x",
 			"editavel": true,
 			"vanovo": "",
-			"width": "15%",
+			"width": "10%",
 			"aTargets": [ ++col ],
 			"mData": "DTUFECHAMENTO",
-			"sTitle":"Data Fechamento",
+			"sTitle":"Fechamento",
 			"defaultContent": " ",
 			};
 		colDefs.push( aux );
@@ -261,7 +303,7 @@ include 'partes/Scripts.php';
 			"tipo": "x",
 			"editavel": true,
 			"vanovo": "",
-			"width": "10%",
+			"width": "5%",
 			"aTargets": [ ++col ],
 			"mData": "QTPENDENTE",
 			"sTitle":"Pendentes",
@@ -274,7 +316,7 @@ include 'partes/Scripts.php';
 			"tipo": "x",
 			"editavel": true,
 			"vanovo": "",
-			"width": "10%",
+			"width": "5%",
 			"aTargets": [ ++col ],
 			"mData": "QTACEITO",
 			"sTitle":"Aceitas",
@@ -287,7 +329,7 @@ include 'partes/Scripts.php';
 			"tipo": "x",
 			"editavel": true,
 			"vanovo": "",
-			"width": "10%",
+			"width": "5%",
 			"aTargets": [ ++col ],
 			"mData": "QTNEGADO",
 			"sTitle":"Negadas",
@@ -300,10 +342,10 @@ include 'partes/Scripts.php';
 			"tipo": "x",
 			"editavel": true,
 			"vanovo": "",
-			"width": "10%",
+			"width": "5%",
 			"aTargets": [ ++col ],
 			"mData": "QTANALISE",
-			"sTitle":"Em Análise",
+			"sTitle":"Análise",
 			"defaultContent": " ",
 			};
 		colDefs.push( aux );

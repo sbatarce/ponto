@@ -232,7 +232,7 @@ include 'partes/Scripts.php';
 				
 			//	linha de médias fechadas
 			var cmp;
-			var wdcmp = "8%"
+			var wdcmp = "8%";
 			var lin = IniLinha("form-group");
 			cmp	=	
 				{
@@ -288,6 +288,31 @@ include 'partes/Scripts.php';
 				nocmp: "saida",
 				width: wdcmp,
 				valor: minToHHMM(resfecha.dados[0].MEDSAIDA)+" ("+resfecha.dados[0].QTDSAIDA+")",
+				inpclass: "input-small",
+				extra: "readonly"
+				};
+			lin	+=	CampoLabel( cmp );
+			
+			mins =  (resfecha.dados[0].MEDINTER-resfecha.dados[0].MEDENTRA)+
+							(resfecha.dados[0].MEDSAIDA-resfecha.dados[0].MEDVOLTA);
+			cmp	=	
+				{
+				label: "Total Diário",
+				nocmp: "todia",
+				width: wdcmp,
+				valor: minToHHMM(mins),
+				inpclass: "input-small",
+				extra: "readonly"
+				};
+			lin	+=	CampoLabel( cmp );
+
+			mins = resfecha.dados[0].MEDVOLTA - resfecha.dados[0].MEDINTER;
+			cmp	=	
+				{
+				label: "Duração intervalo",
+				nocmp: "toint",
+				width: wdcmp,
+				valor: minToHHMM(mins),
 				inpclass: "input-small",
 				extra: "readonly"
 				};
@@ -364,6 +389,31 @@ include 'partes/Scripts.php';
 				nocmp: "saida",
 				width: wdcmp,
 				valor: minToHHMM(resperio.dados[0].MEDSAIDA)+" ("+resperio.dados[0].QTDSAIDA+")" ,
+				inpclass: "input-small",
+				extra: "readonly"
+				};
+			lin	+=	CampoLabel( cmp );
+			
+			mins =  (resperio.dados[0].MEDINTER-resperio.dados[0].MEDENTRA)+
+							(resperio.dados[0].MEDSAIDA-resperio.dados[0].MEDVOLTA);
+			cmp	=	
+				{
+				label: "Total Diário",
+				nocmp: "todia",
+				width: wdcmp,
+				valor: minToHHMM(mins),
+				inpclass: "input-small",
+				extra: "readonly"
+				};
+			lin	+=	CampoLabel( cmp );
+
+			mins = resperio.dados[0].MEDVOLTA - resperio.dados[0].MEDINTER;
+			cmp	=	
+				{
+				label: "Duração intervalo",
+				nocmp: "toint",
+				width: wdcmp,
+				valor: minToHHMM(mins),
 				inpclass: "input-small",
 				extra: "readonly"
 				};
@@ -622,6 +672,8 @@ include 'partes/Scripts.php';
 
 			AjaxSource	=	"partes/tableData.php?query=pendencias&sshd="+sshd+
 										"&dtini="+dtini+"&dtfim="+dtfim+stts;
+			if( sshdfunc != null )
+				AjaxSource += "&sshdfunc="+sshdfunc;
 			inicializa.init();
 			fltable = true;
 			}
@@ -697,17 +749,22 @@ include 'partes/Scripts.php';
 		var	nocmpid			=	"";															//	nome do campo ID da tabela base
 		var sequence		= "";
 		var liNova			=
-						{
-						"DATA": "",
-						"Registros": "",
-						"Mensagens": "",
-						"Totais": ""
-						};
+					{
+					"DATA": "",
+					"Registros": "",
+					"Mensagens": "",
+					"Totais": ""
+					};
 		var sshd = obterCookie( "user" );
 		if( sshd == null )
 			{
 			Deslogar();
+			window.history.back();
+			window.location = "index.php";			
 			}
+			
+		var sshdfunc = obterCookie( "sshdfunc" );
+		matarCookie( "sshdfunc" );
 
 		//	acha a data do último fechamento e acerta as datas iniciais
 		var parms = "&sshd=" + sshd;

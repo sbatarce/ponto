@@ -46,11 +46,6 @@ if( $qry == "indial" )
 		echo	'{ "status": "erro", "erro": "parametro msg obrigatorio" }';
 		return;
 		}
-	if( !isset( $_GET["vals"] ) )
-		{
-		echo	'{ "status": "erro", "erro": "parametro vals obrigatorio" }';
-		return;
-		}
 	$fdtrid	=	$_GET["fdtrid"];
 	$msg	=	$_GET["msg"];
 
