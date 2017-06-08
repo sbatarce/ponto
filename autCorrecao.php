@@ -10,6 +10,7 @@ include 'partes/Head.php';
 	</head>
 	
 	<body onload="javascript:titulo( '<h4>Administração de usuários da Biometria</h4>' );">
+		
 <?php
 include 'partes/MenuPri.php';
 include 'partes/Cabec.php';
