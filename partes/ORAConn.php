@@ -5,6 +5,8 @@ class ORAConn
 	var $conn = NULL;
 	var $stid = NULL;
 	var $mode = OCI_COMMIT_ON_SUCCESS;
+	var $ambi = "";
+	var $usua = "";
 	//
 	function mErro( $e, $local )
 		{
@@ -15,13 +17,17 @@ class ORAConn
 		"status": "erro", 
 		"erro": "$mes", 
 		"local": "$local",
-		"offset": "$off"
+		"offset": "$off",
+		"ambiente": "$ambi",
+		"usuario": "$usua"
 		}
 EOD;
 		}
 	//	
 	function connect( $user, $pass, $amb, $chset )
 		{
+		$ambi = $amb;
+		$usua = $user;
 		$this->conn = @oci_connect( $user, $pass, $amb, $chset, OCI_DEFAULT );
 		if( !$this->conn )
 			{
