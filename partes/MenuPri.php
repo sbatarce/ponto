@@ -7,7 +7,9 @@
 						<!-- Navigation Menu Link Lists -->
 						<div class="col-md-2 col-sm-4 col-xs-6">
 							<div class="menu" >
-								<span class="br-lblue" class="admmenu"><i class="glyphicon glyphicon-eye-open"></i> &nbsp; Autorizadores</span>
+								<span class="br-lblue" class="admmenu">
+									<i class="glyphicon glyphicon-eye-open"></i> &nbsp; Autorizadores
+								</span>
 								<div class="menu-list">
 									<ul>
 										<li>

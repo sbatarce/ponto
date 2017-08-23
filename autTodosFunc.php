@@ -2,8 +2,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
     <title>Ponto do funcionário</title>
-		
-		.table thead>tr>th {text-align: center;}
+		<style>
+			.table thead>tr>th {text-align: center;}
+		</style>
 <?php
 include 'partes/Head.php';
 ?>
@@ -100,6 +101,22 @@ include 'partes/Scripts.php';
 			{
 			criarCookie( "sshdfunc", sshd );
 			window.location = "autPenden.php";
+			}
+			
+		function ausencias( sshd, id, nome )
+			{
+			criarCookie( "idfunc", id );
+			criarCookie( "nofunc", nome );
+			criarCookie( "sshdfunc", sshd );
+			window.location = "autAusencias.php";
+			}
+			
+		function correcoes( sshd )
+			{
+			criarCookie( "idfunc", id );
+			criarCookie( "nofunc", nome );
+			criarCookie( "sshdfunc", sshd );
+			window.location = "autCorrecao.php";
 			}
 			
 		//	chama o detalhe de um funcionário escolhido
@@ -217,21 +234,16 @@ include 'partes/Scripts.php';
 				res += "<button type='button' title='Verificar pendências do funcionário' ";
 				res += "class='btn btn-warning  btn-md'>PEN</button></a>";
 				
-				res += "<a href='javascript:ausencias(\"" + full.SSHDFUNC + "\");' ";
+				res += "<a href='javascript:ausencias( \"" + full.SSHDFUNC;
+				res += "\", \""+ full.IDFUNC + "\", \"" + full.NOFUNC + "\" );' ";
 				res += "<button type='button' title='Autorizar ausências' ";
 				res += "class='btn btn-success  btn-md'>AUS</button></a>";
-				
-				res += "<a href='javascript:correcoes(\"" + full.SSHDFUNC + "\");' ";
+
+				res += "<a href='javascript:correcoes(\"" + full.SSHDFUNC;
+				res += "\", \""+ full.IDFUNC + "\", \"" + full.NOFUNC + "\" );' ";
 				res += "<button type='button' title='Corrigir saldo para mais ou para menos' ";
 				res += "class='btn btn-danger  btn-md'>COR</button></a>";
-/*
-				res += "<button type='button' title='Autorizar ausências' ";
-				res += "onclick='javascript:ausencias('" + full.SSHDFUNC + "') ";
-				res += "class='btn btn-success  btn-md'>Aus</button>";
-				res += "<button type='button' title='Corrigir saldo para mais ou para menos' "
-				res += "onclick='javascript:correcoes('" + full.SSHDFUNC + "') ";
-				res += "class='btn btn-danger  btn-md'>Corr</button>";
-*/
+
 				return res;
 				}
 			};

@@ -480,7 +480,7 @@
 				Table	=	oTable;
 
 				//	cria uma nova linha
-				$('#eddt_new').click
+        $('#eddt_new').click
 					(
 					function (e) 
 						{

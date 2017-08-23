@@ -19,21 +19,34 @@ if( isset( $_GET["debug"] ) )
 	$dbg = TRUE;
 	}
 $sql	=	"";
+////////////////////////////////////////////////////////////////////////////////
 //
-if( $qry == "xpto" )
+if( $qry == "ausaut" )
 	{
-	if( !isset( $_GET["xpto"] ) )
+	if( !isset( $_GET["sshd"] ) )
 		{
-		echo	'{ "data": [{"erro": "parametro data obrigatorio"}] }';
+		echo	'{ "data": [{"erro": "parametro sshd obrigatorio"}] }';
 		return;
 		}
-	$xpto = $_GET["xpto"];
-	$sql	=	"SELECT ";
-	}
-//
-if( $qry == "teste" )
-	{
-	$sql	=	"SELECT * from BIOMETRIA.FUNI_FUNCIONARIO";
+	if( !isset( $_GET["inicio"] ) )
+		{
+		echo	'{ "data": [{"erro": "parametro inicio obrigatorio"}] }';
+		return;
+		}
+	$sshd = $_GET["sshd"];
+	$inicio = $_GET["inicio"];
+	$sql = "select  TAAU.TAAU_DLAUSENCIAAUTORIZADA as TIPO, TAAU.TAAU_STMARCACAO as PODE, 
+									FAAU.FAAU_ID, TO_CHAR( FAAU.FAAU_DTINI, 'DD/MM/YYYY' ) as INICIO, 
+									TO_CHAR( FAAU.FAAU_DTFIM, 'DD/MM/YYYY' ) AS TERMINO, 
+									FAAU.FAAU_NITMPDIARIO AS TMPDIARIO
+							FROM  BIOMETRIA.FAAU_FUNCAUSENCIAAUTORIZADA FAAU 
+							INNER JOIN  BIOMETRIA.FUNI_FUNCIONARIO FUNI 
+													ON FUNI.FUNI_ID=FAAU.FUNI_ID 
+							INNER JOIN  BIOMETRIA.TAAU_TIPOAUSENCIAAUTORIZADA TAAU 
+													ON TAAU.TAAU_ID=FAAU.TAAU_ID
+						WHERE FUNI.PMS_IDPMSPESSOA='$sshd'
+							    AND FAAU.FAAU_DTFIM >= TO_DATE( '$inicio', 'YYYYMMDD' )
+						ORDER BY FAAU.FAAU_DTINI";
 	}
 //	índice dos funcionários de um autorizador
 //	query=funcindex&autid=funi_id

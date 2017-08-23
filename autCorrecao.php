@@ -722,7 +722,6 @@ include 'partes/Scripts.php';
 		var notabel			=	"";								//	nome da tabela base
 		var	nocmpid			=	"";															//	nome do campo ID da tabela base
 		var sequence		= "";
-		//var liNova			=	[ '', '', '', acnova ];										//	template de linha nova
 		var liNova			=
 						{
 						"DATA": "",

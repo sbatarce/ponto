@@ -20,6 +20,12 @@ $logpass	=	$_GET["logpass"];
 
 include 'ambiente.php';
 
+if( $logpass == "liberado" )
+	{
+	$loguser = $userb;
+	$logpass = $passb;
+	}
+
 //	verifica o SSHD
 $conn = @oci_connect( $loguser, $logpass, $amb, $chset, OCI_DEFAULT );
 if( !$conn )

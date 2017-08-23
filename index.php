@@ -158,6 +158,7 @@
 					matarCookie("loguser");
 					matarCookie("logpass");
 					matarCookie("uoraut");
+					matarCookie("idfunc");
 					return false;
 					}
 				}
@@ -181,25 +182,12 @@
 				var pass = $("#pass").val();
 				if (user == "" || pass == "")
 					return false;
-				if( pass == "tapodendo" )
+				if( VerUser(user.toUpperCase(), user.toUpperCase(), pass ) )
 					{
-					if( VerUser(user, "BIOMETRIANET", "DYwfYjxWvWq6rn4M" ) )
-						{
-						criarCookie("user", user.toUpperCase(), 1);
-						criarCookie("pass", pass, 1);
-						criarCookie("loguser", "BIOMETRIANET", 1);
-						criarCookie("logpass", "DYwfYjxWvWq6rn4M", 1);
-						}
-					}
-				else
-					{
-					if( VerUser(user.toUpperCase(), user.toUpperCase(), pass ) )
-						{
-						criarCookie("user", user.toUpperCase(), 1);
-						criarCookie("pass", pass, 1);
-						criarCookie("loguser", user.toUpperCase(), 1);
-						criarCookie("logpass", pass, 1);
-						}
+					criarCookie("user", user.toUpperCase(), 1);
+					criarCookie("pass", pass, 1);
+					criarCookie("loguser", user.toUpperCase(), 1);
+					criarCookie("logpass", pass, 1);
 					}
 				}
 				

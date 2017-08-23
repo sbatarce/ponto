@@ -6,7 +6,7 @@
 									<div class="widget">
 										<div class="widget-header ">
 											<span id="titwidget" class="widget-caption"></span>
-											<div class="widget-buttons">
+											<div id="class_new" class="widget-buttons">
 												<a id="eddt_new" href="javascript:void(0);" class="btn btn-default">
 													Adicionar
 												</a>

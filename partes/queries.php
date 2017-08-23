@@ -1,6 +1,7 @@
 <?php
 //	horasdia( sshd, data) - obtem a quantidade de hora do dia de um funcionário
-//	ausaut( sshd, data ) - obtem todos as ausencias autorizadas com data de término maior
+//	ausaut( sshd, data ) -	obtem ids de todos as ausencias autorizadas com data 
+//													de término maior
 //	dtfecha( sshd ) - obtem a data do último fechamento no formato YYYY-MM-DD
 //	qtdbiom( fdtrid ) - conta a quantidade de batidas de biometria de um FDTR 
 //	reprpmspessoa( pessoa(sshd), dtinic, dtterm ) - obtem os registro na biometria de uma pessoa num período
@@ -10,7 +11,6 @@
 //	fuauid( funiid, uorid ) - obtem o FUAU_ID do autorizador da UOR
 //	medioperio( funiid, dtini, dtfim )
 //	mediofecha( funiid )
-
 if( !isset( $_GET["query"] ) && !isset( $_GET["debug"] ) )
 	{
 	echo	'{ "status": "erro", "erro": "parametro query obrigatorio" }';
@@ -28,6 +28,7 @@ else
 	$dbg	=	true;
 	}
 
+////////////////////////////////////////////////////////////////////////////////
 //	obttaau( taauid ) obtem o TAAU dado o ID
 if( $qry == "obttaau" )
 	{
@@ -42,6 +43,7 @@ if( $qry == "obttaau" )
 						WHERE TAAU_ID=$taauid";
 	}
 
+////////////////////////////////////////////////////////////////////////////////
 //	horasdia( sshd, data) - obtem a quantidade de hora do dia de um funcionário
 if( $qry == "horasdia" )
 	{
@@ -83,6 +85,7 @@ if( $qry == "horasdia" )
 						WHERE FUNI.PMS_IDPMSPESSOA='$sshd'";
 	}
 
+////////////////////////////////////////////////////////////////////////////////
 //	ausaut( sshd, data ) - verifica se na data há uma ausencia autorizada do tipo dado
 if( $qry == "ausaut" )
 	{
@@ -114,6 +117,7 @@ if( $qry == "ausaut" )
 									AND FAAU.TAAU_ID=$taauid";
 	}
 
+////////////////////////////////////////////////////////////////////////////////
 //	dtfecha( sshd ) - obtem a data do último fechamento no formato YYYY-MM-DD
 if( $qry == "dtfecha" )
 	{
@@ -130,6 +134,7 @@ if( $qry == "dtfecha" )
     WHERE FUNI.PMS_IDPMSPESSOA='$sshd'";
 	}
 
+////////////////////////////////////////////////////////////////////////////////
 //	qtdbiom( fdtrid ) - conta a quantidade de batidas de biometria de um FDTR 
 if( $qry == "qtdbiom" )
 	{
@@ -146,6 +151,8 @@ if( $qry == "qtdbiom" )
 							WHERE FDTE.FDTR_ID=$fdtrid 
 							GROUP BY FDTE.TORE_ID";
 	}
+
+////////////////////////////////////////////////////////////////////////////////
 //	reprpmspessoa( pessoa(sshd), dtinic, dtterm ) - obtem os registro na biometria de uma pessoa num período
 if( $qry == "reprpmspessoa" )
 	{
@@ -177,6 +184,8 @@ if( $qry == "reprpmspessoa" )
 					$dtterm . "', 'YYYYMMDD' ) " .
 					"ORDER BY ordem";
 	}
+
+////////////////////////////////////////////////////////////////////////////////
 //	saldoant( funiid, dtinic ) - obter saldo anterior do FUNI_ID em uma data
 if( $qry == "saldoant" )
 	{
@@ -196,6 +205,8 @@ if( $qry == "saldoant" )
 						AS MINUTOS FROM DUAL";
 	}
 
+
+////////////////////////////////////////////////////////////////////////////////
 //	funiid( sshd ) - obter FUNI_ID do SSHD
 if( $qry == "funiid" )
 	{
@@ -209,6 +220,8 @@ if( $qry == "funiid" )
 						WHERE PMS_IDPMSPESSOA='$sshd'";
 	}
 	
+
+////////////////////////////////////////////////////////////////////////////////
 //	funiid( sshd ) - obter FUNI_ID do SSHD
 if( $qry == "sshd" )
 	{
@@ -222,6 +235,7 @@ if( $qry == "sshd" )
 						WHERE FUNI_ID=$funiid";
 	}
 	
+////////////////////////////////////////////////////////////////////////////////
 //	fuauid( funiid, uorid ) - obtem o FUAU_ID do autorizador da UOR
 if( $qry == "fuauid" )
 	{
@@ -244,6 +258,7 @@ if( $qry == "fuauid" )
 						where FUAU.PMS_IDSAUUOR=$uorid and FUNI.PMS_IDPMSPESSOA='$sshd'";
 	}
 	
+////////////////////////////////////////////////////////////////////////////////
 //	medioperio( funiid, dtini, dtfim )
 if( $qry == "medioperio" )
 	{
@@ -274,6 +289,7 @@ if( $qry == "medioperio" )
 														TO_DATE( '$dtfim', 'YYYYMMDD' )))";
 	}
 	
+////////////////////////////////////////////////////////////////////////////////
 //	mediofecha( funiid )
 if( $qry == "mediofecha" )
 	{
@@ -293,7 +309,8 @@ if( $qry == "mediofecha" )
 						ORDER BY FSHM_DTREFERENCIA DESC";
 	}
 	
-//
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 if( $dbg )
 	{
 	echo $sql . "<br>";
