@@ -12,7 +12,7 @@ include 'partes/Head.php';
 		<link rel="shortcut icon" href="/imagens/PMSICO.png">
 	</head>
 	
-	<body onload="javascript:titulo( '<h4>Lista de todos os usuários do Autorizador</h4>' );">
+	<body onload="javascript:titulo( '<h4>Lista de todos todos os usuários do Autorizador</h4>' );">
 <?php
 include 'partes/MenuPri.php';
 include 'partes/Cabec.php';

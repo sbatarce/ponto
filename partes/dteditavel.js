@@ -4,9 +4,11 @@
 	var nChil   = null;	      						//  row.child visível
 	var tdChil  = null;	      						//  TDs da row.child visível
 	var trChil	=	null;										//	tr da row.child
-	var dlen		=	"25";
-	var lens    = [[5, 15, 25, 35, -1],
-							[5, 15, 25, 35, "todos"]];
+	var dlen		=	"10";                   //  quantidade de elementos por página
+	var lens    = [
+                  [5, 10, 20, 30, -1],
+                  [5, 10, 20, 30, "todos"]
+                ];
 
 	var aiNew = null;
 
@@ -659,7 +661,7 @@
 						selecChild( row.data() );
 						}									//  click a.detshow function
 					);
-
+/*
 				$( '#eddt' ).on
 					(
 					'click', 'a.dethide', function()
@@ -675,7 +677,7 @@
 							}
 						}									//  click a.dethide function
 					);									//	$( '#eddt' ).on( 'click'
-
+*/
 				$('#eddt').on
 					(
 					"click", 'a.chk', function (e) 
