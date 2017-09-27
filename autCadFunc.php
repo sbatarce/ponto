@@ -157,7 +157,8 @@ include 'partes/pagebody.php';
 									"\", \"verifica_biometria\": true, " +
 									"\"referencias\": [ " + sshd.substring(1) +  " ]}]";
 			var resul = repserviceB( "POST", "usuarios", idapal, "SISPONTO", null, body );
-			if( resul.status != "OK" && resul.status != "614" )
+			var aux = resul.status;
+			if( resul.status != "OK" && resul.status != "614" && resul.status != "[000]" )
 				{
 				alert( "Erro: " + resul.erro + " acessando o aparelho" );
 				return false;
