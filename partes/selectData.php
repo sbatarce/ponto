@@ -33,7 +33,8 @@ else
 	$debug = true;
 	}
 	
-//
+////////////////////////////////////////////////////////////////////////////////
+//	
 if( $qry == "xpto" )
 	{
 	if( !isset( $_GET["sshd"] ) )
@@ -44,6 +45,24 @@ if( $qry == "xpto" )
 	$sshd	=	$_GET["sshd"];
 
 	$sql	=	"";
+	}
+
+////////////////////////////////////////////////////////////////////////////////
+//	lista de aparelhos associados ao PONTO
+if( $qry == "aparelhos" )
+	{
+	$sql	=	"SELECT APAL.APAL_ID, 
+									VUPU.UOR_DLSIGLAUNIDADE || '-' || APAL.APAL_DLLOCALIZACAO
+							FROM      BIOMETRIA.APAL_APARELHOALOCACAO APAL
+							INNER JOIN  BIOMETRIA.AASI_APARELHOALOCACAO_SIIN AASI ON
+													AASI.APAL_ID=APAL.APAL_ID AND
+													AASI.SIIN_ID=100
+							INNER JOIN  SAU.VWUORPUBLICA VUPU ON
+													VUPU.UOR_IDUNIDADEORGANIZACIONAL = APAL.PMS_IDSAUUOR AND
+													VUPU.UOR_STATIVO=1 AND
+													VUPU.UOR_DTFINAL IS NULL
+							WHERE APAL.APAL_DTFIM IS NULL
+							ORDER BY VUPU.UOR_DLSIGLAUNIDADE, APAL.APAL_DLLOCALIZACAO";
 	}
 
 //	lista de UORS
@@ -105,7 +124,7 @@ include 'ambiente.php';
 include 'ORAConn.php';
 //	obre o oracle
 $ora = new ORAConn();
-$res = $ora->connect( $userb, $passb, $amb, $chset, TRUE );
+$res = $ora->connect( $userb, $passb, $amb, $chset, "" );
 if( $res != "OK" )
 	{
 	echo $res;

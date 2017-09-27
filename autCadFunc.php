@@ -46,14 +46,81 @@ include 'partes/pagebody.php';
 					<div class="modal-body" id="bdymodal" ng>
 						<div class='row linha' style='margin-top: 10px; margin-left:30px;'>
 							<h5>Escolha a nova UOR </h5>
-							<input style='width:90%;' class='input-small tipos' 
-										 id="sltip" title="Tipo de alocaÃ§Ã£o"/>
+							<input style='width:90%;' class='input-small uors' 
+										 id="seluor" title="Escolha a UOR da nova alocação do funcionário"/>
 						</div>
 					</div>
 					<div class="modal-footer">
 						<center>
 							<button type="button" class="btn btn-primary"
 											onclick="javascript:uorOK()">
+											OK
+							</button>
+							<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+						</center>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!--======================================================================-->
+		<!-- modal de alteração do aparelho BASE -->
+    <div id="basemodal" class="modal fade bs-modal-sm" role="dialog"
+				 aria-labelledby="mySmallModalLabel" aria-hidden="true"
+				 style="width: 500px; max-width: 500px;" >
+			<div class="modal-dialog modal-sm" style="width: 500px; max-width: 500px;">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true"
+										onclick="javascript:cancel()">
+							&times;
+						</button>
+						<h4 id="titTrocBase" class="modal-title">Troca do aparelho base</h4>
+					</div>
+					<div class="modal-body" id="bdymodal" ng>
+						<div class='row linha' style='margin-top: 10px; margin-left:30px;'>
+							<h5>Escolha o novo aparelho BASE do funcionário </h5>
+							<h5>O funcionário será removido do aparelho BASE atual</h5>
+							<input style='width:90%;' class='input-small lsapar' 
+										 id="selbase" title="Escolha um aparelho"/>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<center>
+							<button type="button" class="btn btn-primary"
+											onclick="javascript:baseOK()">
+											OK
+							</button>
+							<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+						</center>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!--======================================================================-->
+		<!-- modal de adição de aparelho -->
+    <div id="aparmodal" class="modal fade bs-modal-sm" role="dialog"
+				 aria-labelledby="mySmallModalLabel" aria-hidden="true"
+				 style="width: 500px; max-width: 500px;" >
+			<div class="modal-dialog modal-sm" style="width: 500px; max-width: 500px;">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true"
+										onclick="javascript:cancel()">
+							&times;
+						</button>
+						<h4 id="titAdicApar" class="modal-title">Troca do aparelho base</h4>
+					</div>
+					<div class="modal-body" id="bdymodal" ng>
+						<div class='row linha' style='margin-top: 10px; margin-left:30px;'>
+							<h5>Escolha o aparelho ao qual o funcionário será adicionado</h5>
+							<input style='width:90%;' class='input-small lsapar' 
+										 id="selapar" title="Escolha um aparelho"/>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<center>
+							<button type="button" class="btn btn-primary"
+											onclick="javascript:adicAparOK()">
 											OK
 							</button>
 							<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
@@ -83,44 +150,115 @@ include 'partes/pagebody.php';
 			inicializa.init();
 			}
 			
-		function trocaUor( idfuni )
+		//	rotinas de manipulação dos aparelhos
+		function adicionaSSHD()
+			{
+			var body =	"[ { \"nome\": \"" + nofunc +
+									"\", \"verifica_biometria\": true, " +
+									"\"referencias\": [ " + sshd.substring(1) +  " ]}]";
+			var resul = repserviceB( "POST", "usuarios", idapal, "BIOMETRIA", "{}", body );
+			}
+			
+		function removeSSHD( sshd )
+			{
+			
+			}
+			
+		//	funções de chamada e retorno dos modais
+		function trocaUOR( idfuni )
 			{
 			uorant = uoralo;
 			idfunc = idfuni;
-			$("#alomodal").modal('show');
+			$("#uormodal").modal('show');
 			}
 			
 		function uorOK()
 			{
 			if( uorant == uoralo )
 				return;
-			var url = "partes/trocaUorFunc.php?funiid="+ idfuni + 
+			var url = "partes/trocaUorFunc.php?funiid="+ idfunc + 
 								"&uornova="+uoralo;
 			var resul = remoto( url );
 			if( resul.status == "OK" )
 				{
 				alert( "OK: UOR atualizada." );
-				return null;
 				}
 			else
 				{
 				alert( "Erro trocando URL " + resul.erro );
 				return null;
 				}
-			$("#alomodal").modal('hide');
+			$("#uormodal").modal('hide');
+			var chl	=	obterChild();
+			chl.child( FormataChild( chl.data() ) );
+			atuatab( false );
 			}
 
+		function trocaBase( idfuni )
+			{
+			idfunc = idfuni;
+			$("#basemodal").modal('show');
+			}
+			
+		function baseOK()
+			{
+			$("#basemodal").modal('hide');
+			}
+			
+		function adicApar( idfuni, shd, nome, apal )
+			{
+			idfunc = idfuni;
+			idapar = -1;
+			sshd = shd;
+			nofunc = nome;
+			idapal = apal;
+			
+			$("#aparmodal").modal('show');
+			}
+			
+		function adicAparOK()
+			{
+			if( idapar == -1 )
+				{
+				alert( "Por favor, escolha um aparelho" );
+				return;
+				}
+			//
+			if( adicionaSSHD( idapar, sshd ) )
+				{
+				$("#aparmodal").modal('hide');
+				}
+			}
+			
+		function aparOK()
+			{
+			
+			}
+			
 		function escouor( tipo, id )
 			{
 			if( id > 0 )
 				uoralo	=	id;
 			}
-	/////////////// PRINCIPAL ////////////////////////
+
+		function escapar( tipo, id )
+			{
+			if( id > 0 )
+				idapar	=	id;
+			}
+/////////////// PRINCIPAL ////////////////////////
 		var idfuni = -1;
+		var idapar = -1;
 		var uoralo = null;
 		var uorant = null;
+		
+		var sshd, nofunc, idapal;
+		
 		var url = "selectData.php?query=uor";
-		SelInit( ".uors", url, 0, "Escolha abaixo", escouor, 3 );
+		SelInit( ".uors", url, 0, "Escolha abaixo", escouor, 2 );
+
+		url = "selectData.php?query=aparelhos";
+		SelInit( ".lsapar", url, 0, "Escolha abaixo", escapar, 0 );
 
 		var sshd = obterCookie( "user" );
 		if( sshd == null )
@@ -273,7 +411,7 @@ include 'partes/pagebody.php';
 				lin	+=	CampoTexto( aux );
 				
 				lin	+=	"<a style='margin-left: 10px; margin-top: 10px;' " +
-								"href='javascript:trocaReg( " + resu.dados[0].IDREG + " )' " +
+								"href='javascript:trocaReg( " + original.IDFUNI + " )' " +
 								"class='btn btn-circle btn-info btn-xs ' " +
 								"title=\"Troca o regime do funcionário\" >" +
 								"<i class='glyphicon glyphicon-random'></i></a>";
@@ -290,7 +428,14 @@ include 'partes/pagebody.php';
 				for( var ix=0; ix<resu.linhas; ix++ )
 					{
 					lin = IniLinha( cls );
-					lin += "<h5 style='margin-left: 10px'>Aparelho(s) do funcionário/Servidor</h5>";
+					lin += "<span style='margin-left: 10px'>Aparelho(s) do funcionário/Servidor</span>";
+					lin	+=	"<a style='margin-left: 10px; ' " +
+									"href='javascript:adicApar( " + 
+									original.IDFUNI + ", \"" + original.SSHD + "\", \"" + 
+									original.NOFUNC + "\", " + resu.dados[0].IDAPAL +  " )' " +
+									"class='btn btn-circle btn-info btn-xs ' " +
+									"title=\"Adiciona o funcionário a um aparelho que não o base\" >" +
+									"<i class='glyphicon glyphicon-plus'></i></a>";
 					lin += FimLinha();
 					ret += lin;
 
@@ -338,9 +483,10 @@ include 'partes/pagebody.php';
 					if( resu.dados[ix].EHBASE == "1" )
 						{
 						lin	+=	"<a style='margin-left: 10px; ' " +
-										"href='javascript:trocaBase( " + original.IDFUNI + " )' " +
+										"href='javascript:trocaBase( " + original.IDFUNI + ", \"" +
+										original.SSHD + "\" )' " +
 										"class='btn btn-circle btn-info btn-xs ' " +
-										"title=\"Troca o regime do funcionário\" >" +
+										"title=\"Troca o aparelho base do funcionário\" >" +
 										"<i class='glyphicon glyphicon-random'></i></a>";
 						}
 					else
@@ -349,7 +495,7 @@ include 'partes/pagebody.php';
 										"href='javascript:removeApar( " + original.IDFUNI + " )' " +
 										"class='btn btn-circle btn-info btn-xs ' " +
 										"title=\"Troca o regime do funcionário\" >" +
-										"<i class='glyphicon glyphicon-random'></i></a>";
+										"<i class='glyphicon glyphicon-minus'></i></a>";
 						}
 
 					lin	+=	FimLinha();

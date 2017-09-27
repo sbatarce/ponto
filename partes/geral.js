@@ -2,7 +2,7 @@
 
 var user;
 
-function repserviceA( metodo, funcao, ip, mac, sistema )
+function repserviceA( metodo, funcao, ip, mac, sistema, adhea )
   {
   var resul = { };
   var host = window.location.hostname;
@@ -12,11 +12,54 @@ function repserviceA( metodo, funcao, ip, mac, sistema )
   var hea = { };
   if( adhea != null && adhea != undefined )
     hea = adhea;
+  hea["REPIP"] = ip;
+  hea["REPMAC"] = mac;
+  hea["REPSIS"] = sistema;
+  $.ajax(
+    {
+    headers: hea,
+    url: url,
+    type: metodo,
+    contentType: "application/json",
+    datatype: 'json',
+    async: false,
+    success: function( resp, textStatus, jqXHR )
+      {
+      resul.resp = resp;
+      resul.status = "OK";
+      },
+    error: function( responseData, textStatus, errorThrown )
+      {
+      resul.status = responseData.status;
+      if( responseData.responseText != undefined )
+        resul.erro = responseData.responseText
+      else
+        resul.erro = textStatus;
+      }
+    } );
+  return resul;
+  }
+
+//  chama o repservice com BODY
+function repserviceB( metodo, funcao, idapal, sistema, adhea, body )
+  {
+  var resul = { };
+  var host = window.location.hostname;
+  if( host == "egov.santos.sp.gov.br" )
+    host = "vmp-webserv03.santos.sp.gov.br";
+  var url = "http://" + host + "/cgi-bin/RepService.cgi/" + funcao;
+  var dat = { };
+  if( body != null && body != undefined )
+    dat = body;
+  var hea = { };
+  if( adhea != null && adhea != undefined )
+    hea = adhea;
   hea["IDAPAL"] = idapal;
   hea["REPSIS"] = sistema;
   $.ajax(
     {
     headers: hea,
+    data: dat,
     url: url,
     type: metodo,
     contentType: "application/json",
