@@ -217,14 +217,14 @@ include 'partes/pagebody.php';
 			idapar = -1;
 			sshd = shd;
 			nofunc = nome;
-			idapal = apal;
+			idapal = -1;
 			
 			$("#aparmodal").modal('show');
 			}
 			
 		function adicAparOK()
 			{
-			if( idapar == -1 )
+			if( idapal == -1 )
 				{
 				alert( "Por favor, escolha um aparelho" );
 				return;
@@ -250,7 +250,7 @@ include 'partes/pagebody.php';
 		function escapar( tipo, id )
 			{
 			if( id > 0 )
-				idapar	=	id;
+				idapal	=	id;
 			}
 /////////////// PRINCIPAL ////////////////////////
 		var idfuni = -1;
