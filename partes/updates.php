@@ -38,6 +38,7 @@ if( $qry == "upd" )
 		}	
 	$sql	=	"update ".$_GET["tbl"]." set ".$_GET["alter"]." where ".$_GET["selec"];
 	}
+
 //	delete fdte
 if( $qry == "delfdte" )
 	{

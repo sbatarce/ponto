@@ -11,6 +11,8 @@
 //	fuauid( funiid, uorid ) - obtem o FUAU_ID do autorizador da UOR
 //	medioperio( funiid, dtini, dtfim )
 //	mediofecha( funiid )
+//	obtregimefunc( funiid )
+//	obtaparelhosfunc( funiid )
 if( !isset( $_GET["query"] ) && !isset( $_GET["debug"] ) )
 	{
 	echo	'{ "status": "erro", "erro": "parametro query obrigatorio" }';
@@ -26,6 +28,60 @@ else
 	{
 	$qry	=	$_GET["debug"];
 	$dbg	=	true;
+	}
+
+////////////////////////////////////////////////////////////////////////////////
+//	
+if( $qry == "" )
+	{
+	if( !isset( $_GET["xpto"] ) )
+		{
+		echo	'{ "status": "erro", "erro": "parametro xpto obrigatorio" }';
+		return;
+		}
+	$xpto	=	$_GET["xpto"];
+	$sql = "select * FROM XPTO WHERE XPTO=$xpto";
+	}
+
+////////////////////////////////////////////////////////////////////////////////
+//	obtaparelhosfunc( funiid )
+if( $qry == "obtaparelhosfunc" )
+	{
+	if( !isset( $_GET["funiid"] ) )
+		{
+		echo	'{ "status": "erro", "erro": "parametro funiid obrigatorio" }';
+		return;
+		}
+	$funiid	=	$_GET["funiid"];
+	$sql = "SELECT  SUOR.UOR_DLSIGLAUNIDADE AS UNIAPAR, APAL.APAL_DLLOCALIZACAO AS LOCAAPAR, 
+									FLTR.FLTR_STBASE AS EHBASE
+						FROM        BIOMETRIA.FLTR_FUNCIONARIOLOCALTRABALHO FLTR
+						INNER JOIN  BIOMETRIA.LOTR_LOCALTRABALHO LOTR ON
+												LOTR.LOTR_ID=FLTR.LOTR_ID
+						INNER JOIN  BIOMETRIA.APAL_APARELHOALOCACAO APAL ON
+												APAL.APAL_ID=LOTR.APAL_ID AND
+												APAL.APAL_DTFIM IS NULL
+						INNER JOIN  SAU.VWUORPUBLICA SUOR ON
+												SUOR.UOR_IDUNIDADEORGANIZACIONAL=APAL.PMS_IDSAUUOR AND
+												SUOR.UOR_DTFINAL IS NULL
+						WHERE FLTR.FUNI_ID=$funiid";
+	}
+
+////////////////////////////////////////////////////////////////////////////////
+//	
+if( $qry == "obtregimefunc" )
+	{
+	if( !isset( $_GET["funiid"] ) )
+		{
+		echo	'{ "status": "erro", "erro": "parametro funiid obrigatorio" }';
+		return;
+		}
+	$funiid	=	$_GET["funiid"];
+	$sql = "SELECT RETR.RETR_ID as IDREG, RETR.RETR_DLNOME AS NOREG
+						FROM        BIOMETRIA.FRTR_FUNCIONARIOREGIMETRABALHO FRTR
+						INNER JOIN  BIOMETRIA.RETR_REGIMETRABALHO RETR ON
+												RETR.RETR_ID = FRTR.RETR_ID
+						WHERE FRTR.FUNI_ID=$funiid AND FRTR.FRTR_DTFIM IS NULL";
 	}
 
 ////////////////////////////////////////////////////////////////////////////////

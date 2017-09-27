@@ -20,7 +20,37 @@ if( isset( $_GET["debug"] ) )
 	}
 $sql	=	"";
 ////////////////////////////////////////////////////////////////////////////////
-//
+//	autcadas	tabela de funcionários de um autorizador para cadastro
+//	Parametros SSHD de um autorizador
+if( $qry == "autcadas" )
+	{
+	if( !isset( $_GET["sshd"] ) )
+		{
+		echo	'{ "data": [{"erro": "parametro sshd obrigatorio"}] }';
+		return;
+		}
+	$sshd = $_GET["sshd"];
+
+	$sql = "SELECT  PESS.SIGLAUOR_ATUAL AS UNIDADE, FUNI.FUNI_ID AS IDFUNI,
+									FUNI.PMS_IDPMSPESSOA AS SSHD, 
+									FUOR.PMS_IDSAUUOR as LOTADO, PESS.NOME AS NOFUNC
+						FROM        BIOMETRIA.FUAU_FUNCIONARIOAUTORIZADOR FUAU
+						INNER JOIN  BIOMETRIA.FUNI_FUNCIONARIO FUNIA ON
+												FUNIA.FUNI_ID=FUAU.FUNI_ID AND
+												FUNIA.PMS_IDPMSPESSOA='$sshd'
+						INNER JOIN  BIOMETRIA.FUOR_FUNCUNIDADEORGANIZACIONAL FUOR ON
+												FUOR.PMS_IDSAUUOR=FUAU.PMS_IDSAUUOR
+						INNER JOIN  BIOMETRIA.FUNI_FUNCIONARIO FUNI ON
+												FUOR.FUNI_ID=FUNI.FUNI_ID
+						INNER JOIN  SAU.VWPESSOA_SSHD PESS ON
+												PESS.REGISTRO_FUNCIONAL_ATIVO = 1 
+												AND PESS.IUN = FUNI.PMS_IDPMSPESSOA
+						WHERE   FUAU.FUAU_DTFIM IS NULL
+						ORDER BY  FUOR.PMS_IDSAUUOR, PESS.NOME";
+	}
+////////////////////////////////////////////////////////////////////////////////
+//	ausaut	tabela de ausências autorizadas de um funcionário
+//	Parametros SSHD & data de início
 if( $qry == "ausaut" )
 	{
 	if( !isset( $_GET["sshd"] ) )
@@ -48,7 +78,8 @@ if( $qry == "ausaut" )
 							    AND FAAU.FAAU_DTFIM >= TO_DATE( '$inicio', 'YYYYMMDD' )
 						ORDER BY FAAU.FAAU_DTINI";
 	}
-//	índice dos funcionários de um autorizador
+////////////////////////////////////////////////////////////////////////////////
+//	índice dos funcionários de um autorizador com contagem de eventos
 //	query=funcindex&autid=funi_id
 if( $qry == "funcindex" )
 	{
@@ -110,6 +141,7 @@ if( $qry == "funcindex" )
 							UOFM.UOFM_DTREFERENCIA
 		ORDER BY  UNIDADE, QTPENDENTE DESC";
 	}
+////////////////////////////////////////////////////////////////////////////////
 //	pendencias( sshd, dtini, dtfim, ok, pen, ana, ace, neg, sshdfunc )
 //	sshd								sshd do autorizador
 //	dtini/dtfim					período
@@ -249,7 +281,8 @@ if( $qry == "pendencias" )
 	else
 		$sql .= "WHERE       FUNI.PMS_IDPMSPESSOA = '$sshdfunc'";
 	}
-//
+////////////////////////////////////////////////////////////////////////////////
+	//	funaces
 if( $qry == "funaces" )
 	{
 	if( !isset( $_GET["sshd"] ) )
@@ -321,7 +354,9 @@ if( $qry == "funaces" )
 	else
 		$sql .= "ORDER BY FDTR.FDTR_DTREFERENCIA";
 	}
-//	
+////////////////////////////////////////////////////////////////////////////////	
+////////////////////////////////////////////////////////////////////////////////
+//
 if( $sql == "" )
 	{
 	echo	'{ "data": [{"erro": "query desconhecido"}] }';

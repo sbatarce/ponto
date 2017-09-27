@@ -7,7 +7,7 @@
 		?>
   </head>
 
-  <body onload="javascript:Titulo( '<h4>Cadastro de regimes de trabalho</h4>' );">
+  <body onload="javascript:Titulo( '<h4>Associar Regimes</h4>' );">
 		<?php
 		include 'partes/Menu.php';
 		include 'partes/Cabec.php';

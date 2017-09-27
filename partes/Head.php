@@ -1,8 +1,8 @@
     <meta charset="utf-8" />
 		<title>SisPonto</title>
 
-    <meta name="description" content="Aplicativo da Biometria">
-		<meta name="keywords" content="biometria,digital">
+    <meta name="description" content="Controle de ponto">
+		<meta name="keywords" content="sisponto,digital">
 		<meta name="author" content="w0513263">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />

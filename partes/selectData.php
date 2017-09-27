@@ -45,7 +45,16 @@ if( $qry == "xpto" )
 
 	$sql	=	"";
 	}
-	
+
+//	lista de UORS
+if( $qry == "uor" )
+	{
+	$sql	=	"select UOR_IDUNIDADEORGANIZACIONAL, " .
+					"CONCAT( CONCAT( UOR_DLSIGLAUNIDADE, '-' ), " .
+					"replace( UOR_DLNOMEUNIDADE, '\"', ' ' ) ) as NOME " .
+					"from SAU.VWUORPUBLICA where EMP_IDEMPRESA = 1";
+	}
+
 //	funcsuor - funcionários pertencentes a uma UOR
 if( $qry == "funcsuor" )
 	{

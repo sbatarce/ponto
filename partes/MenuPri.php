@@ -5,6 +5,7 @@
 				<div class="navigation" id="menupri" >
 					<div class="row">
 						<!-- Navigation Menu Link Lists -->
+						<!-- Menu dos autorizadores     -->
 						<div class="col-md-2 col-sm-4 col-xs-6">
 							<div class="menu" >
 								<span class="br-lblue" class="admmenu">
@@ -15,9 +16,24 @@
 										<li>
 											<a href="autCadFunc.php" ttip="ttip" data-placement="bottom" 
 												 data-original-title="Cadastro de funcionários" 
-												 class="aut" style="color: DarkGreen ;" >
-												<i class="glyphicon glyphicon-user"></i>
+												 class="aut" style="color:gold ;" >
+												<i class="typcn typcn-group" ></i>
 												Cadastro
+											</a>
+										<li>
+											<a href="autApaFunc.php" ttip="ttip" data-placement="bottom" 
+												 data-original-title="Associar aparelho" 
+												 class="aut" style="color:darksalmon ;" >
+												<i class="glyphicon glyphicon-time"></i>
+												Associar Aparelho
+											</a>
+										</li>
+										<li>
+											<a href="autRegFunc.php" ttip="ttip" data-placement="bottom" 
+												 data-original-title="Associar regimes" 
+												 class="aut" style="color: blueviolet;">
+												<i class="glyphicon glyphicon-calendar "></i>
+												Associar Regimes
 											</a>
 										</li>
 										<li>
@@ -28,6 +44,7 @@
 												Todos Funcionários 
 											</a>
 										</li>
+										<!-- pendencias só via todosFuncionarios
 										<li>
 											<a href="autPenden.php" ttip="ttip" data-placement="bottom" 
 												 data-original-title="Mostra pendencias de funcionários" 
@@ -36,14 +53,8 @@
 												Pendências
 											</a>
 										</li>
-										<li>
-											<a href="autRegimes.php" ttip="ttip" data-placement="bottom" 
-												 data-original-title="Criar e associar regimes"  
-												 class="aut" style="color: blueviolet;">
-												<i class="glyphicon glyphicon-calendar "></i> 
-												Regimes
-											</a>
-										</li>
+										-->
+										<!-- autorização de ausências e correção a partir de todos Funcionarios
 										<li>
 											<a href="autAusencias.php" ttip="ttip" data-placement="bottom" 
 												 data-original-title="Autorizar ausencias a funcionários"  
@@ -52,9 +63,10 @@
 												Autorizar ausências
 											</a>
 										</li>
+										-->
 										<li>
 											<a href="autFechamento.php" ttip="ttip" data-placement="bottom" 
-												 data-original-title="Fechamento mensal da UOR"  
+												 data-original-title="Fechamento mensal de UOR"  
 												 class="aut" style="color: blue;">
 												<i class="glyphicon glyphicon-indent-left" ></i> 
 												Fechamento Mensal

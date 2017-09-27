@@ -1,174 +1,373 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <title>Biometria</title>
+    <title>Ponto</title>
 		<?php
 		include 'partes/Head.php';
 		?>
   </head>
 
   <body onload="javascript:Titulo( '<h4>Alocação de funcionários</h4>' );">
-		<?php
-		include 'partes/Menu.php';
-		include 'partes/Cabec.php';
-		include 'partes/pageheader.php';
-		?>
-    <img src="imagens/carrega.gif" id="carrega" style="display:none" />
+  <img src="imagens/carrega.gif" id="carrega" style="display:none" />
     <!-- Conteúdo específico da página -->
-    <div class='row input-append linha' style='margin-top: 10px; margin-left:30px;'>
-			<p><b><font size="20">Em construção</b></p>
+<?php
+include 'partes/Menu.php';
+include 'partes/Cabec.php';
+include 'partes/pageheader.php';
+include 'partes/pagebody.php';
+?>
+										<table class="table table-striped table-hover table-bordered" id="eddt">
+											<thead><tr role="row"></tr></thead>
+											<tfoot><tr role="row"></tr></tfoot>
+											<tbody></tbody>
+										</table>
+									</div> <!-- class="widget-body" -->
+								</div> <!-- class="col-xs-12 col-md-12" -->
+							</div> <!-- class="row" -->
+						</div> <!-- class="widget-body" -->
+					</div> <!-- class="page-body" id="conte" -->
+				</div> <!-- /Conteudo -->
+			</div> <!-- /Page Container -->
+		</div> <!-- Main Container -->
+		<!--======================================================================-->
+		<!-- modal de troca de UOR -->
+    <div id="uormodal" class="modal fade bs-modal-sm" role="dialog"
+				 aria-labelledby="mySmallModalLabel" aria-hidden="true"
+				 style="width: 500px; max-width: 500px;" >
+			<div class="modal-dialog modal-sm" style="width: 500px; max-width: 500px;">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true"
+										onclick="javascript:cancelUOR()">
+							&times;
+						</button>
+						<h4 class="modal-title">Alteração de UOR</h4>
+					</div>
+					<div class="modal-body" id="bdymodal" ng>
+						<div class='row linha' style='margin-top: 10px; margin-left:30px;'>
+							<h5>Escolha a nova UOR </h5>
+							<input style='width:90%;' class='input-small tipos' 
+										 id="sltip" title="Tipo de alocaÃ§Ã£o"/>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<center>
+							<button type="button" class="btn btn-primary"
+											onclick="javascript:uorOK()">
+											OK
+							</button>
+							<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+						</center>
+					</div>
+				</div>
+			</div>
 		</div>
 
-		<?php
-			include 'partes/Scripts.php';
-		?>
+<?php
+	include 'partes/Scripts.php';
+?>
 	<script type="text/javascript" src="partes/geral.js" ></script>
-	<script>
-		$( function()
-			{
-			$( "#dtinic" ).datepicker(
-				{
-				dateFormat: "dd/mm/yy"
-				});
-			$( "#dtterm" ).datepicker(
-				{
-				dateFormat: "dd/mm/yy"
-				});
-
-			$( "#dtinic" ).change(
-			function()
-				{
-				dtinic = $("#dtinic").datepicker("getDate");
-				$( "#presen" ).html( "" );
-				Registro();
-				});
-
-			$( "#dtterm" ).change(
-			function()
-				{
-				dtterm = $("#dtterm").datepicker("getDate");
-				$( "#presen" ).html( "" );
-				Registro();
-				});
-			});
-		
+	<script type="text/javascript" src="partes/dteditavel.js" ></script>
+	<script type="text/javascript" >
 		function logout()
 			{
 			Deslogar();
 			}
 
-		var iddepen = 0;
-
-		//	calcula a diferença entre dois horários no formato hhmm
-		function hoDif( hoini, hofin )
+		function setAjax( del )
 			{
-			var h = hoini.substring( 0, 2 );
-			var m = hoini.substring( 2 );
-			var mini = parseInt( h ) * 60 + parseInt( m );
-
-			h = hofin.substring( 0, 2 );
-			m = hofin.substring( 2 );
-			var mfin = parseInt( h ) * 60 + parseInt( m );
-			var mdif = mfin - mini;
-			h = mdif / 60;
-			m = mdif % 60;
-			var result;
-			if( h < 10 )
-				result = "0" + parseInt( "" + h );
+			//
+			if( del != 0 )
+				tableDestroy();
+			AjaxSource	=	"partes/tableData.php?query=autcadas&sshd=" + sshd;
+			inicializa.init();
+			}
+			
+		function trocaUor( idfuni )
+			{
+			uorant = uoralo;
+			idfunc = idfuni;
+			$("#alomodal").modal('show');
+			}
+			
+		function uorOK()
+			{
+			if( uorant == uoralo )
+				return;
+			var url = "partes/trocaUorFunc.php?funiid="+ idfuni + 
+								"&uornova="+uoralo;
+			var resul = remoto( url );
+			if( resul.status == "OK" )
+				{
+				alert( "OK: UOR atualizada." );
+				return null;
+				}
 			else
-				result = "" + parseInt( "" + h );
-			if( m < 10 )
-				result += ":0" + m;
-			else
-				result += ":" + m;
-			return result;
+				{
+				alert( "Erro trocando URL " + resul.erro );
+				return null;
+				}
+			$("#alomodal").modal('hide');
 			}
 
-		function escoPess( tipo, id )
+		function escouor( tipo, id )
 			{
-			iddepen = id;
-			Registro();
+			if( id > 0 )
+				uoralo	=	id;
 			}
+	/////////////// PRINCIPAL ////////////////////////
+		var idfuni = -1;
+		var uoralo = null;
+		var uorant = null;
+		var url = "selectData.php?query=uor";
+		SelInit( ".uors", url, 0, "Escolha abaixo", escouor, 3 );
 
-		function Registro()
-			{
-			if( iddepen < 1 )
-				{
-				$( "#presen" ).val( "" )
-				return;
-				}
-			$( "#presen" ).html( "" );
-			var url = "partes/queries.php?query=reprpmspessoa&pessoa=" + iddepen +
-								"&dtinic=" + $.datepicker.formatDate("yymmdd", dtinic ) +
-								"&dtterm=" + $.datepicker.formatDate("yymmdd", dtterm );
-			var resu = remoto( url );
-			if( resu == null )
-				{
-				$( "#presen" ).val( "Falha na obtenção dos dados" )
-				return;
-				}
-			if( resu.linhas < 1 )
-				{
-				$( "#presen" ).val( "Não há registros neste período" )
-				return;
-				}
-
-			var diaant = "-";
-			var diaatu = "+";
-			var lista = "";
-			var iord = 0;
-			var pontos = "";
-			var difers = "";
-			var hoini = 0;
-			var hofin = 0;
-
-			for( var ix = 0; ix < resu.linhas; ix++ )
-				{
-				diaatu = resu.dados[ix].ORDEM.substring( 0, 8 );
-				if( diaatu != diaant )
-					{
-					if( diaant != "-" )
-						{
-						lista += pontos;
-						lista += ".........." + difers;
-						lista += "</p>";
-						}
-					diaant = diaatu;
-					lista += "<p>" + resu.dados[ix].PONTO.substring( 0, 10 ) + " => ";
-					pontos = "";
-					difers = "";
-					iord = 0;
-					hoini = resu.dados[ix].ORDEM.substring( 8 );
-					}
-				pontos += "  " + resu.dados[ix].PONTO.substring( 11 );
-				if( iord++ > 0 )
-					{
-					hofin = resu.dados[ix].ORDEM.substring( 8 );
-					var dif = hoDif( hoini, hofin );
-					difers += " " + dif;
-					hoini = hofin;
-					}
-				}
-			lista += pontos;
-			lista += ".........." + difers;
-			lista += "</p>";
-			$( "#presen" ).html( lista );
-			}
-		///////////////////////////////////////////////////////////////
-		//	função principal
-		var sshd = obterCookie( "biouser" );
+		var sshd = obterCookie( "user" );
 		if( sshd == null )
-			logout();
-
-		var dtinic = new Date();
-		dtinic.setDate( 1 );
-		var dtterm = new Date();
-
-		$( "#dtinic" ).datepicker("setDate", dtinic);
-		$( "#dtterm" ).datepicker("setDate", dtterm );
+			{
+			Deslogar();
+			}
+		//	formatadores ligados ao datatables
+		//		ticamp:		tipo de campo t/n/l = texto, numÃ©rico ou legenda
+		//		inputs:		nomes dos campos no banco relativamente aos inputs
+		//		origem:		Ã­ndice da coluna do Datatables que atualiza o campo no banco
+		//		editael:	indica se a coluna do datatable Ã© editÃ¡vel
+		var acremove = "<a href='#' class='btn btn-circle btn-danger btn-xs delete' " +
+										"data-mode='alt' title=\"remover funcionário da UOR\" > " +
+										"<i class='typcn typcn-delete-outline'></i></a>";
+		//$("#eddt_new").hide();																		//	esconde o adicionar
+		var notabel			=	"BIOMETRIA.FUNI_FUNCIONARIO";						//	nome da tabela base
+		var	nocmpid			=	"FUNI_ID";															//	nome do campo ID da tabela base
+		var sequence		= "BIOMETRIA.SQ_FUNI";
+		var liNova			=
+						{
+						"UNIDADE": "",
+						"SSHD": "",
+						"NOME": ""
+						};
+		var	order	=	[];						//	ordem de apresentação
+		//	prepara a definição das colunas
+		var colDefs	=	[];
+		var	col	=	-1;
+		var aux	=
+			{
+			"tipo": null,
+			"editavel": false,
+			"vanovo": "",
+			"bSortable": false,
+			"searchable": false,
+			"aTargets": [ ++col ],
+			"orderable":false,
+			"mData":null,
+			"width": "5%",
+			"defaultContent": acshow
+			};
+		colDefs.push( aux );
 		
-		var sel = "selectData.php?query=pessoapebi&sshd=" + sshd.toUpperCase();
-		SelInit( ".depen", sel, 0, "Escolha abaixo", escoPess );
+		aux	=
+			{
+			"tipo": "x",
+			"editavel": false,
+			"vanovo": "",
+			"aTargets": [ ++col ],
+			"mData": "UNIDADE",
+			"sTitle":"Unidade",
+			"defaultContent": " "
+			};
+		colDefs.push( aux );
+		
+		aux	=
+			{
+			"tipo": "x",
+			"editavel": false,
+			"vanovo": "",
+			"aTargets": [ ++col ],
+			"mData": "SSHD",
+			"sTitle":"SSHD",
+			"defaultContent": " "
+			};
+		colDefs.push( aux );
+		
+		aux	=
+			{
+			"tipo": "x",
+			"editavel": false,
+			"vanovo": "",
+			"aTargets": [ ++col ],
+			"mData": "NOFUNC",
+			"sTitle":"Servidor/Funcionário",
+			"defaultContent": " "
+			};
+		colDefs.push( aux );
+		/*
+		aux	=	
+			{
+			"tipo": null,
+			"editavel": false,
+			"vanovo": "",
+			"bSortable": false,
+			"searchable": false,
+			"aTargets": [ ++col ],
+			"orderable":false,
+			"mData":null,
+			"width": "10%",
+			"defaultContent": acremove
+			};
+		colDefs.push( aux );
+		*/
+		//
+		//
+	
+		function completaChild( original )
+			{
+			return " ";
+			}
+
+		function FormataChild( original )
+			{
+			var lin = "",
+					ret = "";
+			var aux, cls;
+			
+			//	UOR de alocação
+			cls = "clsuor";
+			lin = IniLinha( cls );
+			aux	=	
+				{
+				titulo: "uor",
+				nocmp: "UOR",
+				width: "20%",
+				valor: original.UNIDADE,
+				divclass: "col-xs-2",
+				inpclass: cls,
+				extra: "readonly"
+				};
+			lin	+=	CampoTexto( aux );
+
+			lin	+=	"<a style='margin-left: 10px; margin-top: 10px;' " +
+							"href='javascript:trocaUOR( " + original.IDFUNI + " )' " +
+							"class='btn btn-circle btn-info btn-xs ' " +
+							"title=\"Troca a UOR do funcionário\" >" +
+							"<i class='glyphicon glyphicon-random'></i></a>";
+			lin	+=	FimLinha();
+
+			ret += lin;
+			
+			//	regime do funcionário
+			var url	=	"partes/queries.php?query=obtregimefunc&funiid=" + original.IDFUNI;
+			var	resu	=	remoto( url );
+			if( resu.linhas > 0 )
+				{
+				cls = "clsreg";
+				lin = IniLinha( cls );
+				aux	=	
+					{
+					titulo: "Regime atual",
+					nocmp: "REGIME",
+					width: "30%",
+					valor: resu.dados[0].NOREG,
+					divclass: "col-xs-2",
+					inpclass: cls,
+					extra: "readonly"
+					};
+				lin	+=	CampoTexto( aux );
+				
+				lin	+=	"<a style='margin-left: 10px; margin-top: 10px;' " +
+								"href='javascript:trocaReg( " + resu.dados[0].IDREG + " )' " +
+								"class='btn btn-circle btn-info btn-xs ' " +
+								"title=\"Troca o regime do funcionário\" >" +
+								"<i class='glyphicon glyphicon-random'></i></a>";
+
+				lin	+=	FimLinha();
+				}
+			ret += lin;
+			//	aparelhos do funcionário
+			var url	=	"partes/queries.php?query=obtaparelhosfunc&funiid=" + original.IDFUNI;
+			var	resu	=	remoto( url );
+			if( resu.linhas > 0 )
+				{
+				cls = "clsapa";
+				for( var ix=0; ix<resu.linhas; ix++ )
+					{
+					lin = IniLinha( cls );
+					lin += "<h5 style='margin-left: 10px'>Aparelho(s) do funcionário/Servidor</h5>";
+					lin += FimLinha();
+					ret += lin;
+
+					lin = IniLinha( cls );
+					aux	=	
+						{
+						titulo: "",
+						nocmp: "EHBASE",
+						width: "10%",
+						valor: "",
+						divclass: "col-xs-2",
+						inpclass: cls,
+						extra: "readonly"
+						};
+					if( resu.dados[ix].EHBASE == "1" )
+						aux.valor = "Base";
+					else
+						aux.valor = "Adicional";
+					lin	+=	CampoTexto( aux );
+
+					aux	=	
+						{
+						titulo: "",
+						nocmp: "UNIAPAR",
+						width: "10%",
+						valor: resu.dados[ix].UNIAPAR,
+						divclass: "col-xs-2",
+						inpclass: cls,
+						extra: "readonly"
+						};
+					lin	+=	CampoTexto( aux );
+
+					aux	=	
+						{
+						titulo: "",
+						nocmp: "LOCAAPAR",
+						width: "25%",
+						valor: resu.dados[ix].LOCAAPAR,
+						divclass: "col-xs-2",
+						inpclass: cls,
+						extra: "readonly"
+						};
+					lin	+=	CampoTexto( aux );
+
+					if( resu.dados[ix].EHBASE == "1" )
+						{
+						lin	+=	"<a style='margin-left: 10px; ' " +
+										"href='javascript:trocaBase( " + original.IDFUNI + " )' " +
+										"class='btn btn-circle btn-info btn-xs ' " +
+										"title=\"Troca o regime do funcionário\" >" +
+										"<i class='glyphicon glyphicon-random'></i></a>";
+						}
+					else
+						{
+						lin	+=	"<a style='margin-left: 10px; ' " +
+										"href='javascript:removeApar( " + original.IDFUNI + " )' " +
+										"class='btn btn-circle btn-info btn-xs ' " +
+										"title=\"Troca o regime do funcionário\" >" +
+										"<i class='glyphicon glyphicon-random'></i></a>";
+						}
+
+					lin	+=	FimLinha();
+					ret += lin;
+					}
+				}
+			return ret;
+			}
+		///////////////////////////////////////////////////////////////////////
+
+		setAjax( 0 );
+		var handler = function() 
+			{
+				alert( "passou aqui" );
+			};
+		$('#eddt_new').unbind( "click" );
+		$('#eddt_new').bind( "click", handler );
+		
 		</script>
 	</body>	
 </html>
