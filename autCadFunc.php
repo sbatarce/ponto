@@ -157,6 +157,12 @@ include 'partes/pagebody.php';
 									"\", \"verifica_biometria\": true, " +
 									"\"referencias\": [ " + sshd.substring(1) +  " ]}]";
 			var resul = repserviceB( "POST", "usuarios", idapal, "BIOMETRIA", "{}", body );
+			if( resul.status != "OK" && resul.status != "614" )
+				{
+				alert( "Erro: " + resul.erro + " acessando o aparelho" );
+				return false;
+				}
+			return true;
 			}
 			
 		function removeSSHD( sshd )
