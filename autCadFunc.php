@@ -157,13 +157,30 @@ include 'partes/pagebody.php';
 									"\", \"verifica_biometria\": true, " +
 									"\"referencias\": [ " + sshd.substring(1) +  " ]}]";
 			var resul = repserviceB( "POST", "usuarios", idapal, "SISPONTO", null, body );
-			var aux = resul.status;
-			if( resul.status != "OK" && resul.status != "614" && resul.status != "[000]" )
+			var aux = resul.erro;
+			if( aux.indexof("023") >= 0 )
 				{
-				alert( "Erro: " + resul.erro + " acessando o aparelho" );
+				alert( "Atenção: este funcionário já se encontra neste aparelho" );
 				return false;
 				}
-			return true;
+			if( aux.indexof("000") >= 0 )
+				{
+				var url = "partes/adicionaFLTR.php?funiid="+ idfunc + 
+									"&apalid="+idapal;
+				var resul = remoto( url );
+				if( resul.status == "OK" )
+					{
+					alert( "OK: UOR atualizada." );
+					}
+				else
+					{
+					alert( "Erro trocando URL " + resul.erro );
+					return null;
+					}
+				return true;
+				}
+			alert( "Erro: " + aux );
+			return false;
 			}
 			
 		function removeSSHD( sshd )
