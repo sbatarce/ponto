@@ -2,22 +2,16 @@
 //	seleção de dados com retorno para o DataTables
 header('Content-Type: text/html; charset=UTF8');
 
-if( !isset( $_GET["query"] ) && !isset( $_GET["debug"] ) )
+if( !isset( $_GET["query"] )  )
 	{
 	echo	'{ "data": [{"erro": "parametro query obrigatório"}] }';
 	return;
 	}
 //	prepara o select
-if( isset( $_GET["query"] ) )
-	{
-	$qry = $_GET["query"];
-	$dbg = FALSE;
-	}
-if( isset( $_GET["debug"] ) )
-	{
-	$qry = $_GET["debug"];
+$qry = $_GET["query"];
+$dbg = FALSE;
+if( isset( $_GET["dbg"] ) )
 	$dbg = TRUE;
-	}
 $sql	=	"";
 ////////////////////////////////////////////////////////////////////////////////
 //	autcadas	tabela de funcionários de um autorizador para cadastro
@@ -370,16 +364,35 @@ if( $dbg )
 //	
 include 'ambiente.php';
 include 'ORAConn.php';
+
+if( $dbg )
+	{
+	echo "user=$userb, pas=$passb, amb=$amb, chset=$chset<br>";
+	}
 //	obre o oracle
 $ora = new ORAConn();
-$res = $ora->connect( $userb, $passb, $amb, $chset, TRUE );
+if( $dbg )
+	{
+	$ora->setDebug();
+	}
+$res = $ora->connect( $userb, $passb, $amb, $chset, "" );
 if( $res != "OK" )
 	{
 	echo $res;
 	return;
 	}
+if( $dbg )
+	{
+	echo "resultado do connect:";
+	var_dump($res);
+	}
 //	executa o query
 $res = $ora->execSelect($sql);
+if( $dbg )
+	{
+	echo "resultado do execSelect:";
+	var_dump($res);
+	}
 //	monta a resposta { "data": ["cmp": "val"
 $jsres	= json_decode($res);
 $qtcmp	=	$jsres->linhas;
