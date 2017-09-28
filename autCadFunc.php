@@ -220,7 +220,7 @@ include 'partes/pagebody.php';
 		function removeSSHD()
 			{
 			var funcao = "usuarios/" + sshd.substring(1);
-			var resul = repserviceB( "DELETE", "usuarios", idapal, "SISPONTO", null, null );
+			var resul = repserviceB( "DELETE", funcao, idapal, "SISPONTO", null, null );
 			var aux = resul.erro;
 			if( aux.indexOf("022") >= 0 )
 				{
