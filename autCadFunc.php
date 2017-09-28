@@ -194,7 +194,7 @@ include 'partes/pagebody.php';
 				alert( "Atenção: este funcionário não está neste aparelho" );
 				return false;
 				}
-			if( aux.indexOf("000") >= 0 )
+			if( aux.indexOf("000") >= 0 || aux.indexOf("022") >= 0 )
 				{
 				var url = "partes/removeFLTR.php?funiid="+ idfunc + 
 									"&apalid="+idapal;
