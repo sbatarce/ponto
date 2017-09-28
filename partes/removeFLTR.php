@@ -78,7 +78,7 @@ if( $dbg )
 //	remove o FLTR 
 $sql = "DELETE FROM BIOMETRIA.FLTR_FUNCIONARIOLOCALTRABALHO
 					WHERE FUNI_ID=$funiid AND LOTR_ID=$idlotr";
-$res = $ora->execDelUpd( $sql, "BIOMETRIA.SQ_FLTR" );
+$res = $ora->execDelUpd( $sql );
 $jres = json_decode( $res );
 if( $dbg )
 	{
