@@ -158,12 +158,12 @@ include 'partes/pagebody.php';
 									"\"referencias\": [ " + sshd.substring(1) +  " ]}]";
 			var resul = repserviceB( "POST", "usuarios", idapal, "SISPONTO", null, body );
 			var aux = resul.erro;
-			if( aux.indexof("023") >= 0 )
+			if( aux.indexOf("023") >= 0 )
 				{
 				alert( "Atenção: este funcionário já se encontra neste aparelho" );
 				return false;
 				}
-			if( aux.indexof("000") >= 0 )
+			if( aux.indexOf("000") >= 0 )
 				{
 				var url = "partes/adicionaFLTR.php?funiid="+ idfunc + 
 									"&apalid="+idapal;
@@ -449,20 +449,19 @@ include 'partes/pagebody.php';
 			if( resu.linhas > 0 )
 				{
 				cls = "clsapa";
+				lin = IniLinha( cls );
+				lin += "<span style='margin-left: 10px'>Aparelho(s) do funcionário/Servidor</span>";
+				lin	+=	"<a style='margin-left: 10px; ' " +
+								"href='javascript:adicApar( " + 
+								original.IDFUNI + ", \"" + original.SSHD + "\", \"" + 
+								original.NOFUNC + "\", " + resu.dados[0].IDAPAL +  " )' " +
+								"class='btn btn-circle btn-info btn-xs ' " +
+								"title=\"Adiciona o funcionário a um aparelho que não o base\" >" +
+								"<i class='glyphicon glyphicon-plus'></i></a>";
+				lin += FimLinha();
+				ret += lin;
 				for( var ix=0; ix<resu.linhas; ix++ )
 					{
-					lin = IniLinha( cls );
-					lin += "<span style='margin-left: 10px'>Aparelho(s) do funcionário/Servidor</span>";
-					lin	+=	"<a style='margin-left: 10px; ' " +
-									"href='javascript:adicApar( " + 
-									original.IDFUNI + ", \"" + original.SSHD + "\", \"" + 
-									original.NOFUNC + "\", " + resu.dados[0].IDAPAL +  " )' " +
-									"class='btn btn-circle btn-info btn-xs ' " +
-									"title=\"Adiciona o funcionário a um aparelho que não o base\" >" +
-									"<i class='glyphicon glyphicon-plus'></i></a>";
-					lin += FimLinha();
-					ret += lin;
-
 					lin = IniLinha( cls );
 					aux	=	
 						{
