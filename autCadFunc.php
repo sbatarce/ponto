@@ -184,11 +184,13 @@ include 'partes/pagebody.php';
 			return false;
 			}
 		//	remove um SSHD de um aparelho e o FLTR associado
-		function removeSSHD()
+		function removeSSHD( apalid )
 			{
 			var funcao = "usuarios/" + sshd.substring(1);
-			var resul = repserviceB( "DELETE", funcao, idapal, "SISPONTO", null, null );
+			var resul = repserviceB( "DELETE", funcao, apalid, "SISPONTO", null, null );
 			var aux = resul.erro;
+			//	000 -> OK
+			//	022 -> não há este usuário no aparelho
 			if( aux.indexOf("000") >= 0 || aux.indexOf("022") >= 0 )
 				{
 				var url = "partes/removeFLTR.php?funiid="+ idfunc + 
@@ -237,15 +239,42 @@ include 'partes/pagebody.php';
 			atuatab( false );
 			}
 
-		function trocaBase( idfuni, sshd )
+		function trocaBase( idfuni, shd, apal, fltr )
 			{
 			idfunc = idfuni;
+			idapalant = apal;
+			idfltr = fltr;
+			sshd = shd;
+			idapal = -1
+			
 			$("#basemodal").modal('show');
 			}
 			
 		function baseOK()
 			{
-			$("#basemodal").modal('hide');
+			if( idapal == -1 )
+				{
+				alert( "Por favor, escolha um aparelho" );
+				return;
+				}
+			if( !removeSSHD( idapalant ) )
+				return;
+			if( adicionaSSHD( ) )
+				{
+				var url = "partes/trocaFLTR.php?fltrid="+ idfltr + 
+									"&apalid="+idapal;
+				var resul = remoto( url );
+				if( resul.status == "OK" )
+					{
+					alert( "OK: alterado" );
+					$("#basemodal").modal('hide');
+					}
+				else
+					{
+					alert( "Erro removendo funcionário do Local de Trabalho" + resul.erro );
+					return null;
+					}
+				}
 			}
 			
 		function adicApar( idfuni, shd, nome, apal )
@@ -280,7 +309,7 @@ include 'partes/pagebody.php';
 			sshd = shd;
 			idapal = apal;
 			
-			if( removeSSHD() )
+			if( removeSSHD( idapal ) )
 				{
 				$("#adicaparmodal").modal('hide');
 				atuatab( false );
@@ -305,6 +334,7 @@ include 'partes/pagebody.php';
 		var uorant = null;
 		
 		var sshd, nofunc, idapal;
+		var idfltr, idapalant;
 		
 		var url = "selectData.php?query=uor";
 		SelInit( ".uors", url, 0, "Escolha abaixo", escouor, 2 );
@@ -536,7 +566,7 @@ include 'partes/pagebody.php';
 						lin	+=	"<a style='margin-left: 10px; ' " +
 										"href='javascript:trocaBase( " + 
 										original.IDFUNI + ", \"" + original.SSHD + "\", " + 
-										resu.dados[ix].IDAPAL +  " )' " +
+										resu.dados[ix].IDAPAL + ", " + resu.dados[ix].IDFLTR +  " )' " +
 										"class='btn btn-circle btn-info btn-xs ' " +
 										"title=\"Troca o aparelho base do funcionário\" >" +
 										"<i class='glyphicon glyphicon-random'></i></a>";

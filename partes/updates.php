@@ -1,20 +1,14 @@
 <?php
-if( !isset( $_GET["query"] ) && !isset( $_GET["debug"] ) )
+if( !isset( $_GET["query"] ) )
 	{
 	echo	'{ "data": [{"erro": "parametro query obrigatório"}] }';
 	return;
 	}
-//	prepara o select
-if( isset( $_GET["query"] ) )
-	{
-	$qry = $_GET["query"];
-	$dbg = FALSE;
-	}
-if( isset( $_GET["debug"] ) )
-	{
-	$qry = $_GET["debug"];
-	$dbg = TRUE;
-	}
+$qry = $_GET["query"];
+if( isset( $_GET["dbg"] ) )
+	$dbg = true;
+else
+	$dbg = false;
 	
 //	prepara o query
 $sql	=	"";
@@ -37,6 +31,27 @@ if( $qry == "upd" )
 		return;
 		}	
 	$sql	=	"update ".$_GET["tbl"]." set ".$_GET["alter"]." where ".$_GET["selec"];
+	}
+
+//	update FLTR
+if( $qry == "updfltr" )
+	{
+	if( !isset( $_GET["idfltr"] ) )
+		{
+		echo	'{ "status": "erro", "erro": "parametro idfltr obrigatorio" }';
+		return;
+		}
+	if( !isset( $_GET["idlotr"] ) )
+		{
+		echo	'{ "status": "erro", "erro": "parametro idlotr obrigatorio" }';
+		return;
+		}
+		
+	$idfltr = $_GET["idfltr"];
+	$idlotr = $_GET["idlotr"];
+
+	$sql	=	"UPDATE BIOMETRIA.FLTR_FUNCIONARIOLOCALTRABALHO SET LOTR_ID=$idlotr
+							WHERE FLTR_ID=$idfltr";
 	}
 
 //	delete fdte
