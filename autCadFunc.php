@@ -541,7 +541,7 @@ include 'partes/pagebody.php';
 						lin	+=	"<a style='margin-left: 10px; ' " +
 										"href='javascript:trocaBase( " + 
 										original.IDFUNI + ", \"" + original.SSHD + "\", " + 
-										resu.dados[0].IDAPAL +  " )' " +
+										resu.dados[ix].IDAPAL +  " )' " +
 										"class='btn btn-circle btn-info btn-xs ' " +
 										"title=\"Troca o aparelho base do funcionário\" >" +
 										"<i class='glyphicon glyphicon-random'></i></a>";
@@ -551,7 +551,7 @@ include 'partes/pagebody.php';
 						lin	+=	"<a style='margin-left: 10px; ' " +
 										"href='javascript:removeApar( " + 
 										original.IDFUNI + ", \"" + original.SSHD + "\", " + 
-										resu.dados[0].IDAPAL +  " )' " +
+										resu.dados[ix].IDAPAL +  " )' " +
 										"class='btn btn-circle btn-info btn-xs ' " +
 										"title=\"Troca o regime do funcionário\" >" +
 										"<i class='glyphicon glyphicon-minus'></i></a>";
