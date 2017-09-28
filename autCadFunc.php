@@ -174,7 +174,7 @@ include 'partes/pagebody.php';
 					}
 				else
 					{
-					alert( "Erro trocando URL " + resul.erro );
+					alert( "Erro adicionando Local de Trabalho ao funcionário " + resul.erro );
 					return null;
 					}
 				return true;
@@ -251,6 +251,9 @@ include 'partes/pagebody.php';
 			if( adicionaSSHD( idapar, sshd ) )
 				{
 				$("#aparmodal").modal('hide');
+//				var chl	=	obterChild();
+//				chl.child( FormataChild( chl.data() ) );
+				atuatab( false );
 				}
 			}
 			
