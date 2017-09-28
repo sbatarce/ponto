@@ -151,6 +151,47 @@ include 'partes/pagebody.php';
 			}
 			
 		//	rotinas de manipulação dos aparelhos
+		//	remove o funcionario de um aparelho (apal) e insere em outro (apalnovo)
+		function trocaSSHD( idfltr, sshd, nome, apal, apalnovo )
+			{
+			//	insere no aparelho novo
+			var body =	"[ { \"nome\": \"" + nome +
+									"\", \"verifica_biometria\": true, " +
+									"\"referencias\": [ " + sshd.substring(1) +  " ]}]";
+			var resul = repserviceB( "POST", "usuarios", apalnovo, "SISPONTO", null, body );
+			var aux = resul.erro;
+			if( aux.indexOf("000") < 0 && aux.indexOf("023") < 0 )
+				{
+				alert( "Erro inserindo funcionário no novo Local de Trabalho" + resul.erro );
+				return;
+				}
+			//	remove do aparelho atual
+			var funcao = "usuarios/" + sshd.substring(1);
+			var resul = repserviceB( "DELETE", funcao, apal, "SISPONTO", null, null );
+			var aux = resul.erro;
+			//	000 -> OK
+			//	022 -> não há este usuário no aparelho
+			if( aux.indexOf("000") < 0 && aux.indexOf("022") < 0 )
+				{
+				alert( "Erro removendo funcionário do Local de Trabalho" + resul.erro );
+				return false;
+				}
+			//	troca no banco
+			var url = "partes/trocaFLTR.php?fltrid="+ idfltr + 
+								"&apalid=" + apal;
+			var resul = remoto( url );
+			if( resul.status == "OK" )
+				{
+				alert( "OK: alterado" );
+				$("#basemodal").modal('hide');
+				return true;
+				}
+			else
+				{
+				alert( "Erro removendo funcionário do Local de Trabalho" + resul.erro );
+				return false
+				}
+			}
 		//	adiciona um SSHD a um aparelho & atualiza FLTR
 		function adicionaSSHD()
 			{
@@ -159,12 +200,7 @@ include 'partes/pagebody.php';
 									"\"referencias\": [ " + sshd.substring(1) +  " ]}]";
 			var resul = repserviceB( "POST", "usuarios", idapal, "SISPONTO", null, body );
 			var aux = resul.erro;
-			if( aux.indexOf("023") >= 0 )
-				{
-				alert( "Atenção: este funcionário já se encontra neste aparelho" );
-				return false;
-				}
-			if( aux.indexOf("000") >= 0 )
+			if( aux.indexOf("000") >= 0 || aux.indexOf("023") >= 0 )
 				{
 				var url = "partes/adicionaFLTR.php?funiid="+ idfunc + 
 									"&apalid="+idapal;
@@ -238,13 +274,17 @@ include 'partes/pagebody.php';
 			$("#uormodal").modal('hide');
 			atuatab( false );
 			}
-
-		function trocaBase( idfuni, shd, apal, fltr )
+										
+		var sshd, nofunc, idapal;
+		var idfltr, idapalant;
+		function trocaBase( idfuni, shd, nome, apal, fltr )
 			{
 			idfunc = idfuni;
+			sshd = shd;
+			nofunc =nome;
 			idapalant = apal;
 			idfltr = fltr;
-			sshd = shd;
+
 			idapal = -1
 			
 			$("#basemodal").modal('show');
@@ -257,23 +297,9 @@ include 'partes/pagebody.php';
 				alert( "Por favor, escolha um aparelho" );
 				return;
 				}
-			if( !removeSSHD( idapalant ) )
-				return;
-			if( adicionaSSHD( ) )
+			if( trocaSSHD( ) )
 				{
-				var url = "partes/trocaFLTR.php?fltrid="+ idfltr + 
-									"&apalid="+idapal;
-				var resul = remoto( url );
-				if( resul.status == "OK" )
-					{
-					alert( "OK: alterado" );
-					$("#basemodal").modal('hide');
-					}
-				else
-					{
-					alert( "Erro removendo funcionário do Local de Trabalho" + resul.erro );
-					return null;
-					}
+				atuatab( false );
 				}
 			}
 			
@@ -565,7 +591,8 @@ include 'partes/pagebody.php';
 						{
 						lin	+=	"<a style='margin-left: 10px; ' " +
 										"href='javascript:trocaBase( " + 
-										original.IDFUNI + ", \"" + original.SSHD + "\", " + 
+										original.IDFUNI + ", \"" + original.SSHD + "\", \"" + 
+										original.NOFUNC + "\", " + 
 										resu.dados[ix].IDAPAL + ", " + resu.dados[ix].IDFLTR +  " )' " +
 										"class='btn btn-circle btn-info btn-xs ' " +
 										"title=\"Troca o aparelho base do funcionário\" >" +
