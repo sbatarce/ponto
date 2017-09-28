@@ -64,7 +64,8 @@ if( $qry == "obtaparelhosfunc" )
 						INNER JOIN  SAU.VWUORPUBLICA SUOR ON
 												SUOR.UOR_IDUNIDADEORGANIZACIONAL=APAL.PMS_IDSAUUOR AND
 												SUOR.UOR_DTFINAL IS NULL
-						WHERE FLTR.FUNI_ID=$funiid";
+						WHERE FLTR.FUNI_ID=$funiid 						
+						ORDER BY FLTR.FLTR_STBASE DESC";
 	}
 
 ////////////////////////////////////////////////////////////////////////////////

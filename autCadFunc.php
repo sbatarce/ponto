@@ -98,7 +98,7 @@ include 'partes/pagebody.php';
 		</div>
 		<!--======================================================================-->
 		<!-- modal de adição de aparelho -->
-    <div id="aparmodal" class="modal fade bs-modal-sm" role="dialog"
+    <div id="adicaparmodal" class="modal fade bs-modal-sm" role="dialog"
 				 aria-labelledby="mySmallModalLabel" aria-hidden="true"
 				 style="width: 500px; max-width: 500px;" >
 			<div class="modal-dialog modal-sm" style="width: 500px; max-width: 500px;">
@@ -151,6 +151,7 @@ include 'partes/pagebody.php';
 			}
 			
 		//	rotinas de manipulação dos aparelhos
+		//	adiciona um SSHD a um aparelho & atualiza FLTR
 		function adicionaSSHD()
 			{
 			var body =	"[ { \"nome\": \"" + nofunc +
@@ -182,10 +183,35 @@ include 'partes/pagebody.php';
 			alert( "Erro: " + aux );
 			return false;
 			}
-			
+		//	remove um SSHD de um aparelho e o FLTR associado
 		function removeSSHD( sshd )
 			{
-			
+			var funcao = "usuarios/" + sshd.substring(1);
+			var resul = repserviceB( "POST", "usuarios", idapal, "SISPONTO", null, null );
+			var aux = resul.erro;
+			if( aux.indexOf("022") >= 0 )
+				{
+				alert( "Atenção: este funcionário não está neste aparelho" );
+				return false;
+				}
+			if( aux.indexOf("000") >= 0 )
+				{
+				var url = "partes/removeFLTR.php?funiid="+ idfunc + 
+									"&apalid="+idapal;
+				var resul = remoto( url );
+				if( resul.status == "OK" )
+					{
+					alert( "OK: Removido" );
+					}
+				else
+					{
+					alert( "Erro removendo funcionário do Local de Trabalho" + resul.erro );
+					return null;
+					}
+				return true;
+				}
+			alert( "Erro: " + aux );
+			return false;
 			}
 			
 		//	funções de chamada e retorno dos modais
@@ -213,12 +239,10 @@ include 'partes/pagebody.php';
 				return null;
 				}
 			$("#uormodal").modal('hide');
-			var chl	=	obterChild();
-			chl.child( FormataChild( chl.data() ) );
 			atuatab( false );
 			}
 
-		function trocaBase( idfuni )
+		function trocaBase( idfuni, sshd )
 			{
 			idfunc = idfuni;
 			$("#basemodal").modal('show');
@@ -237,7 +261,7 @@ include 'partes/pagebody.php';
 			nofunc = nome;
 			idapal = -1;
 			
-			$("#aparmodal").modal('show');
+			$("#adicaparmodal").modal('show');
 			}
 			
 		function adicAparOK()
@@ -250,16 +274,9 @@ include 'partes/pagebody.php';
 			//
 			if( adicionaSSHD( idapar, sshd ) )
 				{
-				$("#aparmodal").modal('hide');
-//				var chl	=	obterChild();
-//				chl.child( FormataChild( chl.data() ) );
+				$("#adicaparmodal").modal('hide');
 				atuatab( false );
 				}
-			}
-			
-		function aparOK()
-			{
-			
 			}
 			
 		function escouor( tipo, id )
@@ -518,7 +535,8 @@ include 'partes/pagebody.php';
 					else
 						{
 						lin	+=	"<a style='margin-left: 10px; ' " +
-										"href='javascript:removeApar( " + original.IDFUNI + " )' " +
+										"href='javascript:removeApar( " + original.IDFUNI + ", \"" +
+										original.SSHD + "\" )' " +
 										"class='btn btn-circle btn-info btn-xs ' " +
 										"title=\"Troca o regime do funcionário\" >" +
 										"<i class='glyphicon glyphicon-minus'></i></a>";

@@ -11,7 +11,7 @@ if( !isset( $_GET["apalid"] ) )
 	return;
 	}
 $apalid = $_GET["apalid"];
-if( !isset( $_GET["base"] ) )
+if( isset( $_GET["base"] ) )
 	$base = 1;
 else
 	$base = 0;
