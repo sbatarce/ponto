@@ -232,7 +232,7 @@ include 'partes/Scripts.php';
 				res = "";
 				res += "<a href='javascript:pendencias(\"" + full.SSHDFUNC + "\");' ";
 				res += "<button type='button' title='Verificar pendências do funcionário' ";
-				res += "class='btn btn-warning  btn-md'>PEN</button></a>";
+				res += "class='btn btn-warning  btn-md'>ANA</button></a>";
 				
 				res += "<a href='javascript:ausencias( \"" + full.SSHDFUNC;
 				res += "\", \""+ full.IDFUNC + "\", \"" + full.NOFUNC + "\" );' ";
