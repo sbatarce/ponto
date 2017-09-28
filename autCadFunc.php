@@ -129,39 +129,6 @@ include 'partes/pagebody.php';
 				</div>
 			</div>
 		</div>
-		<!--======================================================================-->
-		<!-- modal de remoção de aparelho -->
-    <div id="removeaparmodal" class="modal fade bs-modal-sm" role="dialog"
-				 aria-labelledby="mySmallModalLabel" aria-hidden="true"
-				 style="width: 500px; max-width: 500px;" >
-			<div class="modal-dialog modal-sm" style="width: 500px; max-width: 500px;">
-				<div class="modal-content">
-					<div class="modal-header">
-						<button type="button" class="close" data-dismiss="modal" aria-hidden="true"
-										onclick="javascript:cancel()">
-							&times;
-						</button>
-						<h4 id="titAdicApar" class="modal-title">Troca do aparelho base</h4>
-					</div>
-					<div class="modal-body" id="bdymodal" ng>
-						<div class='row linha' style='margin-top: 10px; margin-left:30px;'>
-							<h5>Escolha o aparelho ao qual o funcionário será adicionado</h5>
-							<input style='width:90%;' class='input-small lsapar' 
-										 id="selapar" title="Escolha um aparelho"/>
-						</div>
-					</div>
-					<div class="modal-footer">
-						<center>
-							<button type="button" class="btn btn-primary"
-											onclick="javascript:removeAparOK()">
-											OK
-							</button>
-							<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-						</center>
-					</div>
-				</div>
-			</div>
-		</div>
 
 <?php
 	include 'partes/Scripts.php';
@@ -316,19 +283,8 @@ include 'partes/pagebody.php';
 			{
 			idfunc = idfuni;
 			sshd = shd;
-			idapal = -1;
+			idapal = apal;
 			
-			$("#removeaparmodal").modal('show');
-			}
-			
-		function removeAparOK()
-			{
-			if( idapal == -1 )
-				{
-				alert( "Por favor, escolha um aparelho" );
-				return;
-				}
-			//
 			if( removeSSHD() )
 				{
 				$("#adicaparmodal").modal('hide');
