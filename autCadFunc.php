@@ -189,11 +189,6 @@ include 'partes/pagebody.php';
 			var funcao = "usuarios/" + sshd.substring(1);
 			var resul = repserviceB( "DELETE", funcao, idapal, "SISPONTO", null, null );
 			var aux = resul.erro;
-			if( aux.indexOf("022") >= 0 )
-				{
-				alert( "Atenção: este funcionário não está neste aparelho" );
-				return false;
-				}
 			if( aux.indexOf("000") >= 0 || aux.indexOf("022") >= 0 )
 				{
 				var url = "partes/removeFLTR.php?funiid="+ idfunc + 
