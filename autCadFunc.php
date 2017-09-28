@@ -297,7 +297,7 @@ include 'partes/pagebody.php';
 				alert( "Por favor, escolha um aparelho" );
 				return;
 				}
-			if( trocaSSHD( ) )
+			if( trocaSSHD( idfltr, sshd, nofunc, idapalant, idapal ) )
 				{
 				atuatab( false );
 				}
