@@ -7,7 +7,7 @@
 	var dlen		=	"10";                   //  quantidade de elementos por página
 	var lens    = [
                   [5, 10, 20, 30, -1],
-                  [5, 10, 20, 30, "todos"]
+                  ["5", "10", "20", "30", "todos"]
                 ];
 
 	var aiNew = null;
@@ -29,6 +29,9 @@
 								"<a href='#' class='btn btn-circle btn-danger btn-xs delete' data-mode='alt' " +
 								"title=\"remover a linha\" >" +
 								"   <i class='typcn typcn-delete-outline'></i></a>";
+	var acsoalt = "<a href='#' class='btn btn-circle btn-info btn-xs edit' data-mode='alt' " +
+								"title=\"editar a linha\" >" +
+								"   <i class='typcn typcn-edit'></i></a>";
 	var acnova	=	"<a href='#' class='btn btn-success btn-xs save' data-mode='new' " +
 								"title=\"salvar\" >" +
 								"   <i class='typcn typcn-tick-outline'></i></a>" +
@@ -300,10 +303,11 @@
 				if( nNova == null )
 					SelInit( "."+colDefs[itds].classe, colDefs[itds].selURL, 
 									aData[colDefs[itds].selID], aData[colDefs[itds].selVal], 
-									null, colDefs[itds].selminlen );
+									colDefs[itds].funcEscolha, colDefs[itds].selminlen );
 				else
 					SelInit( "."+colDefs[itds].classe, colDefs[itds].selURL, 
-									0, "Escolha abaixo", null, colDefs[itds].selminlen );
+									0, "Escolha abaixo", 
+                  colDefs[itds].funcEscolha, colDefs[itds].selminlen );
 				}
 			}
 		}
@@ -332,10 +336,6 @@
 		var jqTds = $('>td', nRow);
 		var	ichk, iinp, isel, sel, cbval, icol, tipo;
 		var aData = oTable.fnGetData(nRow);
-		for( var i=0; i<colDefs.length; i++ )
-			{
-			console.log( colDefs[i] );
-			}
 		isel	=	0;
 		for( ichk=0; ichk<jqChks.length; ichk++ )
 			{
@@ -412,7 +412,22 @@
 		
 	function tableDestroy()
 		{
-		Table.fnDestroy();
+    if( Table != null && Table != undefined )
+      Table.fnDestroy();
+		}
+	
+	function tableClear()
+		{
+    if( Table != null && Table != undefined )
+      Table.api().clear().draw();
+		}
+	
+	function tableQtLins()
+		{
+    if( Table != null && Table != undefined )
+      return Table.fnGetData().length;
+    else
+      return 0;
 		}
 	
 	var inicializa = function ()
@@ -425,7 +440,7 @@
 					(
 						{
 						"aLengthMenu": lens,
-						"iDisplayLength": dlen,
+						"iDisplayLength": 10,
 						"sPaginationType": "bootstrap",
 						"sDom": "Tflt<'row DTTTFooter'<'col-sm-6'i><'col-sm-6'p>>",
 						"aoColumnDefs": colDefs,

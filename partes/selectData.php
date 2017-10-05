@@ -1,5 +1,9 @@
 <?php
 //	seleçao no formato adequado para SELECT2 (combo box web)
+//		selectData.php?query=xpto
+//			parametros opcionais
+//				semzero		-	não gerar o { "id": "0", "text": "Escolha abaixo:" }
+//				maisum e numais - gerar { "id": "$numais", "text": "$maisum" }
 function toHex($string)
 	{
 	$hex='';
@@ -21,6 +25,23 @@ if( isset( $_GET["semzero"] ) )
 	$sem0 = true;
 else
 	$sem0 = false;
+
+if( isset( $_GET["maisum"] ))
+	{
+	$maisum = $_GET["maisum"];
+	if( !isset( $_GET["numais"] ) )
+		{
+		echo '[ {"id": "00", "text": "parametro numais obrigatorio com maisum" } ]';
+		return;
+		}
+	$numais = $_GET["numais"];
+	}
+else
+	{
+	$maisum = "";
+	$numais = -1;
+	}
+
 //	prepara o select
 $sql	=	"";
 $debug = false;
@@ -48,6 +69,13 @@ if( $qry == "xpto" )
 	}
 
 ////////////////////////////////////////////////////////////////////////////////
+//	
+if( $qry == "regimes" )
+	{
+	$sql	=	"SELECT RETR_ID, RETR_DLNOME FROM  BIOMETRIA.RETR_REGIMETRABALHO";
+	}
+
+////////////////////////////////////////////////////////////////////////////////
 //	lista de aparelhos associados ao PONTO
 if( $qry == "aparelhos" )
 	{
@@ -68,10 +96,9 @@ if( $qry == "aparelhos" )
 //	lista de UORS
 if( $qry == "uor" )
 	{
-	$sql	=	"select UOR_IDUNIDADEORGANIZACIONAL, " .
-					"CONCAT( CONCAT( UOR_DLSIGLAUNIDADE, '-' ), " .
-					"replace( UOR_DLNOMEUNIDADE, '\"', ' ' ) ) as NOME " .
-					"from SAU.VWUORPUBLICA where EMP_IDEMPRESA = 1";
+	$sql	=	"SELECT UOR_IDUNIDADEORGANIZACIONAL, UOR_DLSIGLAUNIDADE AS NOME 
+						FROM SAU.VWUORPUBLICA 
+						WHERE EMP_IDEMPRESA = 1 AND UOR_DTFINAL IS NULL";
 	}
 
 //	funcsuor - funcionários pertencentes a uma UOR
@@ -153,10 +180,17 @@ $qtcmp	=	$jsres->linhas;
 if( $debug )
 	echo "linhas=$qtcmp<br>\r\n";
 
+$data = '[ ';
 if( !$sem0 )
-	$data		=	'[ {"id":"0", "text":"Escolha abaixo"}';
-else
-	$data = '[ ';
+	$data		.=	'{"id":"0", "text":"Escolha abaixo"}';
+
+if( $numais >= 0 )
+	{
+	if( strlen( $data ) > 3 )
+		$data	.=	",";
+	$data		.=	"{\"id\":\"$numais\", \"text\":\"$maisum\"}";
+	}
+	
 for( $irec=0; $irec<$qtcmp; $irec++ )
 	{
 	$col = 0;

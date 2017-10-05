@@ -141,15 +141,6 @@ include 'partes/pagebody.php';
 			Deslogar();
 			}
 
-		function setAjax( del )
-			{
-			//
-			if( del != 0 )
-				tableDestroy();
-			AjaxSource	=	"partes/tableData.php?query=autcadas&sshd=" + sshd;
-			inicializa.init();
-			}
-			
 		//	rotinas de manipulação dos aparelhos
 		//	remove o funcionario de um aparelho (apal) e insere em outro (apalnovo)
 		function trocaSSHD( idfltr, sshd, nome, apal, apalnovo )
@@ -353,6 +344,16 @@ include 'partes/pagebody.php';
 			if( id > 0 )
 				idapal	=	id;
 			}
+
+		function setAjax( del )
+			{
+			//
+			if( del != 0 )
+				tableDestroy();
+			AjaxSource	=	"partes/tableData.php?query=autcadas&sshd=" + sshd;
+			inicializa.init();
+			}
+			
 /////////////// PRINCIPAL ////////////////////////
 		var idfuni = -1;
 		var idapar = -1;
@@ -381,15 +382,17 @@ include 'partes/pagebody.php';
 		var acremove = "<a href='#' class='btn btn-circle btn-danger btn-xs delete' " +
 										"data-mode='alt' title=\"remover funcionário da UOR\" > " +
 										"<i class='typcn typcn-delete-outline'></i></a>";
-		//$("#eddt_new").hide();																		//	esconde o adicionar
+								
+		//$("#eddt_new").hide();																	//	esconde o adicionar
 		var notabel			=	"BIOMETRIA.FUNI_FUNCIONARIO";						//	nome da tabela base
 		var	nocmpid			=	"FUNI_ID";															//	nome do campo ID da tabela base
 		var sequence		= "BIOMETRIA.SQ_FUNI";
 		var liNova			=
 						{
-						"UNIDADE": "",
 						"SSHD": "",
-						"NOME": ""
+						"NOME": "",
+						"REGIME": "",
+						"UNIDADE": ""
 						};
 		var	order	=	[];						//	ordem de apresentação
 		//	prepara a definição das colunas
@@ -412,39 +415,83 @@ include 'partes/pagebody.php';
 		
 		aux	=
 			{
-			"tipo": "x",
-			"editavel": false,
-			"vanovo": "",
-			"aTargets": [ ++col ],
-			"mData": "UNIDADE",
-			"sTitle":"Unidade",
-			"defaultContent": " "
-			};
-		colDefs.push( aux );
-		
-		aux	=
-			{
-			"tipo": "x",
+			"tipo": "t",
 			"editavel": false,
 			"vanovo": "",
 			"aTargets": [ ++col ],
 			"mData": "SSHD",
 			"sTitle":"SSHD",
+			"width": "10%",
 			"defaultContent": " "
 			};
 		colDefs.push( aux );
 		
 		aux	=
 			{
-			"tipo": "x",
+			"tipo": "t",
 			"editavel": false,
 			"vanovo": "",
 			"aTargets": [ ++col ],
 			"mData": "NOFUNC",
 			"sTitle":"Servidor/Funcionário",
+			"width": "20%",
 			"defaultContent": " "
 			};
 		colDefs.push( aux );
+
+		aux	=
+			{
+			"tipo": "l",
+			"editavel": true,
+			"vanovo": "",
+			"aTargets": [ ++col ],
+			"mData": "UNIDADE",
+			"sTitle":"Unidade Lotação",
+			"selID": "IDLOTADO",
+			"classe": "cbuors",
+			"selVal": "UNIDADE",
+			"selminlen": 1,
+			"selURL": "selectData.php?query=uor",
+			"funcEscolha": escUor,
+			"width": "15%",
+			"defaultContent": " "
+			};
+		colDefs.push( aux );
+		
+		aux	=
+			{
+			"tipo": "l",
+			"editavel": true,
+			"vanovo": "",
+			"aTargets": [ ++col ],
+			"mData": "NOREG",
+			"sTitle":"Regime",
+			"selID": "IDREG",
+			"classe": "cbregi",
+			"selVal": "NOREG",
+			"selminlen": 1,
+			"selURL": "selectData.php?query=regimes",
+			"funcEscolha": escRegi,
+			"width": "15%",
+			"defaultContent": " "
+			};
+		colDefs.push( aux );
+		
+		aux	=	
+			{
+			"tipo": null,
+			"editavel": false,
+			"vanovo": "",
+			"bSortable": false,
+			"searchable": false,
+			"aTargets": [ ++col ],
+			"orderable":false,
+			"mData":null,
+			"width": "5%",
+			"defaultContent": acsoalt
+			};
+		colDefs.push( aux );
+		
 		/*
 		aux	=	
 			{
@@ -461,9 +508,93 @@ include 'partes/pagebody.php';
 			};
 		colDefs.push( aux );
 		*/
-		//
-		//
-	
+	 
+		//	variáveis e rotinas de atualização
+		var ixedt = -1;			//	row sendo editada
+		var iduor = -1;			//	última uor escolhida
+		var idreg = -1;
+		
+		function escRegi( tipo, id )
+			{
+			if( id >= 0 )
+				idreg	=	id;
+			}
+
+		function escUor( tipo, id )
+			{
+			if( id >= 0 )
+				iduor	=	id;
+			}
+
+		function deleteRow( oTable, nRow )
+			{
+			}
+		function restoreRow( oTable, nRow )
+			{
+			restoreRowG( oTable, nRow );
+			ixedt = -1;
+			}
+		function editRow( oTable, nRow )
+			{
+			ixedt = nRow;
+			iduor = -1;
+			editRowG( oTable, nRow );
+			}
+		function saveRow( oTable, nRow )
+			{
+			var sql = "";
+			var aData = oTable.fnGetData(nRow);
+			if( iduor > 0 || idreg > 0 )
+				{
+				var que = "Estas modificações somente serão válidas a partir do " +
+									" primeiro dia do mês seguinte.\n" +
+									"Por favor, confirme ou cancele."
+				var res = confirm( que );
+				if( !res )
+					{
+					restoreRowG( oTable, nRow );
+					ixedt = -1;
+					return true;
+					}
+				if( iduor > 0 )
+					{
+					var url = "partes/trocaUorFunc.php?funiid="+ aData["IDFUNI"] + 
+										"&uornova="+iduor;
+					var resul = remoto( url );
+					if( resul.status == "OK" )
+						{
+						atuatab( false );
+						}
+					else
+						{
+						alert( "Erro trocando URL " + resul.erro );
+						return null;
+						}
+					}
+				if( idreg > 0 )
+					{
+					var url = "partes/trocaRegiFunc.php?funiid="+ aData["IDFUNI"] + 
+										"&reginovo="+idreg;
+					var resul = remoto( url );
+					if( resul.status == "OK" )
+						{
+						atuatab( false );
+						}
+					else
+						{
+						alert( "Erro trocando URL " + resul.erro );
+						return null;
+						}
+					}
+				}
+			//saveRowG( oTable, nRow, idnovo );
+			return true;
+			}
+		function cancelEditRow( oTable, nRow )
+			{
+			cancelEditRowG( oTable, nRow );
+			}
+			
 		function completaChild( original )
 			{
 			return " ";

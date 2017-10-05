@@ -8,13 +8,13 @@ if( !isset( $_GET["funiid"] ) )
 	}
 $funiid = $_GET["funiid"];
 
-//	verifica parametro uornova = ID da nova UOR do funcionário
-if( !isset( $_GET["uornova"] ) )
+//	verifica parametro reginovo = ID do novo regime
+if( !isset( $_GET["reginovo"] ) )
 	{
-	echo	'{ "data": [{"erro": "parametro uornova obrigatório"}] }';
+	echo	'{ "data": [{"erro": "parametro reginovo obrigatório"}] }';
 	return;
 	}
-$uornova = $_GET["uornova"];
+$reginovo = $_GET["reginovo"];
 //
 include '../partes/fmtErro.php';
 include '../partes/ambiente.php';
@@ -47,10 +47,8 @@ if( $dbg )
 	echo "conectou amb=$amb use=$userb role=$role<br>";
 	}
 	
-//	verifica se a nova UOR existe no SAU
-$sql = "SELECT UOR_DTINICIAL from SAU.VWUORPUBLICA 
-					WHERE UOR_DTFINAL IS NULL AND
-								UOR_IDUNIDADEORGANIZACIONAL=$uornova";
+//	verifica se o novo regime existe
+$sql = "SELECT RETR_DLNOME FROM  BIOMETRIA.RETR_REGIMETRABALHO WHERE RETR_ID=$reginovo";
 $res = $ora->execSelect($sql);
 $jres = json_decode($res);
 if( $dbg )
@@ -60,22 +58,21 @@ if( $dbg )
 	}
 if( $jres->status != "OK" )
 	{
-	fmtErro( "erro", "Verificando existencia da UOR: $jres->erro" );
+	fmtErro( "erro", "Verificando existencia do regime novo: $jres->erro" );
 	$ora->disconnect();
 	return;
 	}
 if( $jres->linhas < 1 )
 	{
-	fmtErro( "erro", "Esta UOR não existe" );
+	fmtErro( "erro", "Este regime não existe" );
 	$ora->disconnect();
 	return;
 	}
 $ora->libStmt();
 
-//	verifica se há um FUOR aberto para o funcionário
-$sql = "SELECT FUOR_ID, PMS_IDSAUUOR FROM BIOMETRIA.FUOR_FUNCUNIDADEORGANIZACIONAL
-					WHERE FUOR_DTFIM IS NULL AND
-								FUNI_ID=$funiid";
+//	verifica se há um FRTR aberto para o funcionário
+$sql = "SELECT FRTR_ID FROM BIOMETRIA.FRTR_FUNCIONARIOREGIMETRABALHO 
+					WHERE FRTR_DTFIM IS NULL AND FUNI_ID=$funiid";
 $res = $ora->execSelect($sql);
 $jres = json_decode($res);
 if( $dbg )
@@ -89,29 +86,29 @@ if( $jres->status != "OK" )
 	$ora->disconnect();
 	return;
 	}
-$idfuorant = -1;
+$idregiant = -1;
 if( $jres->linhas > 0 )
 	{
 	$dado = $jres->dados[0];
 	if( $dbg )
 		var_dump( $dado );
-	$idfuorant = $dado->FUOR_ID;
+	$idregiant = $dado->FRTR_ID;
 	}
 if( $dbg )
-	echo "uor anterior=$idfuorant<br>";
+	echo "uor anterior=$idregiant<br>";
 $ora->libStmt();
 
 //	inicia uma transação 
 $ora->beginTransaction();
 
-//	fecha a eventual FUOR atual
+//	fecha o eventual Regime corrente
 if( $dbg )
-	echo "id da uor anterior: $idfuorant<br>";
-if( $idfuorant >= 0 )
+	echo "id do regime anterior: $idregiant<br>";
+if( $idregiant >= 0 )
 	{
-	$sql = "UPDATE BIOMETRIA.FUOR_FUNCUNIDADEORGANIZACIONAL 
-						SET FUOR_DTFIM=LAST_DAY(SYSDATE)
-						WHERE FUOR_ID=$idfuorant";
+	$sql = "UPDATE BIOMETRIA.FRTR_FUNCIONARIOREGIMETRABALHO 
+						SET FRTR_DTFIM=LAST_DAY(SYSDATE) 
+						WHERE FRTR_ID=$idregiant";
 	$res = $ora->execDelUpd($sql);
 	$jres = json_decode( $res );
 	if( $dbg )
@@ -129,13 +126,14 @@ if( $idfuorant >= 0 )
 	}
 	
 //	cria a nova alocação
-$sql = "INSERT INTO BIOMETRIA.FUOR_FUNCUNIDADEORGANIZACIONAL VALUES
-				  ( BIOMETRIA.SQ_FUOR.NEXTVAL, $funiid, $uornova, LAST_DAY(SYSDATE)+1, null )";
-$res = $ora->execInsert( $sql, "BIOMETRIA.SQ_FUOR" );
+$sql = "INSERT INTO BIOMETRIA.FRTR_FUNCIONARIOREGIMETRABALHO VALUES
+					( BIOMETRIA.SQ_FRTR.NEXTVAL, $funiid, $reginovo, null, 
+						LAST_DAY(SYSDATE)+1, null )";
+$res = $ora->execInsert( $sql, "BIOMETRIA.SQ_FRTR" );
 $jres = json_decode( $res );
 if( $dbg )
 	{
-	echo "insere a nova alocação SQL=$sql/resultado:";
+	echo "insere o novo regime SQL=$sql / resultado:";
 	var_dump($jres);
 	}
 if( $jres->status != "OK" )

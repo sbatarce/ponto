@@ -14,6 +14,93 @@ if( isset( $_GET["dbg"] ) )
 	$dbg = TRUE;
 $sql	=	"";
 ////////////////////////////////////////////////////////////////////////////////
+//	funuorbio	tabela de pessoas em uma UOR do SAU com contagem de BIOMETRIA
+//						
+//	Parametros 
+//			iduor		-	id da UOR a selecionar pessoas
+//			todos		- traz ou não as pessoas ja alocadas em iduor
+if( $qry == "funuorbio" )
+	{
+	if( !isset( $_GET["iduor"] ) )
+		{
+		echo	'{ "data": [{"erro": "parametro iduor obrigatorio"}] }';
+		return;
+		}
+	$iduor = $_GET["iduor"];
+	
+	$sql = "SELECT  FUNI.FUNI_ID, IUN, NOME, IDUOR AS IDUORSAU, DCSIGLAUOR AS SIGLAUORSAU, 
+									RETR.RETR_ID AS IDRETR, RETR.RETR_DLNOME AS REGIME, 
+									FUOR.PMS_IDSAUUOR AS IDUORPONTO, SUOR.UOR_DLSIGLAUNIDADE AS SIGALUORPONTO,
+									( SELECT COUNT(1) FROM BIOMETRIA.PEBI_PESSOABIOMETRIA PEBI 
+											WHERE PEBI.SIIN_ID=100 AND PEBI.PMS_IDPMSPESSOA=TO_NUMBER( SUBSTR(VFAT.IUN,2,8) ) ) AS QTBIO
+						FROM      BIOMETRIA.VWFUNCIONARIOATIVO VFAT
+						LEFT JOIN BIOMETRIA.FUNI_FUNCIONARIO FUNI ON
+											FUNI.FUNI_STATIVO = 1 AND
+											FUNI.PMS_IDPMSPESSOA = VFAT.IUN
+						LEFT JOIN BIOMETRIA.FRTR_FUNCIONARIOREGIMETRABALHO FRTR ON
+											TRUNC(SYSDATE) BETWEEN FRTR.FRTR_DTINICIO AND NVL(FRTR.FRTR_DTFIM, SYSDATE + 1) AND 
+											FRTR.FUNI_ID = FUNI.FUNI_ID
+						LEFT JOIN BIOMETRIA.RETR_REGIMETRABALHO RETR ON
+											RETR.RETR_ID=FRTR.RETR_ID
+						LEFT JOIN BIOMETRIA.FUOR_FUNCUNIDADEORGANIZACIONAL FUOR ON
+											TRUNC(SYSDATE) BETWEEN FUOR.FUOR_DTINICIO AND NVL(FUOR.FUOR_DTFIM, SYSDATE + 1) AND
+											FUOR.FUNI_ID = FUNI.FUNI_ID
+						LEFT JOIN SAU.VWUORPUBLICA SUOR ON
+											SUOR.UOR_IDUNIDADEORGANIZACIONAL=FUOR.PMS_IDSAUUOR
+						WHERE IDUOR=$iduor ";
+	if( !isset( $_GET["todos"] ) )		//	só os não alocados no PONTO
+		$sql .= "AND FUOR.PMS_IDSAUUOR IS NULL ";
+//		$sql .= "AND (FUOR.PMS_IDSAUUOR IS NULL OR FUOR.PMS_IDSAUUOR <> $iduor ) ";
+	$sql .= "ORDER BY NOME";
+	}
+	
+////////////////////////////////////////////////////////////////////////////////
+//	autfuuor	tabela de funcionários de uma UOR para inclusão
+//	Parametros 
+//			iduor		-	id da UOR a selecionar pessoas
+//			todos		-	se presente mostra pessoas alocadas ou não
+if( $qry == "autfuuor" )
+	{
+	if( !isset( $_GET["iduor"] ) )
+		{
+		echo	'{ "data": [{"erro": "parametro iduor obrigatorio"}] }';
+		return;
+		}
+	$iduor = $_GET["iduor"];
+	
+	$sql = "SELECT  FUNI.FUNI_ID, IUN, NOME, IDUOR AS IDUORSAU, DCSIGLAUOR AS SIGLAUORSAU, 
+									RETR.RETR_ID AS IDRETR, RETR.RETR_DLNOME AS REGIME, 
+									FUOR.PMS_IDSAUUOR AS IDUORPONTO, SUOR.UOR_DLSIGLAUNIDADE AS SIGALUORPONTO,
+									LISTAGG( LOTR.APAL_ID, ',' ) 
+										WITHIN GROUP( ORDER BY LOTR.APAL_ID ) AS APARELHOS
+							FROM BIOMETRIA.VWFUNCIONARIOATIVO VFAT
+							LEFT JOIN BIOMETRIA.FUNI_FUNCIONARIO FUNI ON
+												FUNI.FUNI_STATIVO = 1 AND
+												FUNI.PMS_IDPMSPESSOA = VFAT.IUN
+							LEFT JOIN BIOMETRIA.FLTR_FUNCIONARIOLOCALTRABALHO FLTR ON
+												FLTR.FUNI_ID=FUNI.FUNI_ID
+							LEFT JOIN BIOMETRIA.LOTR_LOCALTRABALHO LOTR ON
+												LOTR.LOTR_ID=FLTR.LOTR_ID
+							LEFT JOIN BIOMETRIA.FRTR_FUNCIONARIOREGIMETRABALHO FRTR ON
+												TRUNC(SYSDATE) BETWEEN FRTR.FRTR_DTINICIO AND NVL(FRTR.FRTR_DTFIM, SYSDATE + 1) AND 
+												FRTR.FUNI_ID = FUNI.FUNI_ID
+							LEFT JOIN BIOMETRIA.RETR_REGIMETRABALHO RETR ON
+												RETR.RETR_ID=FRTR.RETR_ID
+							LEFT JOIN BIOMETRIA.FUOR_FUNCUNIDADEORGANIZACIONAL FUOR ON
+												TRUNC(SYSDATE) BETWEEN FUOR.FUOR_DTINICIO AND NVL(FUOR.FUOR_DTFIM, SYSDATE + 1) AND
+												FUOR.FUNI_ID = FUNI.FUNI_ID
+							LEFT JOIN SAU.VWUORPUBLICA SUOR ON
+												SUOR.UOR_IDUNIDADEORGANIZACIONAL=FUOR.PMS_IDSAUUOR
+							WHERE IDUOR=$iduor ";
+	if( !isset( $_GET["todos"] ) )
+		$sql .= "AND FUNI.FUNI_ID IS NULL ";
+	$sql .= "	GROUP BY  FUNI.FUNI_ID, IUN, NOME, IDUOR, DCSIGLAUOR,
+											RETR.RETR_ID, RETR.RETR_DLNOME, 
+											FUOR.PMS_IDSAUUOR, SUOR.UOR_DLSIGLAUNIDADE
+						ORDER BY NOME";
+	}
+	
+////////////////////////////////////////////////////////////////////////////////
 //	autcadas	tabela de funcionários de um autorizador para cadastro
 //	Parametros SSHD de um autorizador
 if( $qry == "autcadas" )
@@ -27,7 +114,8 @@ if( $qry == "autcadas" )
 
 	$sql = "SELECT  SUOR.UOR_DLSIGLAUNIDADE AS UNIDADE, FUNI.FUNI_ID AS IDFUNI,
 									FUNI.PMS_IDPMSPESSOA AS SSHD, 
-									FUOR.PMS_IDSAUUOR as IDLOTADO, PESS.NOME AS NOFUNC
+									FUOR.PMS_IDSAUUOR as IDLOTADO, PESS.NOME AS NOFUNC,
+									RETR.RETR_ID AS IDREG, RETR.RETR_DLNOME AS NOREG
 						FROM        BIOMETRIA.FUAU_FUNCIONARIOAUTORIZADOR FUAU
 						INNER JOIN  BIOMETRIA.FUNI_FUNCIONARIO FUNIA ON
 												FUNIA.FUNI_ID=FUAU.FUNI_ID AND
@@ -43,6 +131,11 @@ if( $qry == "autcadas" )
 						INNER JOIN  SAU.VWPESSOA_SSHD PESS ON
 												PESS.IUN = FUNI.PMS_IDPMSPESSOA AND 
 												PESS.REGISTRO_FUNCIONAL_ATIVO = 1
+						INNER JOIN  BIOMETRIA.FRTR_FUNCIONARIOREGIMETRABALHO FRTR ON
+												FRTR.FUNI_ID=FUNI.FUNI_ID AND
+												FRTR.FRTR_DTFIM IS NULL
+						INNER JOIN  BIOMETRIA.RETR_REGIMETRABALHO RETR ON
+												RETR.RETR_ID=FRTR.RETR_ID
 						WHERE   FUAU.FUAU_DTFIM IS NULL
 						ORDER BY  FUOR.PMS_IDSAUUOR, PESS.NOME";
 	}

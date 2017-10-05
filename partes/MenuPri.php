@@ -22,18 +22,18 @@
 											</a>
 										<li>
 											<a href="autApaFunc.php" ttip="ttip" data-placement="bottom" 
-												 data-original-title="Associar aparelho" 
+												 data-original-title="Alocar pessoas" 
 												 class="aut" style="color:darksalmon ;" >
 												<i class="glyphicon glyphicon-time"></i>
-												Associar Aparelho
+												Alocar pessoas
 											</a>
 										</li>
 										<li>
 											<a href="autRegFunc.php" ttip="ttip" data-placement="bottom" 
-												 data-original-title="Associar regimes" 
+												 data-original-title="Administrar aparelhos" 
 												 class="aut" style="color: blueviolet;">
 												<i class="glyphicon glyphicon-calendar "></i>
-												Associar Regimes
+												Administrar aparelhos
 											</a>
 										</li>
 										<li>

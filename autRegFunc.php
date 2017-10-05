@@ -1,174 +1,567 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <title>Biometria</title>
-		<?php
-		include 'partes/Head.php';
-		?>
-  </head>
-
-  <body onload="javascript:Titulo( '<h4>Associar Regimes</h4>' );">
-		<?php
-		include 'partes/Menu.php';
-		include 'partes/Cabec.php';
-		include 'partes/pageheader.php';
-		?>
-    <img src="imagens/carrega.gif" id="carrega" style="display:none" />
-    <!-- Conteúdo específico da página -->
-    <div class='row input-append linha' style='margin-top: 10px; margin-left:30px;'>
-			<p><b><font size="20">Em construção</b></p>
+	<head>
+    <title>Ponto do funcionário</title>
+		<style>
+			.table thead>tr>th {text-align: center;}
+		</style>
+<?php
+include 'partes/Head.php';
+?>
+		<!-- Favicon -->
+		<link rel="shortcut icon" href="/imagens/PMSICO.png">
+		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+		<link href="bootstrap-3.3.1/dist/css/bootstrap-switch.css" rel="stylesheet">
+	</head>
+	
+	<body onload="javascript:titulo( '<h4>Lista de todos todos os usuários do Autorizador</h4>' );">
+<?php
+include 'partes/MenuPri.php';
+include 'partes/Cabec.php';
+include 'partes/pageheader.php';
+include 'partes/pagebody.php';
+?>
+		<div class='row form-group' 
+				 style='margin-bottom: 5px; margin-left:4px;' data-toggle="buttons">
+			<div class="col-lg-6" style='width:35%;'>
+					UOR de PONTO
+					<input style='width:80%; margin-left:0px;' 
+								 class='input-small uoralo' id="uoralo" 
+								 title="UORs sob administração do autorizador"/>
+			</div>
+			<div class="col-lg-6" style='width:35%;'>
+					UOR da qual adicionar pessoas
+					<input style='width:80%; margin-left:0px;' 
+								 class='input-small uors' id="uors" 
+								 title="As pessoas da UOR (do SAU) escolhida e
+								 que ainda não constam da tabela,
+								 serão incluidas."/>
+			</div>
+			<div class="col-lg-6" style='width:30%;'>
+					Regime a atribuir<input style='width:70%; margin-left:0px;' 
+																	class='input-small regimes' id="selreg" 
+																	title="Regime a atribuir a todos os 
+																	funcionários não lotados na UOR"/>
+			</div>
 		</div>
-
-		<?php
-			include 'partes/Scripts.php';
-		?>
-	<script type="text/javascript" src="partes/geral.js" ></script>
-	<script>
-		$( function()
-			{
-			$( "#dtinic" ).datepicker(
-				{
-				dateFormat: "dd/mm/yy"
-				});
-			$( "#dtterm" ).datepicker(
-				{
-				dateFormat: "dd/mm/yy"
-				});
-
-			$( "#dtinic" ).change(
-			function()
-				{
-				dtinic = $("#dtinic").datepicker("getDate");
-				$( "#presen" ).html( "" );
-				Registro();
-				});
-
-			$( "#dtterm" ).change(
-			function()
-				{
-				dtterm = $("#dtterm").datepicker("getDate");
-				$( "#presen" ).html( "" );
-				Registro();
-				});
-			});
+		<div class='row form-group' 
+				 style='margin-bottom: 5px; margin-left:4px;' data-toggle="buttons">
+			<div class="col-lg-6" style='width:50%;'>
+				<input class="btn btn-primary" type="button" value="Adicionar por SSHD"
+							 onclick="javascript:atribuir();"
+							 title="Seleciona uma pessoa a partir do SSHD (do SAU).
+							 Adiciona a pessoa na lista abaixo.">
+				<input class="btn btn-primary" type="button" value="Alocar pessoas na UOR do PONTO"
+							 onclick="javascript:executar();"
+							 title="Coloca todas as pessoas da lista
+							 abaixo na UOR de PONTO selecionada
+							 que ainda não estão na UOR de PONTO.">
+			</div>
+		</div>
 		
+										<table class="table table-striped table-hover table-bordered" id="eddt">
+											<thead><tr role="row"></tr></thead>
+											<tfoot><tr role="row"></tr></tfoot>
+											<tbody></tbody>
+										</table>
+									</div> <!-- class="widget-body" -->
+								</div> <!-- class="col-xs-12 col-md-12" -->
+							</div> <!-- class="row" -->
+						</div> <!-- class="widget-body" -->
+					</div> <!-- class="page-body" id="conte" -->
+				</div> <!-- /Conteudo -->
+			</div> <!-- /Page Container -->
+		</div> <!-- Main Container -->
+		
+<?php
+include 'partes/Scripts.php';
+?>
+
+	<script type="text/javascript" src="bootstrap-3.3.1/dist/js/bootstrap-switch.js"></script>
+	<script type="text/javascript" src="partes/geral.js" ></script>
+	<script type="text/javascript" src="partes/dteditavel.js" ></script>
+	<script type="text/javascript" >
+		
+		$('#cktodos').bootstrapSwitch('state', false);
+
+		$("#cktodos").on( 'switchChange.bootstrapSwitch', function( evn, state )
+			{
+			fltodos = state;
+			});
+
 		function logout()
 			{
 			Deslogar();
 			}
-
-		var iddepen = 0;
-
-		//	calcula a diferença entre dois horários no formato hhmm
-		function hoDif( hoini, hofin )
+			
+	function escualo( tipo, id, text	 )
 			{
-			var h = hoini.substring( 0, 2 );
-			var m = hoini.substring( 2 );
-			var mini = parseInt( h ) * 60 + parseInt( m );
-
-			h = hofin.substring( 0, 2 );
-			m = hofin.substring( 2 );
-			var mfin = parseInt( h ) * 60 + parseInt( m );
-			var mdif = mfin - mini;
-			h = mdif / 60;
-			m = mdif % 60;
-			var result;
-			if( h < 10 )
-				result = "0" + parseInt( "" + h );
-			else
-				result = "" + parseInt( "" + h );
-			if( m < 10 )
-				result += ":0" + m;
-			else
-				result += ":" + m;
-			return result;
-			}
-
-		function escoPess( tipo, id )
-			{
-			iddepen = id;
-			Registro();
-			}
-
-		function Registro()
-			{
-			if( iddepen < 1 )
+			if( id > 0 )
 				{
-				$( "#presen" ).val( "" )
+				idualo	=	id;
+				noualo	= text;
+				}
+			setAjax();
+			}
+
+	function escuors( tipo, id, text	 )
+			{
+			if( idualo < 0 )
+				{
+				alert( "Por favor, selecione uma UOR de PONTO ao lado" );
+				$(".uors").select2('val', 0 );
 				return;
 				}
-			$( "#presen" ).html( "" );
-			var url = "partes/queries.php?query=reprpmspessoa&pessoa=" + iddepen +
-								"&dtinic=" + $.datepicker.formatDate("yymmdd", dtinic ) +
-								"&dtterm=" + $.datepicker.formatDate("yymmdd", dtterm );
-			var resu = remoto( url );
+			if( id > 0 )
+				{
+				iduor	=	id;
+				nouor	= text;
+				}
+			/*
+			var quest = "Adicionar todas as pessoas ainda não adicionadas " +
+					"da UOR " + text + " na lista abaixo?\n" +
+					"A seguir você poderá excluir algumas\ndessas pessoas diretamente na lista."
+			if( confirm( quest ) )
+				{
+			*/
+				var url	=	"partes/tableData.php?query=funuorbio&iduor=" + iduor;
+				var	resu	=	remoto( url );
+				if( resu == null )
+					{
+					alert( "Falha na obtenção dos dados. Por Favor, tente mais tarde")
+					return;
+					}
+				var qt = resu.data.length;
+				var data = [];
+				if( qt > 0 )
+					{
+					for( var ix=0; ix<qt; ix++ )
+						{
+						if( resu.data[ix].IDUORPONTO == resu.data[ix].IDUORSAU )
+							{
+							data.push({	"IUN": resu.data[ix].IUN,
+													"NOME": resu.data[ix].NOME,
+													"QTBIO": resu.data[ix].QTBIO,
+													"REGIME": resu.data[ix].REGIME,
+													"PRESENTE": "1",
+													"MANTER": "1",
+													"action": ""} );
+							}
+						else
+							{
+							data.push({	"IUN": resu.data[ix].IUN,
+													"NOME": resu.data[ix].NOME,
+													"QTBIO": resu.data[ix].QTBIO,
+													"REGIME": resu.data[ix].REGIME,
+													"PRESENTE": "0",
+													"MANTER": "1",
+													"IDREG": "",
+													"action": acsoalt} );
+							}
+						}
+					Table.fnAddData( data, true );
+					}
+				/*
+				}
+				*/
+			$(".uors").select2('val', 0 );
+			}
+
+		function escregi( tipo, id, text )
+			{
+			if( idualo < 1 )
+				{
+				$(".regimes").select2('val', 0 );
+				return;
+				}
+			if( id < 1 )
+				{
+				idregi	=	-1;
+				noregi	= "";
+				return;
+				}
+			idregi	=	id;
+			noregi	= text;
+			//
+			var qtlin = tableQtLins();
+			var row;
+			for( var ix=0; ix<qtlin; ix++ )
+				{
+				row = Table.fnGetData( ix );
+				if( row["REGIME"] == "" )
+					{
+					row["REGIME"] = noregi;
+					row["IDREG"] = idregi;
+					Table.api().row(ix).data(row);
+					}
+				}
+			}
+			
+		function executar()
+			{
+			var qtlin = tableQtLins();
+			if( qtlin < 1 )
+				{
+				var txt = "Nada a fazer. \n" +
+						"Por favor, escolha uma UOR de PONTO,\n" +
+						"e faça adequações. Somente depois\n" +
+						"poderá ser feita a alocação.";
+				alert( txt )
+				return;
+				}
+			var row;
+			for( var ix=0; ix<qtlin; ix++ )
+				{
+				row = Table.fnGetData( ix );
+				if( row["PRESENTE"] == "1" )
+					continue;
+				if( row["MANTER"] != "1" )
+					continue;
+				if( row["IDREG"] == "" )
+					{
+					var txt = "Todos os funcionários a criar devem ter REGIME.\n" +
+										"Nenhuma criação efetuada";
+					alert( txt );
+					return;
+					}
+				}
+			for( var ix=0; ix<qtlin; ix++ )
+				{
+				row = Table.fnGetData( ix );
+				if( row["PRESENTE"] == "1" )
+					continue;
+				if( row["MANTER"] != "1" )
+					continue;
+				var url = "partes/criaFuni.php?sshd=" + row["IUN"] +
+									"&idretr=" + row["IDREG"] +
+									"&ualoc=" + idualo;
+				var resul = remoto( url );
+				if( resul.status != "OK" )
+					{
+					var txt = "Erro:\n" + resul.erro + "\ncriando o funcionário:\n" +
+										row["NOME"];
+					alert( txt );
+					}
+				}
+			}
+
+		function deleteRow( oTable, nRow )
+			{
+			if( DBDelete( oTable, nRow ) )
+				deleteRowG( oTable, nRow );
+			}
+			
+		function restoreRow( oTable, nRow )
+			{
+			restoreRowG( oTable, nRow );
+			}
+			
+		function saveRow( oTable, nRow, idnovo )
+			{
+			saveRowG( oTable, nRow, null );
+			}
+			
+		function editRow( oTable, nRow )
+			{
+			editRowG( oTable, nRow );
+			}
+			
+		function completaChild( original )
+			{
+			return " ";
+			}
+
+		function FormataChild( original )
+			{
+			}
+			
+		function toHora( data )
+			{
+			var hh = data.getHours();
+			if( hh < 10 )
+				hh = "0" + hh;
+			var mm = data.getMinutes();
+			var mm = data.getHours();
+			if( mm < 10 )
+				mm = "0" + mm;
+			return hh + ":" + mm;
+			}
+			
+		function minToHHMM( minutos )
+			{
+			var hh = Math.floor(Math.abs(minutos)/60);
+			var mm = Math.abs(minutos)%60;
+			if( hh < 10 )
+				hh = "0" + hh;
+			if( mm < 10 )
+				mm = "0" + mm;
+			if( minutos < 0 )
+				return "-"+hh+":"+mm;
+			else
+				return hh+":"+mm;
+			}
+			
+		//	chama a página de pendências do funcionário
+		function pendencias( sshd )
+			{
+			criarCookie( "sshdfunc", sshd );
+			window.location = "autPenden.php";
+			}
+			
+		function ausencias( sshd, id, nome )
+			{
+			criarCookie( "idfunc", id );
+			criarCookie( "nofunc", nome );
+			criarCookie( "sshdfunc", sshd );
+			window.location = "autAusencias.php";
+			}
+			
+		function correcoes( sshd )
+			{
+			criarCookie( "idfunc", id );
+			criarCookie( "nofunc", nome );
+			criarCookie( "sshdfunc", sshd );
+			window.location = "autCorrecao.php";
+			}
+			
+		//	chama o detalhe de um funcionário escolhido
+		function detfunc( id, nome, sshd )
+			{
+			criarCookie( "idfunc", id );
+			criarCookie( "nofunc", nome );
+			criarCookie( "sshdfunc", sshd );
+			window.location = "autFuncio.php";
+			}
+			
+		//	tratamento inicial das datas e inicialização do datatables
+		function setAjax(  )
+			{
+			if( idualo <= 0 )
+				return;
+			//
+			/*
+			tableDestroy();
+			
+			AjaxSource	=	"";
+			inicializa.init();
+			*/
+			tableClear();
+			
+			var url	=	"partes/tableData.php?query=funuorbio&todos&iduor=" + idualo;
+			var	resu	=	remoto( url );
 			if( resu == null )
 				{
-				$( "#presen" ).val( "Falha na obtenção dos dados" )
+				alert( "Falha na obtenção dos dados. Por Favor, tente mais tarde")
 				return;
 				}
-			if( resu.linhas < 1 )
+			var qt = resu.data.length;
+			var data = [];
+			if( qt > 0 )
 				{
-				$( "#presen" ).val( "Não há registros neste período" )
-				return;
-				}
-
-			var diaant = "-";
-			var diaatu = "+";
-			var lista = "";
-			var iord = 0;
-			var pontos = "";
-			var difers = "";
-			var hoini = 0;
-			var hofin = 0;
-
-			for( var ix = 0; ix < resu.linhas; ix++ )
-				{
-				diaatu = resu.dados[ix].ORDEM.substring( 0, 8 );
-				if( diaatu != diaant )
+				for( var ix=0; ix<qt; ix++ )
 					{
-					if( diaant != "-" )
+					if( resu.data[ix].IDUORPONTO == resu.data[ix].IDUORSAU )
 						{
-						lista += pontos;
-						lista += ".........." + difers;
-						lista += "</p>";
+						data.push({	"IUN": resu.data[ix].IUN,
+												"NOME": resu.data[ix].NOME,
+												"QTBIO": resu.data[ix].QTBIO,
+												"REGIME": resu.data[ix].REGIME,
+												"PRESENTE": "1",
+												"MANTER": "1",
+												"IDREG": "",
+												"action": ""} );
 						}
-					diaant = diaatu;
-					lista += "<p>" + resu.dados[ix].PONTO.substring( 0, 10 ) + " => ";
-					pontos = "";
-					difers = "";
-					iord = 0;
-					hoini = resu.dados[ix].ORDEM.substring( 8 );
+					else
+						{
+						data.push({	"IUN": resu.data[ix].IUN,
+												"NOME": resu.data[ix].NOME,
+												"QTBIO": resu.data[ix].QTBIO,
+												"REGIME": resu.data[ix].REGIME,
+												"PRESENTE": "0",
+												"MANTER": "1",
+												"IDREG": "",
+												"action": acsoalt} );
+						}
 					}
-				pontos += "  " + resu.dados[ix].PONTO.substring( 11 );
-				if( iord++ > 0 )
-					{
-					hofin = resu.dados[ix].ORDEM.substring( 8 );
-					var dif = hoDif( hoini, hofin );
-					difers += " " + dif;
-					hoini = hofin;
-					}
+				Table.fnAddData( data, true );
+				//atuatab();
 				}
-			lista += pontos;
-			lista += ".........." + difers;
-			lista += "</p>";
-			$( "#presen" ).html( lista );
 			}
-		///////////////////////////////////////////////////////////////
-		//	função principal
-		var sshd = obterCookie( "biouser" );
+		/////////////// PRINCIPAL ////////////////////////
+		var idualo = -1;
+		var noualo = "";
+		var iduor = -1;
+		var nouor = "";
+		var idregi = -1;
+		var noregi = "";
+		var fltodos = false;
+
+		var sshd = obterCookie( "user" );
 		if( sshd == null )
-			logout();
+			{
+			Deslogar();
+			}
+			
+		var url = "selectData.php?query=uorsaut&sshd=" + sshd;
+		SelInit( ".uoralo", url, 0, "Escolha abaixo", escualo, 0 );
 
-		var dtinic = new Date();
-		dtinic.setDate( 1 );
-		var dtterm = new Date();
+		url = "selectData.php?query=uor";
+		SelInit( ".uors", url, 0, "Escolha abaixo", escuors, 0 );
 
-		$( "#dtinic" ).datepicker("setDate", dtinic);
-		$( "#dtterm" ).datepicker("setDate", dtterm );
+		url = "selectData.php?query=regimes";
+		SelInit( ".regimes", url, 0, "Escolha abaixo", escregi, 0 );
 		
-		var sel = "selectData.php?query=pessoapebi&sshd=" + sshd.toUpperCase();
-		SelInit( ".depen", sel, 0, "Escolha abaixo", escoPess );
+		$("#eddt_new").hide();
+		//	tabelas de definição da tabela de presenças
+		var dataatual;
+		var fdtrid;
+		var fdtmid;
+		//	formatadores ligados ao datatables
+		//		ticamp:		tipo de campo t/n/l = texto, numérico ou legenda
+		//		inputs:		nomes dos campos no banco relativamente aos inputs
+		//		origem:		índice da coluna do Datatables que atualiza o campo no banco
+		//		editael:	indica se a coluna do datatable é editável
+		var notabel			=	"";								//	nome da tabela base
+		var	nocmpid			=	"";															//	nome do campo ID da tabela base
+		var sequence		= "";
+		//var liNova			=	[ '', '', '', acnova ];										//	template de linha nova
+		var liNova			=
+						{
+						"IUN": "",
+						"NOME": "",
+						"DCSIGLAUORSAU": "",
+						"REGIME": ""
+						};
+
+		//	monta o datatables
+		var	order	=	[];											//	sem classificação 
+		//	prepara a definiçao das colunas
+		var colDefs	=	[];
+		var	col	=	-1;
+
+		aux	=
+			{
+			"tipo": "t",
+			"editavel": false,
+			"vanovo": "",
+			"width": "5%",
+			"aTargets": [ ++col ],
+			"mData": "IUN",
+			"sTitle":"SSHD",
+			"defaultContent": " "
+			};
+		colDefs.push( aux );
+		
+		aux	=
+			{
+			"tipo": "t",
+			"editavel": false,
+			"vanovo": "",
+			"width": "15%",
+			"aTargets": [ ++col ],
+			"mData": "NOME",
+			"sTitle":"Funcionário",
+			"defaultContent": " "
+			};
+		colDefs.push( aux );
+		
+		aux	=
+			{
+			"tipo": "t",
+			"editavel": false,
+			"vanovo": "",
+			"width": "10%",
+			"aTargets": [ ++col ],
+			"mData": "QTBIO",
+			"sTitle":"Biometrias",
+			"defaultContent": " "
+			};
+		colDefs.push( aux );
+		
+		aux	=
+			{
+			"tipo": "t",
+			"editavel": false,
+			"vanovo": "",
+			"width": "10%",
+			"aTargets": [ ++col ],
+			"mData": "REGIME",
+			"sTitle":"Regime",
+			"defaultContent": " "
+			};
+		colDefs.push( aux );
+		
+		aux	=
+			{
+			"tipo": "x",
+			"editavel": false,
+			"vanovo": "",
+			"width": "10%",
+			"aTargets": [ ++col ],
+			"mData": "PRESENTE",
+			"sTitle":"Presente",
+			"defaultContent": " ",
+			"render": function( data, type, full )
+					{
+					if( data == 0 )
+						return "<i class='glyphicon glyphicon-remove'></i></a>";
+					else
+						return "<i class='glyphicon glyphicon-ok'></i></a>";
+					}
+			};
+		colDefs.push( aux );
+		
+		aux	=
+			{
+			"tipo": "x",
+			"editavel": false,
+			"vanovo": "",
+			"width": "10%",
+			"aTargets": [ ++col ],
+			"mData": "MANTER",
+			"sTitle":"Manter",
+			"defaultContent": " ",
+			"render": function( data, type, full )
+					{
+					if( data == 0 )
+						return "<i class='glyphicon glyphicon-remove'></i></a>";
+					else
+						return "<i class='glyphicon glyphicon-ok'></i></a>";
+					}
+			};
+		colDefs.push( aux );
+		
+		aux	=	
+			{
+			"tipo": null,
+			"editavel": false,
+			"vanovo": "",
+			"bSortable": false,
+			"searchable": false,
+			"aTargets": [ ++col ],
+			"orderable":false,
+			"mData": "action",
+			"width": "5%",
+			"defaultContent": acsoalt
+			};
+		colDefs.push( aux );
+		
+		
+		///////////////////////////////////////////////////////////////////////
+
+		AjaxSource	=	"";
+		inicializa.init();
+		var data = [];
+		data.push( {	"IUN": "",
+									"NOME": "Escolha uma UOR de PONTO acima",
+									"QTBIO": "",
+									"REGIME": "",
+									"PRESENTE": "0",
+									"MANTER": "0",
+									"IDREG": "",
+									"action": ""} );
+		Table.fnAddData( data, true );
+				
 		</script>
 	</body>	
 </html>

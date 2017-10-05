@@ -13,6 +13,8 @@
 //	mediofecha( funiid )
 //	obtregimefunc( funiid )
 //	obtaparelhosfunc( funiid )
+//	obtuors() - obter todas as UORS de UORPUBLICA
+//	pesuor( iduor )	-	obter todas as pessoas de uma UOR 
 if( !isset( $_GET["query"] ) && !isset( $_GET["debug"] ) )
 	{
 	echo	'{ "status": "erro", "erro": "parametro query obrigatorio" }';
@@ -29,7 +31,7 @@ else
 	$qry	=	$_GET["debug"];
 	$dbg	=	true;
 	}
-
+	
 ////////////////////////////////////////////////////////////////////////////////
 //	
 if( $qry == "" )
@@ -41,6 +43,30 @@ if( $qry == "" )
 		}
 	$xpto	=	$_GET["xpto"];
 	$sql = "select * FROM XPTO WHERE XPTO=$xpto";
+	}
+
+////////////////////////////////////////////////////////////////////////////////
+//	
+if( $qry == "pesuor" )
+	{
+	if( !isset( $_GET["iduor"] ) )
+		{
+		echo	'{ "status": "erro", "erro": "parametro iduor obrigatorio" }';
+		return;
+		}
+	$iduor	=	$_GET["iduor"];
+	$sql = "SELECT IUN, NOME 
+						FROM BIOMETRIA.VWFUNCIONARIOATIVO
+						WHERE IDUOR=$iduor";
+	}
+
+////////////////////////////////////////////////////////////////////////////////
+//	
+if( $qry == "obtuors" )
+	{
+	$sql = "SELECT	UOR_IDUNIDADEORGANIZACIONAL AS IDUOR, 
+									UOR_DLSIGLAUNIDADE AS SIGLA  
+									FROM SAU.VWUORPUBLICA";
 	}
 
 ////////////////////////////////////////////////////////////////////////////////

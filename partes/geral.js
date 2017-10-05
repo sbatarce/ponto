@@ -314,6 +314,12 @@ function SelOptions( url )
   }
 
 //	carrega os dados de uma Select2
+//  sel     - selector jQuery
+//  url     - url com o resultado do conteúdo
+//  id      - campo que será usado como id do Select2
+//  text    - campo que será mostrado no Select2
+//  func    - nome da função a chamar quando houver uma escolha
+//  minlen  - mínimo de caracteres a conter noi campo de pesquisa
 function SelInit( sel, url, id, text, func, minlen )
   {
   var min;
@@ -341,7 +347,7 @@ function SelInit( sel, url, id, text, func, minlen )
       .on( "change", function( e )
         {
         if( func != undefined && func != null )
-          func( "change", e.val );
+          func( "change", e.val, e.added.text );
         } );
       },
     error: function( responseData, textStatus, errorThrown )
