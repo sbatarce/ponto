@@ -154,7 +154,7 @@ if( $dbg )
 
 //	insere FUOR
 $sql = "INSERT INTO BIOMETRIA.FUOR_FUNCUNIDADEORGANIZACIONAL VALUES
-				  ( BIOMETRIA.SQ_FUOR.NEXTVAL, $idfuni, $ualoc, sysdate+1, null )";
+				  ( BIOMETRIA.SQ_FUOR.NEXTVAL, $idfuni, $ualoc, TRUNC( SYSDATE+1 ), null )";
 $res = $ora->execInsert( $sql, "BIOMETRIA.SQ_FUOR" );
 $jres = json_decode( $res );
 if( $dbg )
@@ -172,7 +172,7 @@ if( $jres->status != "OK" )
 
 //	insere FRTR
 $sql = "INSERT INTO BIOMETRIA.FRTR_FUNCIONARIOREGIMETRABALHO VALUES
-				  ( BIOMETRIA.SQ_FRTR.NEXTVAL, $idfuni, $idretr, 0, sysdate+1, null )";
+				  ( BIOMETRIA.SQ_FRTR.NEXTVAL, $idfuni, $idretr, 0, TRUNC( SYSDATE+1 ), null )";
 $res = $ora->execInsert( $sql, "BIOMETRIA.SQ_FUOR" );
 $jres = json_decode( $res );
 if( $dbg )
@@ -190,7 +190,7 @@ if( $jres->status != "OK" )
 
 //	insere FSHM
 $sql = "INSERT INTO BIOMETRIA.FSHM_FUNCSALDOHORAMENSAL VALUES
-				  ( BIOMETRIA.SQ_FSHM.NEXTVAL, $idfuni, sysdate,  
+				  ( BIOMETRIA.SQ_FSHM.NEXTVAL, $idfuni, TRUNC( SYSDATE ),  
 					0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 )";
 $res = $ora->execInsert( $sql, "BIOMETRIA.SQ_FSHM" );
 $jres = json_decode( $res );

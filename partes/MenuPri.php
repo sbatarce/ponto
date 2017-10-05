@@ -21,7 +21,7 @@
 												Cadastro
 											</a>
 										<li>
-											<a href="autApaFunc.php" ttip="ttip" data-placement="bottom" 
+											<a href="autAlocaFunc.php" ttip="ttip" data-placement="bottom" 
 												 data-original-title="Alocar pessoas" 
 												 class="aut" style="color:darksalmon ;" >
 												<i class="glyphicon glyphicon-time"></i>
@@ -29,7 +29,7 @@
 											</a>
 										</li>
 										<li>
-											<a href="autRegFunc.php" ttip="ttip" data-placement="bottom" 
+											<a href="autAdmApar.php" ttip="ttip" data-placement="bottom" 
 												 data-original-title="Administrar aparelhos" 
 												 class="aut" style="color: blueviolet;">
 												<i class="glyphicon glyphicon-calendar "></i>
