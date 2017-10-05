@@ -172,7 +172,7 @@ if( $jres->status != "OK" )
 
 //	insere FRTR
 $sql = "INSERT INTO BIOMETRIA.FRTR_FUNCIONARIOREGIMETRABALHO VALUES
-				  ( BIOMETRIA.SQ_FRTR.NEXTVAL, $idfuni, $idretr, 0, TRUNC( SYSDATE+1 ), null )";
+				  ( BIOMETRIA.SQ_FRTR.NEXTVAL, $idfuni, $idretr, NULL, TRUNC( SYSDATE+1 ), NULL )";
 $res = $ora->execInsert( $sql, "BIOMETRIA.SQ_FUOR" );
 $jres = json_decode( $res );
 if( $dbg )

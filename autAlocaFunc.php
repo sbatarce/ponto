@@ -124,7 +124,7 @@ include 'partes/Scripts.php';
 			if( confirm( quest ) )
 				{
 			*/
-				var url	=	"partes/tableData.php?query=funuorbio&iduor=" + iduor;
+				var url	=	"partes/tableData.php?query=funuorbio&todos&iduor=" + iduor;
 				var	resu	=	remoto( url );
 				if( resu == null )
 					{
@@ -339,15 +339,9 @@ include 'partes/Scripts.php';
 			if( idualo <= 0 )
 				return;
 			//
-			/*
-			tableDestroy();
-			
-			AjaxSource	=	"";
-			inicializa.init();
-			*/
 			tableClear();
 			
-			var url	=	"partes/tableData.php?query=funuorbio&todos&iduor=" + idualo;
+			var url	=	"partes/tableData.php?query=funuorbio&iduor=" + idualo;
 			var	resu	=	remoto( url );
 			if( resu == null )
 				{
