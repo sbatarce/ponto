@@ -17,7 +17,7 @@
 											<a href="autCadFunc.php" ttip="ttip" data-placement="bottom" 
 												 data-original-title="Cadastro de funcionários" 
 												 class="aut" style="color:gold ;" >
-												<i class="typcn typcn-group" ></i>
+												<i class="glyphicon glyphicon-user" ></i>
 												Cadastro
 											</a>
 										<li>
@@ -32,7 +32,7 @@
 											<a href="autAdmApar.php" ttip="ttip" data-placement="bottom" 
 												 data-original-title="Administrar aparelhos" 
 												 class="aut" style="color: blueviolet;">
-												<i class="glyphicon glyphicon-calendar "></i>
+												<i class="glyphicon "></i>
 												Administrar aparelhos
 											</a>
 										</li>
@@ -40,7 +40,7 @@
 											<a href="autTodosFunc.php" ttip="ttip" data-placement="bottom" 
 												 data-original-title="Todos os funcionários" 
 												 class="aut" style="color: DarkGreen ;" >
-												<i class="glyphicon glyphicon-user"></i>
+												<i class="typcn typcn-group"></i>
 												Todos Funcionários 
 											</a>
 										</li>
@@ -68,7 +68,7 @@
 											<a href="autFechamento.php" ttip="ttip" data-placement="bottom" 
 												 data-original-title="Fechamento mensal de UOR"  
 												 class="aut" style="color: blue;">
-												<i class="glyphicon glyphicon-indent-left" ></i> 
+												<i class="glyphicon glyphicon-calendar" ></i> 
 												Fechamento Mensal
 											</a>
 										</li>
