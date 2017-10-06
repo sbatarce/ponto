@@ -94,6 +94,12 @@ include 'partes/Scripts.php';
 			Deslogar();
 			}
 			
+		function escRegime( tipo, id )
+			{
+			if( id >= 0 )
+				idregime	=	id;
+			}
+
 	function escualo( tipo, id, text	 )
 			{
 			if( id > 0 )
@@ -117,53 +123,44 @@ include 'partes/Scripts.php';
 				iduor	=	id;
 				nouor	= text;
 				}
-			/*
-			var quest = "Adicionar todas as pessoas ainda não adicionadas " +
-					"da UOR " + text + " na lista abaixo?\n" +
-					"A seguir você poderá excluir algumas\ndessas pessoas diretamente na lista."
-			if( confirm( quest ) )
+			var url	=	"partes/tableData.php?query=funuorbio&iduor=" + iduor;
+			var	resu	=	remoto( url );
+			if( resu == null )
 				{
-			*/
-				var url	=	"partes/tableData.php?query=funuorbio&todos&iduor=" + iduor;
-				var	resu	=	remoto( url );
-				if( resu == null )
-					{
-					alert( "Falha na obtenção dos dados. Por Favor, tente mais tarde")
-					return;
-					}
-				var qt = resu.data.length;
-				var data = [];
-				if( qt > 0 )
-					{
-					for( var ix=0; ix<qt; ix++ )
-						{
-						if( resu.data[ix].IDUORPONTO == resu.data[ix].IDUORSAU )
-							{
-							data.push({	"IUN": resu.data[ix].IUN,
-													"NOME": resu.data[ix].NOME,
-													"QTBIO": resu.data[ix].QTBIO,
-													"REGIME": resu.data[ix].REGIME,
-													"PRESENTE": "1",
-													"MANTER": "1",
-													"action": ""} );
-							}
-						else
-							{
-							data.push({	"IUN": resu.data[ix].IUN,
-													"NOME": resu.data[ix].NOME,
-													"QTBIO": resu.data[ix].QTBIO,
-													"REGIME": resu.data[ix].REGIME,
-													"PRESENTE": "0",
-													"MANTER": "1",
-													"IDREG": "",
-													"action": acsoalt} );
-							}
-						}
-					Table.fnAddData( data, true );
-					}
-				/*
+				alert( "Falha na obtenção dos dados. Por Favor, tente mais tarde")
+				return;
 				}
-				*/
+			var qt = resu.data.length;
+			var data = [];
+			if( qt > 0 )
+				{
+				for( var ix=0; ix<qt; ix++ )
+					{
+					if( resu.data[ix].IDRETR == "" )
+						{
+						data.push({	"IUN": resu.data[ix].IUN,
+												"NOME": resu.data[ix].NOME,
+												"QTBIO": resu.data[ix].QTBIO,
+												"REGIME": "Escolha Abaixo",
+												"PRESENTE": "0",
+												"MANTER": "1",
+												"IDREG": "0",
+												"action": acsoalt} );
+						}
+					else
+						{
+						data.push({	"IUN": resu.data[ix].IUN,
+												"NOME": resu.data[ix].NOME,
+												"QTBIO": resu.data[ix].QTBIO,
+												"REGIME": resu.data[ix].REGIME,
+												"PRESENTE": "0",
+												"MANTER": "1",
+												"IDREG": resu.data[ix].IDRETR,
+												"action": acsoalt} );
+						}
+					}
+				Table.fnAddData( data, true );
+				}
 			$(".uors").select2('val', 0 );
 			}
 
@@ -188,7 +185,9 @@ include 'partes/Scripts.php';
 			for( var ix=0; ix<qtlin; ix++ )
 				{
 				row = Table.fnGetData( ix );
-				if( row["REGIME"] == "" )
+				if( row["action"] == "" )
+					continue;
+				if( row["IDREG"] == "0" )
 					{
 					row["REGIME"] = noregi;
 					row["IDREG"] = idregi;
@@ -217,10 +216,12 @@ include 'partes/Scripts.php';
 					continue;
 				if( row["MANTER"] != "1" )
 					continue;
-				if( row["IDREG"] == "" )
+				if( row["IDREG"] <= 0 )
 					{
 					var txt = "Todos os funcionários a criar devem ter REGIME.\n" +
-										"Nenhuma criação efetuada";
+										"Nenhuma criação efetuada.\n" +
+										"Clique no ícone de edição à direita " +
+										"e corrija o regime do(s) funcionário(s)";
 					alert( txt );
 					return;
 					}
@@ -254,15 +255,24 @@ include 'partes/Scripts.php';
 		function restoreRow( oTable, nRow )
 			{
 			restoreRowG( oTable, nRow );
+			var row = Table.fnGetData( nRow );
+			row["action"] = acsoalt;
+			Table.api().row(nRow).data(row);
 			}
 			
 		function saveRow( oTable, nRow, idnovo )
 			{
 			saveRowG( oTable, nRow, null );
+			var row = Table.fnGetData( nRow );
+			if( idregime > 0 )
+				row["IDREG"] = idregi;
+			row["action"] = acsoalt;
+			Table.api().row(nRow).data(row);
 			}
 			
 		function editRow( oTable, nRow )
 			{
+			idregime = 0;
 			editRowG( oTable, nRow );
 			}
 			
@@ -341,7 +351,7 @@ include 'partes/Scripts.php';
 			//
 			tableClear();
 			
-			var url	=	"partes/tableData.php?query=funuorbio&iduor=" + idualo;
+			var url	=	"partes/tableData.php?query=funuorbio&janafuor&iduor=" + idualo;
 			var	resu	=	remoto( url );
 			if( resu == null )
 				{
@@ -354,28 +364,14 @@ include 'partes/Scripts.php';
 				{
 				for( var ix=0; ix<qt; ix++ )
 					{
-					if( resu.data[ix].IDUORPONTO == resu.data[ix].IDUORSAU )
-						{
-						data.push({	"IUN": resu.data[ix].IUN,
-												"NOME": resu.data[ix].NOME,
-												"QTBIO": resu.data[ix].QTBIO,
-												"REGIME": resu.data[ix].REGIME,
-												"PRESENTE": "1",
-												"MANTER": "1",
-												"IDREG": "",
-												"action": ""} );
-						}
-					else
-						{
-						data.push({	"IUN": resu.data[ix].IUN,
-												"NOME": resu.data[ix].NOME,
-												"QTBIO": resu.data[ix].QTBIO,
-												"REGIME": resu.data[ix].REGIME,
-												"PRESENTE": "0",
-												"MANTER": "1",
-												"IDREG": "",
-												"action": acsoalt} );
-						}
+					data.push({	"IUN": resu.data[ix].IUN,
+											"NOME": resu.data[ix].NOME,
+											"QTBIO": resu.data[ix].QTBIO,
+											"REGIME": resu.data[ix].REGIME,
+											"PRESENTE": "1",
+											"MANTER": "1",
+											"IDREG": "",
+											"action": ""} );
 					}
 				Table.fnAddData( data, true );
 				//atuatab();
@@ -387,6 +383,7 @@ include 'partes/Scripts.php';
 		var iduor = -1;
 		var nouor = "";
 		var idregi = -1;
+		var idregime = -1;
 		var noregi = "";
 		var fltodos = false;
 
@@ -474,13 +471,19 @@ include 'partes/Scripts.php';
 		
 		aux	=
 			{
-			"tipo": "t",
+			"tipo": "l",
 			"editavel": false,
 			"vanovo": "",
 			"width": "10%",
 			"aTargets": [ ++col ],
 			"mData": "REGIME",
 			"sTitle":"Regime",
+			"selID": "IDREG",
+			"classe": "cbregi",
+			"selVal": "REGIME",
+			"selminlen": 0,
+			"selURL": "selectData.php?query=regimes",
+			"funcEscolha": escRegime,
 			"defaultContent": " "
 			};
 		colDefs.push( aux );

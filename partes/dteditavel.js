@@ -422,6 +422,12 @@
       Table.api().clear().draw();
 		}
 	
+	function tableDraw()
+		{
+    if( Table != null && Table != undefined )
+      Table.api().draw();
+		}
+	
 	function tableQtLins()
 		{
     if( Table != null && Table != undefined )

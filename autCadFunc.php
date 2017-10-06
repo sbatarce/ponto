@@ -469,7 +469,7 @@ include 'partes/pagebody.php';
 			"selID": "IDREG",
 			"classe": "cbregi",
 			"selVal": "NOREG",
-			"selminlen": 1,
+			"selminlen": 0,
 			"selURL": "selectData.php?query=regimes",
 			"funcEscolha": escRegi,
 			"width": "15%",
