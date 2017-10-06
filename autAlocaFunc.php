@@ -14,7 +14,7 @@ include 'partes/Head.php';
 		<link href="bootstrap-3.3.1/dist/css/bootstrap-switch.css" rel="stylesheet">
 	</head>
 	
-	<body onload="javascript:titulo( '<h4>Lista de todos todos os usuários do Autorizador</h4>' );">
+	<body onload="javascript:titulo( '<h4>Alocação de funcionários na(s) UOR(s) do autorizador</h4>' );">
 <?php
 include 'partes/MenuPri.php';
 include 'partes/Cabec.php';
