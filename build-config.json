@@ -20,7 +20,7 @@
         "autRegimes.php",
         "autFuncio.php",
         "autTodosFunc.php",
-	"autAlocaFunc.php,
+	"autAlocaFunc.php",
 	"autAdmApar.php",
         "bootstrap-3.3.1",
         "bootstrap-datepicker",
