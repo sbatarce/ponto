@@ -216,7 +216,7 @@ include 'partes/Scripts.php';
 										"UORPONTO": resu.data[ix].SIGLAUORPONTO,
 										"PRESENTE": "sim",
 										"MANTER": "sim",
-										"action": " ";
+										"action": " "
 										} );
 					}
 				Table.fnAddData( data, true );
