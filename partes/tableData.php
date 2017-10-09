@@ -119,7 +119,7 @@ if( $qry == "funcapar" )
 														 VUOR.UOR_IDUNIDADEORGANIZACIONAL = FUOR.PMS_IDSAUUOR
 									INNER JOIN SAU.VWPESSOA_SSHD PESS ON 
 														 PESS.IUN = FUNI.PMS_IDPMSPESSOA
-						WHERE LOTR.APAL_ID=$idapal;
+						WHERE LOTR.APAL_ID=$idapal";
 	}
 	
 ////////////////////////////////////////////////////////////////////////////////
