@@ -54,6 +54,21 @@ if( $qry == "updfltr" )
 							WHERE FLTR_ID=$idfltr";
 	}
 
+//	delete FLTR
+if( $qry == "delfltr" )
+	{
+	if( !isset( $_GET["idfltr"] ) )
+		{
+		echo	'{ "status": "erro", "erro": "parametro idfltr obrigatorio" }';
+		return;
+		}
+		
+	$idfltr = $_GET["idfltr"];
+
+	$sql	=	"DELETE BIOMETRIA.FLTR_FUNCIONARIOLOCALTRABALHO 
+							WHERE FLTR_ID=$idfltr";
+	}
+
 //	delete fdte
 if( $qry == "delfdte" )
 	{

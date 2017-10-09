@@ -14,7 +14,7 @@ include 'partes/Head.php';
 		<link href="bootstrap-3.3.1/dist/css/bootstrap-switch.css" rel="stylesheet">
 	</head>
 	
-	<body onload="javascript:titulo( '<h4>Lista de todos todos os usuários do Autorizador</h4>' );">
+	<body onload="javascript:titulo( '<h4>Pessoas em aparelhos</h4>' );">
 <?php
 include 'partes/MenuPri.php';
 include 'partes/Cabec.php';
@@ -23,54 +23,34 @@ include 'partes/pagebody.php';
 ?>
 		<div class='row form-group' 
 				 style='margin-bottom: 5px; margin-left:4px;' data-toggle="buttons">
-			<div class="col-lg-6" style='width:30%;'>
-					Aparelho<input style='width:70%; margin-left:10px;' 
-												 class='input-small aparelhos' id="selapar" 
-												 title="Escolha o aparelho a adicionar pessoas"/>
+			<div class="col-lg-6" style='width:20%;'>
+					Aparelho
+					<input style='width:100%; ' 
+								 class='input-small aparelhos' id="selapar" 
+								 title="Escolha o aparelho a adicionar pessoas"/>
 			</div>
 			<div class="col-lg-6" style='width:40%;'>
-					Pessoas da UOR<input style='width:70%; margin-left:10px;' 
-															 class='input-small uors' id="seluor" 
-															 title="UOR em que as pessoas estão"/>
+					Adicionar todas as pessoas da UOR
+					<input style='width:100%; ' 
+								 class='input-small uors' id="selfuor" 
+								 title="UOR em que as pessoas estão"/>
 			</div>
 			<div class="col-lg-6" style='width:30%;'>
-				<input class="btn btn-primary" type="button" value="Obter"
-							 onclick="javascript:setAjax();"
-							 title="Obtem todos os funcionários da 
-											UOR especificada à esquerda">
-				<input class="btn btn-primary" type="button" value="Atribuir"
-							 onclick="javascript:atribuir();"
-							 title="Atribui Regime e UOR iniciais a todos
-											os funcionários não atribuídos.
-											Funcionários já com regime e UOR
-											atribuídos permanecerão sem alteração.">
-				<input class="btn btn-primary" type="button" value="Colocar"
-							 onclick="javascript:colocar();"
-							 title="Coloca as pessoas marcadas no aparelho.
-											Salva Regimes e UOR de alocação.">
+					Adicionar pessoas
+					<input style='width:100%; ' 
+								 class='input-small pess' id="selpes" 
+								 title="UOR em que as pessoas estão"/>
 			</div>
 		</div>
+
 		<div class='row form-group' 
 				 style='margin-bottom: 5px; margin-left:4px;' data-toggle="buttons">
-			<div class="col-lg-6" style='width:30%;'>
-					Regime inicial<input style='width:70%; margin-left:10px;' 
-															 class='input-small regimes' id="selreg" 
-										 title="Escolha um regime que em princípio será atribuído a todos"/>
-			</div>
-			<div class="col-lg-6" style='width:40%;'>
-					UOR Inicial<input style='width:70%; margin-left:10px;' 
-														class='input-small uoralo' id="selreg" 
-														title="Escolha uma UOR de alocação inicial"/>
-			</div>
-			<div class="col-lg-6" style='width:30%;'>
-				<div class="checkbox">
-					<div id="divanali" class="checkbox-inline make-switch has-switch" >
-						<input id="cktodos" type="checkbox" 
-									 data-size="mini" data-label-text=''
-									 data-off-color="danger" data-on-color="success"
-									 data-off-text="Não Alocados" data-on-text="Todos" >
-					</div>
-				</div>
+			<div class="col-lg-6" style='width:50%;'>
+				<input class="btn btn-primary" type="button" value="Efetuar modificações"
+							 onclick="javascript:executar();"
+							 title="Efetua todas as modificações marcadas 
+							 no banco de dados, adiciona e remove as pessoas 
+							 no aparelho selecionado em Aparelho.">
 			</div>
 		</div>
 		
@@ -96,7 +76,12 @@ include 'partes/Scripts.php';
 	<script type="text/javascript" src="partes/geral.js" ></script>
 	<script type="text/javascript" src="partes/dteditavel.js" ></script>
 	<script type="text/javascript" >
-		
+
+		var acadic =	"<a href='#' onClick='javascript:adiciona(" + "ix" + ")' " +
+									"class='btn btn-circle btn-info btn-xs adicionar' " +
+									"title=\"adicionar ao aparelho\" >" +
+									"   <i class='glyphicon glyphicon-remove'></i></a>";
+
 		$('#cktodos').bootstrapSwitch('state', false);
 
 		$("#cktodos").on( 'switchChange.bootstrapSwitch', function( evn, state )
@@ -109,33 +94,213 @@ include 'partes/Scripts.php';
 			Deslogar();
 			}
 			
-		function escapar( tipo, id )
+		function executar()
 			{
-			if( id > 0 )
-				idapal	=	id;
-			}
-
-		function escuors( tipo, id )
-			{
-			if( id > 0 )
-				iduors	=	id;
-			}
-
-		function escregi( tipo, id, text )
-			{
-			if( id > 0 )
+			var qtlin = tableQtLins();
+			if( qtlin < 1 )
 				{
-				idregi	=	id;
-				noregi	= text;
+				var txt = "Nada a fazer. \n" +
+						"Por favor, escolha um Aparelho,\n" +
+						"remova e/ou inclua pessoas nele e\n" +
+						"pressione Efetuar Modificações novamente.";
+				alert( txt )
+				return;
+				}
+			var row;
+			for( var ix=0; ix<qtlin; ix++ )
+				{
+				row = Table.fnGetData( ix );
+				if( row["PRESENTE"] == row["MANTER"] )
+					continue;
+				if( row["MANTER"] != "sim" )
+					continue;
+				//	adicionar pessoa ao aparelho
+				var url = "partes/adicionaApar.php?funiid=" + row["FUNIID"] +
+									"&apalid=" + idapal;
+				var resul = remoto( url );
+				if( resul.status != "OK" )
+					{
+					var txt = "Anote o erro: " + resul.erro + 
+										"\nAdicionando: " + row["NOME"] + 
+										"\nAo Aparelho:\n" + noapal;
+					alert( txt );
+					}
+				idfltr = resul.id;
+				//	adiciona o funcionário no aparelho
+				var body =	"[ { \"nome\": \"" + row["NOME"] +
+						"\", \"verifica_biometria\": true, " +
+						"\"referencias\": [ " + row["SSHD"].substring(1) +  " ]}]";
+				var resul = repserviceB( "POST", "usuarios", idapal, "SISPONTO", null, body );
+				var aux = resul.erro;
+				if( aux.indexOf("000") >= 0 || aux.indexOf("023") >= 0 )
+					continue;
+				var url = "partes/updates.php?query=delfltr&idfltr="+idfltr;
+				var resul = remoto( url );
+				var txt = "Por favor, anote\nO Funcionário: " + row["NOME"] + 
+									"\nNão pode ser adicionado ao aparelho";
+				alert( txt );
 				}
 			}
 
-	function escualo( tipo, id, text	 )
+		function adiciona( ix )
+			{
+			var act = "<a href='#' onClick='javascript:remove(" + ix + ")' " +
+									"class='btn btn-circle btn-info btn-xs adicionar' " +
+									"title=\"remover funcionário do aparelho\" >" +
+									"   <i class='glyphicon glyphicon-remove'></i></a>"
+			Table.fnUpdate( "sim", ix, 5, false );
+			Table.fnUpdate( act, ix, 6 );
+			flalt = true;
+			}
+		
+			
+		function remove( ix )
+			{
+			var act = "<a href='#' onClick='javascript:adiciona(" + ix + ")' " +
+									"class='btn btn-circle btn-info btn-xs adicionar' " +
+									"title=\"adicionar funcionário ao aparelho\" >" +
+									"   <i class='glyphicon glyphicon-ok'></i></a>"
+			Table.fnUpdate( "nao", ix, 5, false );
+			Table.fnUpdate( act, ix, 6 );
+			flalt = true;
+			}
+			
+		function escapar( tipo, id, text )
+			{
+			if( flalt )
+				{
+				var txt = "Foram efetuadas modificações na tela.\n" +
+						"Se você prosseguir clicando em OK, \n" +
+						"elas serão perdidas. \n" +
+						"Para mantê-las pressione CANCELAR e " +
+						"em seguida pressione Salvar todas as modificações."
+				var res = confirm( txt );
+				if( !res )
+					{
+					$(".aparelhos").select2( 'val', idapalant );
+					return;
+					}
+				}
+			if( id <= 0 )
+				return;
+			//	
+			var url	=	"partes/tableData.php?query=funcapar&idapal=" + id;
+			var	resu	=	remoto( url );
+			if( resu == null )
+				{
+				alert( "Falha na obtenção dos dados. Por Favor, tente mais tarde");
+				$(".aparelhos").select2( 'val', idapalant );
+				return;
+				}
+			idapal	=	id;
+			noapal	=	text;
+			idapalant = idapal;
+			noapalant = noapal;
+			flmod = false;
+			var qt = resu.data.length;
+			tableClear();
+			var data = [];
+			if( qt > 0 )
+				{
+				for( var ix=0; ix<qt; ix++ )
+					{
+					var act = "<a href='#' onClick='javascript:remove(" + ix + ")' " +
+									"class='btn btn-circle btn-info btn-xs remover' " +
+										"title=\"remover do aparelho\" >" +
+										"   <i class='glyphicon glyphicon-remove'></i></a>";
+					data.push({	
+										"FUNIID": resu.data[ix].FUNI_ID,
+										"SSHD": resu.data[ix].SSHD,
+										"NOME": resu.data[ix].NOME,
+										"BIOS": resu.data[ix].BIOS,
+										"UORPONTO": resu.data[ix].SIGLAUORPONTO,
+										"PRESENTE": "sim",
+										"MANTER": "sim",
+										"action": act
+										} );
+					}
+				Table.fnAddData( data, true );
+				}
+			else
+				{
+				data.push(	{	
+										"FUNIID": "",
+										"SSHD": "",
+										"NOME": "Não há dados a exibir",
+										"BIOS": "",
+										"UORPONTO": "",
+										"PRESENTE": "",
+										"MANTER": "",
+										"action": " "
+										} );
+
+				Table.fnAddData( data, true );
+				}
+			}
+
+		function escuor( tipo, id, text )
+			{
+			if( idapal < 1 )
+				{
+				alert( "Por favor, escolha um dos aparelhos." );
+				return;
+				}
+			if( id > 0 )
+				{
+				iduor	=	id;
+				nouor	=	text;
+				}
+			var url	=	"partes/tableData.php?query=fuornapar&idapal=" + idapal +
+									"&fuor=" + iduor;
+			var	resu	=	remoto( url );
+			if( resu == null )
+				{
+				alert( "Falha na obtenção dos dados. Por Favor, tente mais tarde")
+				return;
+				}
+			$(".uors").select2( 'val', 0 );
+			var qt = resu.data.length;
+			var data = [];
+			if( qt > 0 )
+				{
+				for( var ix=0; ix<qt; ix++ )
+					{
+					var act = "<a href='#' onClick='javascript:remove(" + ix + ")' " +
+									"class='btn btn-circle btn-info btn-xs remover' " +
+										"title=\"remover do aparelho\" >" +
+										"   <i class='glyphicon glyphicon-remove'></i></a>";
+					data.push({	
+										"FUNIID": resu.data[ix].FUNI_ID,
+										"SSHD": resu.data[ix].SSHD,
+										"NOME": resu.data[ix].NOME,
+										"BIOS": resu.data[ix].QTBIO,
+										"UORPONTO": resu.data[ix].SIGLAUORSAU,
+										"PRESENTE": "não",
+										"MANTER": "sim",
+										"action": act
+										} );
+					}
+				var lis = Table.fnAddData( data, false );
+				for( var ix=0; ix < lis.length; ix++ )
+					{
+					var act = "<a href='#' onClick='javascript:remove(" + lis[ix] + ")' " +
+									"class='btn btn-circle btn-info btn-xs remover' " +
+										"title=\"remover do aparelho\" >" +
+										"   <i class='glyphicon glyphicon-remove'></i></a>";
+					Table.fnUpdate( act, lis[ix], 6, act, false );
+					}
+				Table.fnDraw( true );
+				}			
+			else
+				alert( "Nenhum funcionário foi adiciona à lista" );
+			}
+
+		function escpess( tipo, id, text )
 			{
 			if( id > 0 )
 				{
-				idualo	=	id;
-				noualo	= text;
+				idpess	=	id;
+				nopess	= text;
 				}
 			}
 
@@ -143,13 +308,10 @@ include 'partes/Scripts.php';
 		SelInit( ".aparelhos", url, 0, "Escolha abaixo", escapar, 0 );
 
 		url = "selectData.php?query=uor";
-		SelInit( ".uors", url, 0, "Escolha abaixo", escuors, 0 );
+		SelInit( ".uors", url, 0, "Escolha abaixo", escuor, 0 );
 
-		url = "selectData.php?query=regimes";
-		SelInit( ".regimes", url, 0, "Escolha abaixo", escregi, 0 );
-
-		var url = "selectData.php?query=uor";
-		SelInit( ".uoralo", url, 0, "Escolha abaixo", escualo, 0 );
+		var url = "selectData.php?query=funcfuni";
+		SelInit( ".pess", url, 0, "Escolha abaixo", escpess, 0 );
 
 		function deleteRow( oTable, nRow )
 			{
@@ -234,41 +396,16 @@ include 'partes/Scripts.php';
 			window.location = "autFuncio.php";
 			}
 			
-		//	atribui regime e UOR ao funcionários não atribuídos
-		function atribuir()
-			{
-			if( idregi < 0 || idualo < 0 )
-				{
-				alert( "É necessário escolher Regime e UOR iniciais para atribuir.");
-				return;
-				}
-			atrib = true;
-			setAjax();
-			}
-
-		//	tratamento inicial das datas e inicialização do datatables
-		function setAjax(  )
-			{
-			if( iduors <= 0 )
-				return;
-			if( idapal <= 0 )
-				return;
-			//
-			tableDestroy();
-			AjaxSource	=	"partes/tableData.php?query=autfuuor&iduor=" + iduors;
-			if( fltodos )
-				AjaxSource += "&todos";
-			inicializa.init();
-			}
 		/////////////// PRINCIPAL ////////////////////////
+		var idapalant = 0;
+		var noapalant = "Escolha abaixo";
 		var idapal = -1;
-		var iduors = -1;
-		var idregi = -1;
-		var noregi = "";
-		var idualo = -1;
-		var noualo = "";
-		var fltodos = false;
-		var atrib = false;
+		var iduor = -1;
+		var idpess = -1;
+		var noapal = -1;
+		var nouor = -1;
+		var nopess = -1;
+		var flalt = false;				//	indica que houve alterações
 
 		var sshd = obterCookie( "user" );
 		if( sshd == null )
@@ -292,14 +429,17 @@ include 'partes/Scripts.php';
 		//var liNova			=	[ '', '', '', acnova ];										//	template de linha nova
 		var liNova			=
 						{
-						"IUN": "",
+						"SSHD": "",
 						"NOME": "",
-						"DCSIGLAUORSAU": "",
-						"REGIME": ""
+						"REGIME": "",
+						"UORPONTO": "",
+						"UORSAU": "",
+						"PRESENTE": "",
+						"MANTER": ""
 						};
 
 		//	monta o datatables
-		var	order	=	[];											//	sem classificação 
+		var	order	=	[4, 'asc'];											//	sem classificação 
 		//	prepara a definiçao das colunas
 		var colDefs	=	[];
 		var	col	=	-1;
@@ -311,7 +451,7 @@ include 'partes/Scripts.php';
 			"vanovo": "",
 			"width": "10%",
 			"aTargets": [ ++col ],
-			"mData": "IUN",
+			"mData": "SSHD",
 			"sTitle":"SSHD",
 			"defaultContent": " "
 			};
@@ -322,7 +462,7 @@ include 'partes/Scripts.php';
 			"tipo": "t",
 			"editavel": false,
 			"vanovo": "",
-			"width": "10%",
+			"width": "25%",
 			"aTargets": [ ++col ],
 			"mData": "NOME",
 			"sTitle":"Funcionário",
@@ -337,40 +477,38 @@ include 'partes/Scripts.php';
 			"vanovo": "",
 			"width": "10%",
 			"aTargets": [ ++col ],
-			"mData": "SIGLAUORSAU",
-			"sTitle":"UOR SAU",
+			"mData": "BIOS",
+			"sTitle":"Biometrias",
 			"defaultContent": " "
 			};
 		colDefs.push( aux );
 		
 		aux	=
 			{
-			"tipo": "x",
+			"tipo": "t",
 			"editavel": false,
 			"vanovo": "",
 			"width": "10%",
 			"aTargets": [ ++col ],
-			"mData": "APARELHOS",
+			"mData": "UORPONTO",
+			"sTitle":"UOR Alocado",
+			"defaultContent": " "
+			};
+		colDefs.push( aux );
+		
+		aux	=
+			{
+			"tipo": "t",
+			"editavel": false,
+			"vanovo": "",
+			"width": "10%",
+			"aTargets": [ ++col ],
+			"mData": "PRESENTE",
 			"sTitle":"Presente",
-			"defaultContent": " ",
-			"render": function( data, type, full )
-				{
-				if( full["APARELHOS"] == "" )
-					return "<i class='glyphicon glyphicon-remove'></i></a>";
-				else
-					{
-					var apars = full["APARELHOS"].split(',');
-					for( var ix=0; ix<apars.length; ix++ )
-						{
-						if( Number( apars[ix] ) == idapal )
-							return "<i class='glyphicon glyphicon-ok'></i></a>";
-						}
-					return "<i class='glyphicon glyphicon-remove'></i></a>";
-					}
-				}
+			"defaultContent": " "
 			};
 		colDefs.push( aux );
-		
+
 		aux	=
 			{
 			"tipo": "t",
@@ -378,93 +516,12 @@ include 'partes/Scripts.php';
 			"vanovo": "",
 			"width": "10%",
 			"aTargets": [ ++col ],
-			"mData": "REGIME",
-			"sTitle":"Regime",
-			"defaultContent": " ",
-			"render": function( data, type, full )
-				{
-				if( data != "" )
-					return data;
-				if( !atrib )
-					return "a atribuir";
-				return noregi;
-				}
+			"mData": "MANTER",
+			"sTitle":"Manter",
+			"defaultContent": " "
 			};
 		colDefs.push( aux );
-		
-		aux	=
-			{
-			"tipo": "t",
-			"editavel": false,
-			"vanovo": "",
-			"width": "10%",
-			"aTargets": [ ++col ],
-			"mData": "SIGALUORPONTO",
-			"sTitle":"UOR Ponto",
-			"defaultContent": " ",
-			"render": function( data, type, full )
-				{
-				if( data != "" )
-					return data;
-				if( !atrib )
-					return "a atribuir";
-				return noualo;
-				}
-			};
-		colDefs.push( aux );
-		/*
-		var aux	=
-			{
-			"tipo": "l",
-			"editavel": false,
-			"vanovo": "",
-			"width": "15%",
-			"aTargets": [ ++col ],
-			"sTitle":"Ações",
-			"defaultContent": " ",
-			"render": function( data, type, full )
-				{
-				res = "";
-				res += "<a href='javascript:pendencias(\"" + full.SSHDFUNC + "\");' ";
-				res += "<button type='button' title='Verificar pendências do funcionário' ";
-				res += "class='btn btn-warning  btn-md'>ANA</button></a>";
-				
-				res += "<a href='javascript:ausencias( \"" + full.SSHDFUNC;
-				res += "\", \""+ full.IDFUNC + "\", \"" + full.NOFUNC + "\" );' ";
-				res += "<button type='button' title='Autorizar ausências' ";
-				res += "class='btn btn-success  btn-md'>AUS</button></a>";
 
-				res += "<a href='javascript:correcoes(\"" + full.SSHDFUNC;
-				res += "\", \""+ full.IDFUNC + "\", \"" + full.NOFUNC + "\" );' ";
-				res += "<button type='button' title='Corrigir saldo para mais ou para menos' ";
-				res += "class='btn btn-danger  btn-md'>COR</button></a>";
-
-				return res;
-				}
-			};
-		colDefs.push( aux );
-		
-		aux	=
-			{
-			"tipo": "x",
-			"editavel": false,
-			"vanovo": "",
-			"width": "25%",
-			"aTargets": [ ++col ],
-			"mData": "NOFUNC",
-			"sTitle":"Funcionário",
-			"defaultContent": " ",
-			"render": function( data, type, full )
-				{
-				var act	=	"<a href='javascript:detfunc( \"" + full.IDFUNC + 
-								"\", \""+ data + "\", \"" + full.SSHDFUNC + 
-								"\" )' title=\"detalhes do funcionário\" >" +
-								data + "</a>";
-				return act;
-				}
-			};
-		colDefs.push( aux );
-		*/
 		aux	=	
 			{
 			"tipo": null,
@@ -474,16 +531,32 @@ include 'partes/Scripts.php';
 			"searchable": false,
 			"aTargets": [ ++col ],
 			"orderable":false,
-			"mData":null,
+			"mData": "action",
 			"width": "5%",
-			"defaultContent": acsoalt
+			"defaultContent": " "
 			};
 		colDefs.push( aux );
 		
 		
 		///////////////////////////////////////////////////////////////////////
 
-		setAjax();
+		
+		AjaxSource	=	"";
+		inicializa.init();
+		var data = [];
+		data.push(	{	
+								"FUNIID": "",
+								"SSHD": "",
+								"NOME": "Escolha um dos aparelhos de ponto",
+								"BIOS": "",
+								"UORPONTO": "",
+								"PRESENTE": "",
+								"MANTER": "",
+								"action": " "
+								} );
+
+		Table.fnAddData( data, true );
+		flalt = false;
 				
 		</script>
 	</body>	

@@ -4,6 +4,16 @@
 //			parametros opcionais
 //				semzero		-	não gerar o { "id": "0", "text": "Escolha abaixo:" }
 //				maisum e numais - gerar { "id": "$numais", "text": "$maisum" }
+//				
+//	aparelhos - lista de aparelhos associados ao PONTO siin=100
+//	uor - lista de todas as UORS do sau
+//	funcfuni	-	todos os funcionários na funi
+//	funcsuor - funcionários na funi pertencentes a uma UOR
+//	funcfuor - funcionário pertencentes a uma FUOR
+//	funcapar - funcionários em um aparelho
+//	uorsaut - uors que um autorizador autoriza
+//	tiaus - tipos de ausencias autorizadas
+
 function toHex($string)
 	{
 	$hex='';
@@ -69,6 +79,18 @@ if( $qry == "xpto" )
 	}
 
 ////////////////////////////////////////////////////////////////////////////////
+//	funcfuni - todos os funcionários na funi
+if( $qry == "funcfuni" )
+	{
+	$sql	=	"SELECT  FUNI.PMS_IDPMSPESSOA AS SSHD, PESS.NOME AS NOME
+							FROM        BIOMETRIA.FUNI_FUNCIONARIO FUNI
+							INNER JOIN  SAU.VWPESSOA_SSHD PESS ON 
+													PESS.IUN=FUNI.PMS_IDPMSPESSOA AND
+													PESS.REGISTRO_FUNCIONAL_ATIVO = 1
+							WHERE FUNI.FUNI_STATIVO=1";
+	}
+
+////////////////////////////////////////////////////////////////////////////////
 //	
 if( $qry == "regimes" )
 	{
@@ -76,7 +98,7 @@ if( $qry == "regimes" )
 	}
 
 ////////////////////////////////////////////////////////////////////////////////
-//	lista de aparelhos associados ao PONTO
+//	aparelhos - lista de aparelhos associados ao PONTO siin=100
 if( $qry == "aparelhos" )
 	{
 	$sql	=	"SELECT APAL.APAL_ID, 
@@ -93,15 +115,36 @@ if( $qry == "aparelhos" )
 							ORDER BY VUPU.UOR_DLSIGLAUNIDADE, APAL.APAL_DLLOCALIZACAO";
 	}
 
-//	lista de UORS
+//	uor lista de UORS - todas as UORS do sau
 if( $qry == "uor" )
 	{
 	$sql	=	"SELECT UOR_IDUNIDADEORGANIZACIONAL, UOR_DLSIGLAUNIDADE AS NOME 
 						FROM SAU.VWUORPUBLICA 
 						WHERE EMP_IDEMPRESA = 1 AND UOR_DTFINAL IS NULL";
 	}
+	
+//	funcfuor - funcionários na funi pertencentes a uma FUOR
+if( $qry == "funcfuor" )
+	{
+	if( !isset( $_GET["uor"] ) )
+		{
+		echo '[ {"id": "00", "text": "parametro uor obrigatorio" } ]';
+		return;
+		}
+	$uor	=	$_GET["uor"];
 
-//	funcsuor - funcionários pertencentes a uma UOR
+	$sql	=	"SELECT  FUNI.PMS_IDPMSPESSOA AS SSHD, PESS.NOME AS NOME
+							FROM        BIOMETRIA.FUOR_FUNCUNIDADEORGANIZACIONAL FUOR
+							INNER JOIN  BIOMETRIA.FUNI_FUNCIONARIO FUNI ON
+													FUNI.FUNI_ID=FUOR.FUNI_ID AND
+													FUNI.FUNI_STATIVO=1
+							INNER JOIN  SAU.VWPESSOA_SSHD PESS ON 
+													PESS.IUN=FUNI.PMS_IDPMSPESSOA AND
+													PESS.REGISTRO_FUNCIONAL_ATIVO = 1
+							WHERE FUOR.PMS_IDSAUUOR=$uor";
+	}
+
+//	funcsuor - funcionários na funi pertencentes a uma UOR
 if( $qry == "funcsuor" )
 	{
 	if( !isset( $_GET["uor"] ) )

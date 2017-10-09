@@ -81,8 +81,8 @@ include 'partes/Scripts.php';
 	<script type="text/javascript" src="partes/geral.js" ></script>
 	<script type="text/javascript" src="partes/dteditavel.js" ></script>
 	<script type="text/javascript" >
-		
-		$('#cktodos').bootstrapSwitch('state', false);
+
+	$('#cktodos').bootstrapSwitch('state', false);
 
 		$("#cktodos").on( 'switchChange.bootstrapSwitch', function( evn, state )
 			{

@@ -1,5 +1,13 @@
 <?php
 //	seleção de dados com retorno para o DataTables
+//	funuorbio	tabela de pessoas em uma UOR do SAU com contagem de BIOMETRIA
+//	autfuuor	tabela de funcionários de uma UOR para inclusão
+//	ausaut	tabela de ausências autorizadas de um funcionário
+//	funcindex	-	índice dos funcionários de um autorizador com contagem de eventos
+//	pendencias - obtem todas as pendencias de um sshd
+//	funaces
+//	funcapar	funcionários da funi em um aparelho dado pelo apalid
+//	fuornapar - funcionários de uma FUOR que não esteja no IDAPAL
 header('Content-Type: text/html; charset=UTF8');
 
 if( !isset( $_GET["query"] )  )
@@ -13,6 +21,109 @@ $dbg = FALSE;
 if( isset( $_GET["dbg"] ) )
 	$dbg = TRUE;
 $sql	=	"";
+////////////////////////////////////////////////////////////////////////////////
+//	fuornapar - funcionários de uma FUOR que não esteja no IDAPAL
+if( $qry == "fuornapar" )
+	{
+	if( !isset( $_GET["idapal"] ) )
+		{
+		echo	'{ "data": [{"erro": "parametro idapal obrigatorio"}] }';
+		return;
+		}
+	$idapal = $_GET["idapal"];
+	
+	if( !isset( $_GET["fuor"] ) )
+		{
+		echo	'{ "data": [{"erro": "parametro fuor obrigatorio"}] }';
+		return;
+		}
+	$fuor = $_GET["fuor"];
+	
+	$sql	=	"SELECT FUNI.FUNI_ID, FUNI.PMS_IDPMSPESSOA AS SSHD, VFAT.NOME, 
+									VFAT.IDUOR AS IDUORSAU, VFAT.DCSIGLAUOR AS SIGLAUORSAU,
+									RETR.RETR_ID AS IDRETR, RETR.RETR_DLNOME AS REGIME,
+									FUOR.PMS_IDSAUUOR AS IDUORPONTO, 
+									SUOR.UOR_DLSIGLAUNIDADE AS SIGALUORPONTO,
+									(SELECT COUNT(1) 
+											FROM BIOMETRIA.PEBI_PESSOABIOMETRIA PEBI
+											WHERE PEBI.SIIN_ID = 100 AND 
+														PEBI.PMS_IDPMSPESSOA = 
+														TO_NUMBER(SUBSTR(FUNI.PMS_IDPMSPESSOA, 2, 8))) AS QTBIO
+						FROM	BIOMETRIA.FUOR_FUNCUNIDADEORGANIZACIONAL FUOR 
+						INNER JOIN	BIOMETRIA.FUNI_FUNCIONARIO FUNI ON
+												FUNI.FUNI_ID = FUOR.FUNI_ID
+						INNER JOIN	BIOMETRIA.FRTR_FUNCIONARIOREGIMETRABALHO FRTR ON
+												TRUNC(SYSDATE + 1) BETWEEN FRTR.FRTR_DTINICIO AND 
+												NVL(FRTR.FRTR_DTFIM, TRUNC(SYSDATE + 1)) AND
+												FRTR.FUNI_ID = FUOR.FUNI_ID
+						INNER JOIN	BIOMETRIA.RETR_REGIMETRABALHO RETR ON
+												RETR.RETR_ID = FRTR.RETR_ID
+
+					 -- PUS LEFT JOIN POR NÃO TER COMO CONTROLAR QUANDO UM SSHD OU 
+					 -- UMA UOR SÃO CANCELADAS NO SAU. 
+					 -- NESSES CASO, O ERRO FICARÁ VISÍVEL NO SISPONTO E O FUNCIONÁRIO NÃO DEIXARÁ 
+					 -- DE APARECER NO SISTEMA. SE PUSERMOS INNER JOIN A QUERY FICA MUITO MAIS LENTA, 
+					 -- MAS TEREMOS QUE GARANTIR QUE UM FUNCIONÁRIO OU UMA UOR NÃO SERÃO INATIVADAS 
+					 -- SEM QUE O SISPONTO SEJA MANTIDO!!!
+					 -- ESSA CONDIÇÃO SERVE PARA O SISTEMA INTEIRO!!!!
+
+						LEFT JOIN		SAU.VWUORPUBLICA SUOR ON
+												SUOR.UOR_IDUNIDADEORGANIZACIONAL = FUOR.PMS_IDSAUUOR
+						LEFT JOIN		BIOMETRIA.VWFUNCIONARIOATIVO VFAT ON
+												VFAT.IUN = FUNI.PMS_IDPMSPESSOA
+						WHERE	TRUNC(SYSDATE + 1) BETWEEN 
+									FUOR.FUOR_DTINICIO AND NVL(FUOR.FUOR_DTFIM, TRUNC(SYSDATE + 1)) AND
+									FUOR.PMS_IDSAUUOR = $fuor AND
+
+					 -- IDENTIFICA SE FUNCIONÁRIO ASSOCIADO À UOR DA FUOR ESTÁ NO APARELHO. 
+					 -- TEMOS QUE LER A LOTR PORQUE É ELA QUE POSSUI O APAL.
+					 -- QUANDO RETIRARMOS A LOTR, A PRÓPRIA FLTR TERÁ ESSE ID.
+
+									NOT EXISTS (SELECT FLTR.FUNI_ID
+																FROM BIOMETRIA.FLTR_FUNCIONARIOLOCALTRABALHO FLTR
+																		 INNER JOIN BIOMETRIA.LOTR_LOCALTRABALHO LOTR ON
+																								LOTR.APAL_ID = $idapal AND
+																								LOTR.LOTR_ID = FLTR.LOTR_ID
+																WHERE FLTR.FUNI_ID = FUOR.FUNI_ID)
+						ORDER BY NOME";
+	}
+	
+////////////////////////////////////////////////////////////////////////////////
+//	funcapar - funcionário da funi em um aparelho dado o idapal
+if( $qry == "funcapar" )
+	{
+	if( !isset( $_GET["idapal"] ) )
+		{
+		echo	'{ "data": [{"erro": "parametro idapal obrigatorio"}] }';
+		return;
+		}
+	$idapal = $_GET["idapal"];
+	
+	$sql	=	"SELECT	FUNI.FUNI_ID, FUNI.PMS_IDPMSPESSOA AS SSHD, 
+									FUOR.PMS_IDSAUUOR AS FUOR, PESS.NOME AS NOME, 
+									VUOR.UOR_IDUNIDADEORGANIZACIONAL AS IDUORPONTO, 
+									VUOR.UOR_DLSIGLAUNIDADE AS SIGLAUORPONTO,
+									COUNT( PEBI.PEBI_ID ) AS BIOS
+							FROM        BIOMETRIA.LOTR_LOCALTRABALHO LOTR
+							INNER JOIN  BIOMETRIA.FLTR_FUNCIONARIOLOCALTRABALHO FLTR ON
+													FLTR.LOTR_ID=LOTR.LOTR_ID
+							INNER JOIN  BIOMETRIA.FUNI_FUNCIONARIO FUNI ON
+													FUNI.FUNI_ID=FLTR.FUNI_ID AND
+													FUNI.FUNI_STATIVO=1
+							INNER JOIN  BIOMETRIA.FUOR_FUNCUNIDADEORGANIZACIONAL FUOR ON
+													FUOR.FUNI_ID=FUNI.FUNI_ID
+							INNER JOIN  SAU.VWUORPUBLICA VUOR ON 
+													VUOR.UOR_IDUNIDADEORGANIZACIONAL=FUOR.PMS_IDSAUUOR
+							LEFT JOIN   BIOMETRIA.PEBI_PESSOABIOMETRIA PEBI ON
+													PEBI.PMS_IDPMSPESSOA=TO_NUMBER( SUBSTR(FUNI.PMS_IDPMSPESSOA, 2, 8 ))
+							INNER JOIN  SAU.VWPESSOA_SSHD PESS ON 
+													PESS.IUN=FUNI.PMS_IDPMSPESSOA AND
+													PESS.REGISTRO_FUNCIONAL_ATIVO = 1
+							WHERE LOTR.APAL_ID=$idapal
+							GROUP BY    FUNI.FUNI_ID, FUNI.PMS_IDPMSPESSOA, FUOR.PMS_IDSAUUOR,
+													PESS.NOME, VUOR.UOR_IDUNIDADEORGANIZACIONAL, VUOR.UOR_DLSIGLAUNIDADE";
+	}
+	
 ////////////////////////////////////////////////////////////////////////////////
 //	funuorbio	tabela de pessoas em uma UOR do SAU com contagem de BIOMETRIA
 //						
@@ -50,9 +161,9 @@ if( $qry == "funuorbio" )
 													FUOR.FUNI_ID = FUNI.FUNI_ID
 								LEFT JOIN SAU.VWUORPUBLICA SUOR ON
 													SUOR.UOR_IDUNIDADEORGANIZACIONAL=FUOR.PMS_IDSAUUOR
-								WHERE (VFAT.IDUOR = $iduor AND
-												FUNI.FUNI_ID IS NULL) OR
-											 FUOR.PMS_IDSAUUOR = $iduor
+								WHERE	(VFAT.IDUOR = $iduor AND
+											FUNI.FUNI_ID IS NULL) OR
+											FUOR.PMS_IDSAUUOR = $iduor
 								ORDER BY NOME";
 		}
 	else
@@ -78,7 +189,6 @@ if( $qry == "funuorbio" )
 //	autfuuor	tabela de funcionários de uma UOR para inclusão
 //	Parametros 
 //			iduor		-	id da UOR do SAU a selecionar pessoas
-//			todos		-	se presente mostra pessoas alocadas ou não
 if( $qry == "autfuuor" )
 	{
 	if( !isset( $_GET["iduor"] ) )
@@ -174,7 +284,7 @@ if( $qry == "ausaut" )
 						ORDER BY FAAU.FAAU_DTINI";
 	}
 ////////////////////////////////////////////////////////////////////////////////
-//	índice dos funcionários de um autorizador com contagem de eventos
+//	funcindex	-	índice dos funcionários de um autorizador com contagem de eventos
 //	query=funcindex&autid=funi_id
 if( $qry == "funcindex" )
 	{
@@ -237,7 +347,8 @@ if( $qry == "funcindex" )
 		ORDER BY  UNIDADE, QTPENDENTE DESC";
 	}
 ////////////////////////////////////////////////////////////////////////////////
-//	pendencias( sshd, dtini, dtfim, ok, pen, ana, ace, neg, sshdfunc )
+//	pendencias - obtem todas as pendencias de um sshd
+//	( sshd, dtini, dtfim, ok, pen, ana, ace, neg, sshdfunc )
 //	sshd								sshd do autorizador
 //	dtini/dtfim					período
 //	ok/pen/ana/ace/neg	status desejados
@@ -377,7 +488,7 @@ if( $qry == "pendencias" )
 		$sql .= "WHERE       FUNI.PMS_IDPMSPESSOA = '$sshdfunc'";
 	}
 ////////////////////////////////////////////////////////////////////////////////
-	//	funaces
+//	funaces
 if( $qry == "funaces" )
 	{
 	if( !isset( $_GET["sshd"] ) )
