@@ -98,7 +98,7 @@ if( $qry == "regimes" )
 	}
 
 ////////////////////////////////////////////////////////////////////////////////
-//	aparelhos - lista de aparelhos associados ao PONTO siin=100
+//	aparelhos - lista de todos os aparelhos associados ao PONTO siin=100 
 if( $qry == "aparelhos" )
 	{
 	$sql	=	"SELECT APAL.APAL_ID, VUPU.UOR_DLSIGLAUNIDADE || 
