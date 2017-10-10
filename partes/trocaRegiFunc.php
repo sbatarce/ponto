@@ -107,7 +107,7 @@ if( $dbg )
 if( $idregiant >= 0 )
 	{
 	$sql = "UPDATE BIOMETRIA.FRTR_FUNCIONARIOREGIMETRABALHO 
-						SET FRTR_DTFIM=LAST_DAY(SYSDATE) 
+						SET FRTR_DTFIM=SYSDATE
 						WHERE FRTR_ID=$idregiant";
 	$res = $ora->execDelUpd($sql);
 	$jres = json_decode( $res );
@@ -128,7 +128,7 @@ if( $idregiant >= 0 )
 //	cria a nova alocação
 $sql = "INSERT INTO BIOMETRIA.FRTR_FUNCIONARIOREGIMETRABALHO VALUES
 					( BIOMETRIA.SQ_FRTR.NEXTVAL, $funiid, $reginovo, null, 
-						LAST_DAY(SYSDATE)+1, null )";
+						SYSDATE+1, null )";
 $res = $ora->execInsert( $sql, "BIOMETRIA.SQ_FRTR" );
 $jres = json_decode( $res );
 if( $dbg )

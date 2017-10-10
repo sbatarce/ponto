@@ -110,7 +110,7 @@ if( $dbg )
 if( $idfuorant >= 0 )
 	{
 	$sql = "UPDATE BIOMETRIA.FUOR_FUNCUNIDADEORGANIZACIONAL 
-						SET FUOR_DTFIM=LAST_DAY(SYSDATE)
+						SET FUOR_DTFIM=SYSDATE 
 						WHERE FUOR_ID=$idfuorant";
 	$res = $ora->execDelUpd($sql);
 	$jres = json_decode( $res );
@@ -130,7 +130,7 @@ if( $idfuorant >= 0 )
 	
 //	cria a nova alocação
 $sql = "INSERT INTO BIOMETRIA.FUOR_FUNCUNIDADEORGANIZACIONAL VALUES
-				  ( BIOMETRIA.SQ_FUOR.NEXTVAL, $funiid, $uornova, LAST_DAY(SYSDATE)+1, null )";
+				  ( BIOMETRIA.SQ_FUOR.NEXTVAL, $funiid, $uornova, SYSDATE+1, null )";
 $res = $ora->execInsert( $sql, "BIOMETRIA.SQ_FUOR" );
 $jres = json_decode( $res );
 if( $dbg )
