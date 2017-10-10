@@ -137,16 +137,23 @@ include 'partes/Scripts.php';
 					{
 					if( resul.status != "OK" )
 						{
-						var url = "partes/updates.php?query=delfltr&idfltr="+idfltr;
-						var resul = remoto( url );
-						var txt = "Por favor, anote\nO Funcionário: " + row["NOME"] + 
-											"\nNão pode ser adicionado ao aparelho";
-						aux = "Por favor, anote\nO Funcionário: " + row["NOME"] + 
-											"\nNão pode ser adicionado ao aparelho:\n";
-						//alert( aux );
+						if( !(aux.indexOf("000") >= 0 || aux.indexOf("023") >= 0 ) )
+							{
+							var url = "partes/updates.php?query=delfltr&idfltr="+idfltr;
+							var resul = remoto( url );
+							var txt = "Por favor, anote\nO Funcionário: " + row["NOME"] + 
+												"\nNão pode ser adicionado ao aparelho";
+							aux = "Por favor, anote\nO Funcionário: " + row["NOME"] + 
+												"\nNão pode ser adicionado ao aparelho:\n";
+							//alert( aux );
+							flerr = true;
+							}
 						}
-					else
-						Table.api().row(ix).remove().draw(false);
+					if( !flerr )
+						{
+						Table.fnUpdate( "sim", ix, 4, false );
+						Table.fnUpdate( "", ix, 6 );
+						}
 					}
 				}
 			}
