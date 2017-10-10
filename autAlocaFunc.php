@@ -196,12 +196,9 @@ include 'partes/Scripts.php';
 				row = Table.fnGetData( ix );
 				if( row["REGIME"] != "" )
 					continue;
-				if( row["IDREG"] == "0" )
-					{
-					row["REGIME"] = noregi;
-					row["IDREG"] = idregi;
-					Table.api().row(ix).data(row);
-					}
+				row["REGIME"] = noregi;
+				row["IDREG"] = idregi;
+				Table.api().row(ix).data(row);
 				}
 			}
 			
