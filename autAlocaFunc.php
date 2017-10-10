@@ -123,7 +123,7 @@ include 'partes/Scripts.php';
 				iduor	=	id;
 				nouor	= text;
 				}
-			var url	=	"partes/tableData.php?query=funuorbio&iduor=" + iduor;
+			var url	=	"partes/tableData.php?query=funuorbio&iduor="+iduor;
 			var	resu	=	remoto( url );
 			if( resu == null )
 				{
