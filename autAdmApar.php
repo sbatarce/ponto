@@ -137,6 +137,7 @@ include 'partes/Scripts.php';
 					{
 					if( resul.status != "OK" )
 						{
+						aux = resul.erro;
 						if( !(aux.indexOf("000") >= 0 || aux.indexOf("023") >= 0 ) )
 							{
 							var url = "partes/updates.php?query=delfltr&idfltr="+idfltr;
