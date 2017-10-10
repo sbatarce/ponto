@@ -145,9 +145,9 @@ include 'partes/Scripts.php';
 											"\nNão pode ser adicionado ao aparelho:\n";
 						//alert( aux );
 						}
-					Table.api().row(ix).remove();
+					else
+						Table.api().row(ix).remove().draw(false);
 					}
-				Table.api().draw(false);
 				}
 			}
 
