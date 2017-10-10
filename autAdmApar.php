@@ -530,6 +530,7 @@ include 'partes/Scripts.php';
 			{
 			"tipo": "t",
 			"editavel": false,
+			"visible": false,
 			"vanovo": "",
 			"width": "10%",
 			"aTargets": [ ++col ],
