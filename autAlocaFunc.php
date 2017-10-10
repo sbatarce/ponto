@@ -194,7 +194,7 @@ include 'partes/Scripts.php';
 			for( var ix=0; ix<qtlin; ix++ )
 				{
 				row = Table.fnGetData( ix );
-				if( row["action"] == "" )
+				if( row["REGIME"] == "" )
 					continue;
 				if( row["IDREG"] == "0" )
 					{
