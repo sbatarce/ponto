@@ -131,14 +131,23 @@ include 'partes/Scripts.php';
 						"\", \"verifica_biometria\": true, " +
 						"\"referencias\": [ " + row["SSHD"].substring(1) +  " ]}]";
 				var resul = repserviceB( "POST", "usuarios", idapal, "SISPONTO", null, body );
-				var aux = resul.erro;
-				if( aux.indexOf("000") >= 0 || aux.indexOf("023") >= 0 )
-					continue;
-				var url = "partes/updates.php?query=delfltr&idfltr="+idfltr;
-				var resul = remoto( url );
-				var txt = "Por favor, anote\nO Funcionário: " + row["NOME"] + 
-									"\nNão pode ser adicionado ao aparelho";
-				alert( txt );
+				var aux;
+				var flerr = false;
+				if( resul.hasOwnProperty('status') )
+					{
+					if( resul.status != "OK" )
+						{
+						var url = "partes/updates.php?query=delfltr&idfltr="+idfltr;
+						var resul = remoto( url );
+						var txt = "Por favor, anote\nO Funcionário: " + row["NOME"] + 
+											"\nNão pode ser adicionado ao aparelho";
+						aux = "Por favor, anote\nO Funcionário: " + row["NOME"] + 
+											"\nNão pode ser adicionado ao aparelho:\n";
+						//alert( aux );
+						}
+					Table.api().row(ix).remove();
+					}
+				Table.api().draw(false);
 				}
 			}
 
