@@ -194,7 +194,8 @@ include 'partes/Scripts.php';
 			for( var ix=0; ix<qtlin; ix++ )
 				{
 				row = Table.fnGetData( ix );
-				if( row["REGIME"] != "" )
+				noreg = row["REGIME"];
+				if( noreg != "" && noreg.indexOf("Escolha") < 0 )
 					continue;
 				row["REGIME"] = noregi;
 				row["IDREG"] = idregi;
