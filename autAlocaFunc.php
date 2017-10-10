@@ -205,7 +205,7 @@ include 'partes/Scripts.php';
 			
 		function adiciona( ix )
 			{
-			var fica = "<a href='#' onClick='javascript:remove(" + ix + ")' " +
+			var remo = "<a href='#' onClick='javascript:remove(" + ix + ")' " +
 									"class='btn btn-circle btn-info btn-xs adicionar' " +
 									"title=\"remover funcionário do aparelho\" >" +
 									"   <i class='glyphicon glyphicon-ok'></i></a>"
@@ -411,14 +411,32 @@ include 'partes/Scripts.php';
 				{
 				for( var ix=0; ix<qt; ix++ )
 					{
-					data.push({	"IUN": resu.data[ix].IUN,
-											"NOME": resu.data[ix].NOME,
-											"QTBIO": resu.data[ix].QTBIO,
-											"REGIME": resu.data[ix].REGIME,
-											"PRESENTE": "sim",
-											"MANTER": "sim",
-											"IDREG": "",
-											"action": ""} );
+					if( resu.data[ix].FUNI_ID == "" )
+						{
+						var fica = "<a href='#' onClick='javascript:remove(" + ix + ")' " +
+											"class='btn btn-circle btn-info btn-xs remover' " +
+											"title=\"não colocar este funcionário na UOR de ponto\" >" +
+											"<i class='glyphicon glyphicon-ok'></i></a>";
+						data.push({	"IUN": resu.data[ix].IUN,
+												"NOME": resu.data[ix].NOME,
+												"QTBIO": resu.data[ix].QTBIO,
+												"REGIME": resu.data[ix].REGIME,
+												"PRESENTE": "não",
+												"MANTER": "sim",
+												"IDREG": "",
+												"action": fica } );
+						}
+					else
+						{
+						data.push({	"IUN": resu.data[ix].IUN,
+												"NOME": resu.data[ix].NOME,
+												"QTBIO": resu.data[ix].QTBIO,
+												"REGIME": resu.data[ix].REGIME,
+												"PRESENTE": "sim",
+												"MANTER": "sim",
+												"IDREG": "",
+												"action": ""} );
+						}
 					}
 				Table.fnAddData( data, true );
 				//atuatab();
