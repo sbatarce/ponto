@@ -253,9 +253,9 @@ include 'partes/Scripts.php';
 			for( var ix=0; ix<qtlin; ix++ )
 				{
 				row = Table.fnGetData( ix );
-				if( row["PRESENTE"] == "1" )
+				if( row["PRESENTE"] == "sim" )
 					continue;
-				if( row["MANTER"] != "1" )
+				if( row["MANTER"] != "sim" )
 					continue;
 				if( row["IDREG"] <= 0 )
 					{
@@ -270,9 +270,9 @@ include 'partes/Scripts.php';
 			for( var ix=0; ix<qtlin; ix++ )
 				{
 				row = Table.fnGetData( ix );
-				if( row["PRESENTE"] == "1" )
+				if( row["PRESENTE"] == "sim" )
 					continue;
-				if( row["MANTER"] != "1" )
+				if( row["MANTER"] != "sim" )
 					continue;
 				var url = "partes/criaFuni.php?sshd=" + row["IUN"] +
 									"&idretr=" + row["IDREG"] +
@@ -282,7 +282,12 @@ include 'partes/Scripts.php';
 					{
 					var txt = "Erro:\n" + resul.erro + "\ncriando o funcionário:\n" +
 										row["NOME"];
-					alert( txt );
+					//alert( txt );
+					}
+				else
+					{
+					Table.fnUpdate( "sim", ix, 4, false );
+					Table.fnUpdate( "", ix, 5 );
 					}
 				}
 			}
