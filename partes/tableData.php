@@ -123,7 +123,8 @@ if( $qry == "funcapar" )
 	}
 	
 ////////////////////////////////////////////////////////////////////////////////
-//	funuorbio	tabela de pessoas em uma UOR do SAU com contagem de BIOMETRIA
+//	funuorbio	tabela de pessoas em uma UOR do SAU (VWFUNCIONARIOATIVO) 
+//						com contagem de BIOMETRIA
 //						
 //	Parametros 
 //			iduor		-	id da UOR a selecionar pessoas

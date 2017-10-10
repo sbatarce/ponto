@@ -142,10 +142,10 @@ include 'partes/Scripts.php';
 												"NOME": resu.data[ix].NOME,
 												"QTBIO": resu.data[ix].QTBIO,
 												"REGIME": "Escolha Abaixo",
-												"PRESENTE": "0",
-												"MANTER": "1",
+												"PRESENTE": "não",
+												"MANTER": "sim",
 												"IDREG": "0",
-												"action": acsoalt} );
+												"action": "" } );
 						}
 					else
 						{
@@ -153,13 +153,22 @@ include 'partes/Scripts.php';
 												"NOME": resu.data[ix].NOME,
 												"QTBIO": resu.data[ix].QTBIO,
 												"REGIME": resu.data[ix].REGIME,
-												"PRESENTE": "0",
-												"MANTER": "1",
+												"PRESENTE": "não",
+												"MANTER": "sim",
 												"IDREG": resu.data[ix].IDRETR,
-												"action": acsoalt} );
+												"action": "" } );
 						}
 					}
-				Table.fnAddData( data, true );
+				var lis = Table.fnAddData( data, false );
+				for( var ix=0; ix < lis.length; ix++ )
+					{
+					var fica = "<a href='#' onClick='javascript:remove(" + lis[ix] + ")' " +
+										"class='btn btn-circle btn-info btn-xs remover' " +
+										"title=\"não colocar este funcionário na UOR de ponto\" >" +
+										"<i class='glyphicon glyphicon-ok'></i></a>";
+					Table.fnUpdate( fica, lis[ix], 5, fica, false );
+					}
+				Table.fnDraw( true );
 				}
 			$(".uors").select2('val', 0 );
 			}
@@ -194,6 +203,41 @@ include 'partes/Scripts.php';
 					Table.api().row(ix).data(row);
 					}
 				}
+			}
+			
+		function adiciona( ix )
+			{
+			var fica = "<a href='#' onClick='javascript:remove(" + ix + ")' " +
+									"class='btn btn-circle btn-info btn-xs adicionar' " +
+									"title=\"remover funcionário do aparelho\" >" +
+									"   <i class='glyphicon glyphicon-ok'></i></a>"
+			var row = Table.fnGetData( ix );
+			row["action"] = remo;
+			row["MANTER"] = "sim";
+			Table.api().row(ix).data(row);
+/*
+			Table.fnUpdate( "sim", ix, 5, false );
+			Table.fnUpdate( act, ix, 6 );
+			flalt = true;
+	*/
+			}
+		
+			
+		function remove( ix )
+			{
+			var tira =	"<a href='#' onClick='javascript:adiciona(" + ix + ")' " +
+									"class='btn btn-circle btn-info btn-xs adicionar' " +
+									"title=\"adicionar funcionário ao aparelho\" >" +
+									"   <i class='glyphicon glyphicon-remove'></i></a>"
+			var row = Table.fnGetData( ix );
+			row["action"] = tira;
+			row["MANTER"] = "não";
+			Table.api().row(ix).data(row);
+/*
+			Table.fnUpdate( "nao", ix, 5, false );
+			Table.fnUpdate( act, ix, 6 );
+			flalt = true;
+			*/
 			}
 			
 		function executar()
@@ -368,8 +412,8 @@ include 'partes/Scripts.php';
 											"NOME": resu.data[ix].NOME,
 											"QTBIO": resu.data[ix].QTBIO,
 											"REGIME": resu.data[ix].REGIME,
-											"PRESENTE": "1",
-											"MANTER": "1",
+											"PRESENTE": "sim",
+											"MANTER": "sim",
 											"IDREG": "",
 											"action": ""} );
 					}
@@ -425,7 +469,7 @@ include 'partes/Scripts.php';
 						};
 
 		//	monta o datatables
-		var	order	=	[];											//	sem classificação 
+		var	order	=	[4, 'asc'];											//	sem classificação 
 		//	prepara a definiçao das colunas
 		var colDefs	=	[];
 		var	col	=	-1;
@@ -497,34 +541,7 @@ include 'partes/Scripts.php';
 			"aTargets": [ ++col ],
 			"mData": "PRESENTE",
 			"sTitle":"Presente",
-			"defaultContent": " ",
-			"render": function( data, type, full )
-					{
-					if( data == 0 )
-						return "<i class='glyphicon glyphicon-remove'></i></a>";
-					else
-						return "<i class='glyphicon glyphicon-ok'></i></a>";
-					}
-			};
-		colDefs.push( aux );
-		
-		aux	=
-			{
-			"tipo": "x",
-			"editavel": false,
-			"vanovo": "",
-			"width": "10%",
-			"aTargets": [ ++col ],
-			"mData": "MANTER",
-			"sTitle":"Manter",
-			"defaultContent": " ",
-			"render": function( data, type, full )
-					{
-					if( data == 0 )
-						return "<i class='glyphicon glyphicon-remove'></i></a>";
-					else
-						return "<i class='glyphicon glyphicon-ok'></i></a>";
-					}
+			"defaultContent": " "
 			};
 		colDefs.push( aux );
 		
@@ -533,13 +550,14 @@ include 'partes/Scripts.php';
 			"tipo": null,
 			"editavel": false,
 			"vanovo": "",
+			"sTitle":"Adicionar",
 			"bSortable": false,
 			"searchable": false,
 			"aTargets": [ ++col ],
 			"orderable":false,
 			"mData": "action",
-			"width": "5%",
-			"defaultContent": acsoalt
+			"width": "10%",
+			"defaultContent": ""
 			};
 		colDefs.push( aux );
 		
@@ -553,8 +571,8 @@ include 'partes/Scripts.php';
 									"NOME": "Escolha uma UOR de PONTO acima",
 									"QTBIO": "",
 									"REGIME": "",
-									"PRESENTE": "0",
-									"MANTER": "0",
+									"PRESENTE": "",
+									"MANTER": "",
 									"IDREG": "",
 									"action": ""} );
 		Table.fnAddData( data, true );
