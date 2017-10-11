@@ -125,28 +125,11 @@ include 'partes/Scripts.php';
 			{
 			}
 			
-		//	chama a página de pendências do funcionário
-		function pendencias( sshd )
-			{
-			criarCookie( "sshdfunc", sshd );
-			window.location = "autPenden.php";
-			}
-			
-		//	obtem o detalhe de um funcionário escolhido no autTodosFunc
-		function detfunc( id, nome, sshd )
-			{
-			criarCookie( "idfunc", id );
-			criarCookie( "nofunc", nome );
-			criarCookie( "sshdfunc", sshd );
-			window.location = "autFuncio.php";
-			}
-
 		//	tratamento inicial das datas e inicialização do datatables
-		function setAjax( del )
+		function setAjax(  )
 			{
 			//
-			if( del != 0 )
-				tableDestroy();
+			tableDestroy();
 			var dt = $("#dtini").datepicker("getDate");
 			dtini = $.datepicker.formatDate("yymmdd", dt );
 			AjaxSource	=	"partes/tableData.php?query=ausaut" + 
@@ -169,8 +152,20 @@ include 'partes/Scripts.php';
 				{ 
 				var dt = $("#dtini").datepicker("getDate");
 				dtini = $.datepicker.formatDate("yymmdd", dt );
-				setAjax(1);
+				setAjax();
 				});
+				
+	function escaus( tipo, id, text	 )
+			{
+			if( id > 0 )
+				{
+				idaus	=	id;
+				noaus	= text;
+				}
+			setAjax();
+			}
+
+				
 		/////////////// PRINCIPAL ////////////////////////
 //		$('#eddt_new').hide();
     $('#eddt_new').click(function( e )
@@ -178,14 +173,15 @@ include 'partes/Scripts.php';
 					e.stopImmediatePropagation();
 					}
 				);
+		var idaus = -1;
+		var noaus = "";
 		var dtini = null;
 		var sshd = obterCookie( "user" );
 		if( sshd == null )
 			{
 			Deslogar();
-			}
-		if( sshd == null )
 			window.location = "index.php";
+			}
 		var idfunc = obterCookie( "idfunc" );
 		if( idfunc == null )
 			{
@@ -226,10 +222,12 @@ include 'partes/Scripts.php';
 		//	formatadores ligados ao datatables
 		var liNova			=
 						{
-						"DATA": "",
-						"Registros": "",
-						"Mensagens": "",
-						"Totais": ""
+						"IDTIPO": "0",
+						"TIPO": "Escolha abaixo",
+						"PODE": "",
+						"INICIO": "",
+						"TERMINO": "",
+						"TMPDIARIO": ""
 						};
 
 		//	monta o datatables
@@ -240,13 +238,23 @@ include 'partes/Scripts.php';
 
 		var aux	=
 			{
-			"tipo": "x",
+			"tipo": "l",
 			"editavel": false,
 			"vanovo": "",
-			"width": "30%",
+			"width": "20%",
 			"aTargets": [ ++col ],
 			"mData": "TIPO",
 			"sTitle":"Tipo",
+
+
+			"selID": "IDTIPO",
+			"classe": "cbtiaus",
+			"selVal": "TIPO",
+			"selminlen": 1,
+			"selURL": "selectData.php?query=tiaus",
+			"funcEscolha": escaus,
+		
+		
 			"defaultContent": " "
 			};
 		colDefs.push( aux );
@@ -296,7 +304,7 @@ include 'partes/Scripts.php';
 			"aTargets": [ ++col ],
 			"mData": "TERMINO",
 			"sTitle":"Término",
-			"defaultContent": " ",
+			"defaultContent": " "
 			};
 		colDefs.push( aux );
 		
@@ -309,12 +317,41 @@ include 'partes/Scripts.php';
 			"aTargets": [ ++col ],
 			"mData": "TMPDIARIO",
 			"sTitle":"Tempo diário",
-			"defaultContent": " ",
+			"defaultContent": " "
+			};
+		colDefs.push( aux );
+		
+		aux	=	
+			{
+			"tipo": null,
+			"editavel": false,
+			"vanovo": "",
+			"sTitle":"",
+			"bSortable": false,
+			"searchable": false,
+			"aTargets": [ ++col ],
+			"orderable":false,
+			"mData": "action",
+			"width": "10%",
+			"render": function( data, type, row )
+				{
+				var ago = new Date();
+				var stnow = ago.getFullYear() +
+										com2Digs( ago.getMonth()+1 ) +
+										com2Digs( ago.getDate() );
+				var stini = toDateInv( row.INICIO );
+				var stter = toDateInv( row.TERMINO );
+				
+				if( stnow > stini || stnow > stter )
+					return "";
+				else
+					return acremo;
+				}
 			};
 		colDefs.push( aux );
 		///////////////////////////////////////////////////////////////////////
 
-		setAjax( 0 );
+		setAjax();
 				
 		</script>
 	</body>	

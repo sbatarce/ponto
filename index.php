@@ -129,18 +129,22 @@
 				var resul = remoto( aux );
 				if( resul.status == "OK" )
 					{
-					if( resul.UOR_ID == "" )
+					$(".usu").show();
+					$(".aut").hide();
+					$(".adm").hide();
+					matarCookie("uoraut");
+					matarCookie("super");
+					
+					if( resul.UOR_ID != "" )
 						{
-						$(".usu").show();
-						$(".aut").hide();
-						matarCookie("uoraut");
+						$(".aut").show();
+						criarCookie("uoraut", resul.UOR_ID, 1);
 						}
-					else
+					if( resul.PERF_ID > "3" )
 						{
-						$(".usu").show();
-						$(".aut").hide();
+						$(".adm").show();
+						criarCookie("super", "1", 1);
 						}
-					criarCookie("uoraut", resul.UOR_ID, 1);
 					$("#menupri").collapse("show");
 					$("#menu").show();
 					$("#menu").click();
@@ -152,13 +156,16 @@
 						$("#resul").val(resul.erro);
 					else
 						$("#resul").val(resul.erro + "-" + resul.dbmens);
-					$("#menu").hide();
 					matarCookie("user");
 					matarCookie("pass");
 					matarCookie("loguser");
 					matarCookie("logpass");
 					matarCookie("uoraut");
 					matarCookie("idfunc");
+					$(".usu").hide();
+					$(".aut").hide();
+					$(".adm").hide();
+					$("#menu").hide();
 					return false;
 					}
 				}

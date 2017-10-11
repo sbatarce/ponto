@@ -163,6 +163,20 @@ function Titulo( titu )
   {
   document.getElementById( "titu" ).innerHTML = titu;
   }
+ 
+function com2Digs(number)
+  {
+  return( number < 10 ? '0' : '' ) + number;
+  }
+
+//  de DD/MM/YYYY => YYYYMMDD
+ function toDateInv( data )
+  {
+  var res = data.substr( 6 );
+  res += data.substr( 3, 5 );
+  res += data.substr( 0, 2 );
+  return res;
+  }
 
 function titulo( titu )
   {

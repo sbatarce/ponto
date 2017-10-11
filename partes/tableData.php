@@ -138,6 +138,14 @@ if( $qry == "funuorbio" )
 		return;
 		}
 	$iduor = $_GET["iduor"];
+
+	if( !isset( $_GET["sguor"] ) )
+		{
+		echo	'{ "data": [{"erro": "parametro sguor obrigatorio"}] }';
+		return;
+		}
+	$sguor = $_GET["sguor"];
+
 	if( isset( $_GET["janafuor"] ) )
 		{
 		$sql =	"SELECT	FUNI.FUNI_ID, IUN, NOME, IDUOR AS IDUORSAU, DCSIGLAUOR AS SIGLAUORSAU,
@@ -161,9 +169,10 @@ if( $qry == "funuorbio" )
 													FUOR.FUNI_ID = FUNI.FUNI_ID
 								LEFT JOIN SAU.VWUORPUBLICA SUOR ON
 													SUOR.UOR_IDUNIDADEORGANIZACIONAL=FUOR.PMS_IDSAUUOR
-								WHERE	(VFAT.IDUOR = $iduor AND
-											FUNI.FUNI_ID IS NULL) OR
-											FUOR.PMS_IDSAUUOR = $iduor
+								WHERE ((VFAT.IDUOR = $iduor OR
+												 VFAT.DCSIGLAUOR = '$sguor') AND
+												 FUNI.FUNI_ID IS NULL) OR
+												FUOR.PMS_IDSAUUOR = $iduor
 								ORDER BY NOME";
 		}
 	else
@@ -270,7 +279,8 @@ if( $qry == "ausaut" )
 		}
 	$sshd = $_GET["sshd"];
 	$inicio = $_GET["inicio"];
-	$sql = "select  TAAU.TAAU_DLAUSENCIAAUTORIZADA as TIPO, TAAU.TAAU_STMARCACAO as PODE, 
+	$sql = "select  TAAU.TAAU_ID AS IDTIPO, TAAU.TAAU_DLAUSENCIAAUTORIZADA as TIPO, 
+									TAAU.TAAU_STMARCACAO as PODE, 
 									FAAU.FAAU_ID, TO_CHAR( FAAU.FAAU_DTINI, 'DD/MM/YYYY' ) as INICIO, 
 									TO_CHAR( FAAU.FAAU_DTFIM, 'DD/MM/YYYY' ) AS TERMINO, 
 									FAAU.FAAU_NITMPDIARIO AS TMPDIARIO
