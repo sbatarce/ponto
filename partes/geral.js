@@ -173,11 +173,48 @@ function com2Digs(number)
  function toDateInv( data )
   {
   var res = data.substr( 6 );
-  res += data.substr( 3, 5 );
+  res += data.substr( 3, 2 );
   res += data.substr( 0, 2 );
   return res;
   }
 
+//  minutos => hh:mm
+function minToHHMM( minutos )
+  {
+  var hh = Math.floor(Math.abs(minutos)/60);
+  var mm = Math.abs(minutos)%60;
+  if( hh < 10 )
+    hh = "0" + hh;
+  if( mm < 10 )
+    mm = "0" + mm;
+  if( minutos < 0 )
+    return "-"+hh+":"+mm;
+  else
+    return ""+hh+":"+mm;
+  }
+			
+//	de hh:mm para minutos
+function hhmmToMin( hhmm )
+  {
+  if( hhmm.substring(2,3) != ":" )
+    return -1;
+  if( !$.isNumeric(hhmm.substring(0,2)) )
+    return -1;
+  if( !$.isNumeric(hhmm.substring(3,5)) )
+    return -1;
+
+  var hh = Number(hhmm.substring( 0, 2 ));
+  var mm = Number(hhmm.substring( 3, 5 ));
+
+  if( hh < 0 || hh > 23 )
+    return -1;
+  if( mm < 0 || mm > 59 )
+    return -1;
+
+  return hh*60+mm;
+  }
+
+//  formatação de componentes HTML
 function titulo( titu )
   {
   document.getElementById( "titu" ).innerHTML = titu;

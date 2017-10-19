@@ -170,7 +170,7 @@ if( $qry == "horasdia" )
 	}
 
 ////////////////////////////////////////////////////////////////////////////////
-//	ausaut( sshd, data ) - verifica se na data há uma ausencia autorizada do tipo dado
+//	ausaut( sshd, data, taauid ) - verifica se na data há uma ausencia autorizada do tipo dado
 if( $qry == "ausaut" )
 	{
 	if( !isset( $_GET["sshd"] ) )
