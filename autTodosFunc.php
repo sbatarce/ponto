@@ -103,19 +103,21 @@ include 'partes/Scripts.php';
 			window.location = "autPenden.php";
 			}
 			
-		function ausencias( sshd, id, nome )
+		function ausencias( sshd, id, nome, iduorfunc )
 			{
 			criarCookie( "idfunc", id );
 			criarCookie( "nofunc", nome );
 			criarCookie( "sshdfunc", sshd );
+			criarCookie( "iduorfunc", iduorfunc );
 			window.location = "autAusencias.php";
 			}
 			
-		function correcoes( sshd )
+		function correcoes( sshd, id, nome, iduorfunc )
 			{
 			criarCookie( "idfunc", id );
 			criarCookie( "nofunc", nome );
 			criarCookie( "sshdfunc", sshd );
+			criarCookie( "iduorfunc", iduorfunc );
 			window.location = "autCorrecao.php";
 			}
 			
@@ -230,19 +232,21 @@ include 'partes/Scripts.php';
 			"render": function( data, type, full )
 				{
 				res = "";
-				res += "<a href='javascript:pendencias(\"" + full.SSHDFUNC + "\");' ";
-				res += "<button type='button' title='Verificar pendências do funcionário' ";
-				res += "class='btn btn-warning  btn-md'>ANA</button></a>";
+				res +=	"<a href='javascript:pendencias(\"" + full.SSHDFUNC + "\");' " +
+								"<button type='button' title='Verificar pendências do funcionário' " +
+								"class='btn btn-warning  btn-md'>ANA</button></a>";
 				
-				res += "<a href='javascript:ausencias( \"" + full.SSHDFUNC;
-				res += "\", \""+ full.IDFUNC + "\", \"" + full.NOFUNC + "\" );' ";
-				res += "<button type='button' title='Autorizar ausências' ";
-				res += "class='btn btn-success  btn-md'>AUS</button></a>";
+				res +=	"<a href='javascript:ausencias( \"" + full.SSHDFUNC +
+								"\", \""+ full.IDFUNC + "\", \"" + full.NOFUNC + 
+								"\", \""+ full.UORFUNC + "\" );' " +
+								"<button type='button' title='Autorizar ausências' " +
+								"class='btn btn-success  btn-md'>AUS</button></a>";
 
-				res += "<a href='javascript:correcoes(\"" + full.SSHDFUNC;
-				res += "\", \""+ full.IDFUNC + "\", \"" + full.NOFUNC + "\" );' ";
-				res += "<button type='button' title='Corrigir saldo para mais ou para menos' ";
-				res += "class='btn btn-danger  btn-md'>COR</button></a>";
+				res +=	"<a href='javascript:correcoes(\"" + full.SSHDFUNC+
+								"\", \""+ full.IDFUNC + "\", \"" + full.NOFUNC + 
+								"\", \""+ full.UORFUNC + "\" );' " +
+								"<button type='button' title='Corrigir saldo para mais ou para menos' " +
+								"class='btn btn-danger  btn-md'>COR</button></a>";
 
 				return res;
 				}

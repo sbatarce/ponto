@@ -458,7 +458,8 @@ include 'partes/Scripts.php';
 			//
 			tableClear();
 			
-			var url	=	"partes/tableData.php?query=funuorbio&janafuor&iduor=" + idualo;
+			var url	=	"partes/tableData.php?query=funuorbio&janafuor&iduor=" + idualo +
+								"&sguor="+noualo;
 			var	resu	=	remoto( url );
 			if( resu == null )
 				{

@@ -6,7 +6,7 @@
 					<div class="row">
 						<!-- Navigation Menu Link Lists -->
 						<!-- Menu dos autorizadores     -->
-						<div class="col-md-2 col-sm-4 col-xs-6">
+						<div class="col-md-2 col-sm-4 col-xs-6 aut">
 							<div class="menu" >
 								<span class="br-lblue" class="admmenu">
 									<i class="glyphicon glyphicon-eye-open"></i> &nbsp; Autorizadores
@@ -76,7 +76,7 @@
 								</div>
 							</div>
 						</div>
-						<div class="col-md-2 col-sm-5 col-xs-7">
+						<div class="col-md-2 col-sm-5 col-xs-7 adm">
 							<div class="menu">
 								<span class="br-green"><i class="glyphicon glyphicon-adjust"></i> &nbsp; Administradores</span>
 								<div class="menu-list">

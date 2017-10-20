@@ -35,23 +35,17 @@ if( !$conn )
   echo "{ \"status\": \"erro\", \"erro\":\"acesso negado\", \"dbmens\": \"$mes\" }";
   return;
   }
-oci_close( $conn );
 
 //	verifica na biometria
-$sql	=	"SELECT FUNI.FUNI_ID, FUAU.PMS_IDSAUUOR
-					FROM BIOMETRIA.FUNI_FUNCIONARIO FUNI
-					LEFT JOIN BIOMETRIA.FUAU_FUNCIONARIOAUTORIZADOR FUAU ON
-										FUAU.FUNI_ID=FUNI.FUNI_ID AND
-										FUAU.FUAU_DTFIM IS NULL
-					WHERE FUNI.PMS_IDPMSPESSOA='$user'";
-$conn = @oci_connect( $userb, $passb, $amb, $chset, OCI_DEFAULT );
-if( !$conn )
-  {
-  $e = oci_error();
-  $mes = $e[ 'message' ];
-  echo "{ \"status\": \"erro\", \"erro\":\"$mes\", \"local\": \"oci_connect\" }";
-  return;
-  }
+$sql	=	"SELECT FUNI.FUNI_ID, FUAU.PMS_IDSAUUOR, USUA.PERF_ID
+						FROM BIOMETRIA.FUNI_FUNCIONARIO FUNI
+						LEFT JOIN BIOMETRIA.FUAU_FUNCIONARIOAUTORIZADOR FUAU ON
+											FUAU.FUNI_ID=FUNI.FUNI_ID AND
+											FUAU.FUAU_DTFIM IS NULL 
+						LEFT JOIN BIOMETRIA.USUA_USUARIO USUA ON
+											USUA.PMS_CDSAUUSUARIOSSHD=FUNI.PMS_IDPMSPESSOA
+						WHERE FUNI.PMS_IDPMSPESSOA='$user'";
+
 // Prepare the statement
 $stid = oci_parse( $conn, $sql );
 if( !$stid )
@@ -76,8 +70,26 @@ if( !$row )
   echo "{ \"status\": \"erro\", \"erro\":\"usuario não localizado\" }";
 	return;
 	}
+
 $funiid	=	$row['FUNI_ID'];
 $puorid = $row['PMS_IDSAUUOR'];
+$perfid = $row['PERF_ID'];
 oci_free_statement( $stid );
 oci_close( $conn );
-echo "{ \"status\": \"OK\", \"FUNI_ID\": \"$funiid\", \"UOR_ID\": \"$puorid\" }";
+if( isset( $_GET["dbg"] ) )
+	echo "{ 
+				\"status\": \"OK\", 
+				\"FUNI_ID\": \"$funiid\", 
+				\"UOR_ID\": \"$puorid\",
+				\"PERF_ID\": \"$perfid\",
+				\"loguser\": \"$loguser\",
+				\"logpass\": \"$logpass\",
+				\"amb\": \"$amb\"
+				}";
+else
+	echo "{ 
+				\"status\": \"OK\", 
+				\"FUNI_ID\": \"$funiid\", 
+				\"UOR_ID\": \"$puorid\",
+				\"PERF_ID\": \"$perfid\"
+				}";

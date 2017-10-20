@@ -32,6 +32,9 @@
 	var acsoalt = "<a href='#' class='btn btn-circle btn-info btn-xs edit' data-mode='alt' " +
 								"title=\"editar a linha\" >" +
 								"   <i class='typcn typcn-edit'></i></a>";
+	var acremo = "<a href='#' class='btn btn-circle btn-danger btn-xs delete' data-mode='alt' " +
+								"title=\"remover a linha\" >" +
+								"   <i class='typcn typcn-delete-outline'></i></a>";
 	var acnova	=	"<a href='#' class='btn btn-success btn-xs save' data-mode='new' " +
 								"title=\"salvar\" >" +
 								"   <i class='typcn typcn-tick-outline'></i></a>" +

@@ -544,47 +544,38 @@ include 'partes/pagebody.php';
 			{
 			var sql = "";
 			var aData = oTable.fnGetData(nRow);
-			if( iduor > 0 || idreg > 0 )
+			if( iduor <= 0 && idreg <= 0 )
+				return;
+			
+			if( iduor > 0 )
 				{
-				var que = "Estas modificações somente serão válidas a partir do " +
-									" primeiro dia do mês seguinte.\n" +
-									"Por favor, confirme ou cancele."
-				var res = confirm( que );
-				if( !res )
+				var url = "partes/trocaUorFunc.php?funiid="+ aData["IDFUNI"] + 
+									"&uornova="+iduor;
+				var resul = remoto( url );
+				if( resul.status == "OK" )
 					{
-					restoreRowG( oTable, nRow );
-					ixedt = -1;
-					return true;
+					atuatab( false );
 					}
-				if( iduor > 0 )
+				else
 					{
-					var url = "partes/trocaUorFunc.php?funiid="+ aData["IDFUNI"] + 
-										"&uornova="+iduor;
-					var resul = remoto( url );
-					if( resul.status == "OK" )
-						{
-						atuatab( false );
-						}
-					else
-						{
-						alert( "Erro trocando URL " + resul.erro );
-						return null;
-						}
+					alert( "Erro trocando URL " + resul.erro );
+					return null;
 					}
-				if( idreg > 0 )
+				}
+				
+			if( idreg > 0 )
+				{
+				var url = "partes/trocaRegiFunc.php?funiid="+ aData["IDFUNI"] + 
+									"&reginovo="+idreg;
+				var resul = remoto( url );
+				if( resul.status == "OK" )
 					{
-					var url = "partes/trocaRegiFunc.php?funiid="+ aData["IDFUNI"] + 
-										"&reginovo="+idreg;
-					var resul = remoto( url );
-					if( resul.status == "OK" )
-						{
-						atuatab( false );
-						}
-					else
-						{
-						alert( "Erro trocando URL " + resul.erro );
-						return null;
-						}
+					atuatab( false );
+					}
+				else
+					{
+					alert( "Erro trocando URL " + resul.erro );
+					return null;
 					}
 				}
 			//saveRowG( oTable, nRow, idnovo );
@@ -606,58 +597,6 @@ include 'partes/pagebody.php';
 					ret = "";
 			var aux, cls;
 			
-			//	UOR de alocação
-			cls = "clsuor";
-			lin = IniLinha( cls );
-			aux	=	
-				{
-				titulo: "uor",
-				nocmp: "UOR",
-				width: "20%",
-				valor: original.UNIDADE,
-				divclass: "col-xs-2",
-				inpclass: cls,
-				extra: "readonly"
-				};
-			lin	+=	CampoTexto( aux );
-
-			lin	+=	"<a style='margin-left: 10px; margin-top: 10px;' " +
-							"href='javascript:trocaUOR( " + original.IDFUNI + " )' " +
-							"class='btn btn-circle btn-info btn-xs ' " +
-							"title=\"Troca a UOR do funcionário\" >" +
-							"<i class='glyphicon glyphicon-random'></i></a>";
-			lin	+=	FimLinha();
-
-			ret += lin;
-			
-			//	regime do funcionário
-			var url	=	"partes/queries.php?query=obtregimefunc&funiid=" + original.IDFUNI;
-			var	resu	=	remoto( url );
-			if( resu.linhas > 0 )
-				{
-				cls = "clsreg";
-				lin = IniLinha( cls );
-				aux	=	
-					{
-					titulo: "Regime atual",
-					nocmp: "REGIME",
-					width: "30%",
-					valor: resu.dados[0].NOREG,
-					divclass: "col-xs-2",
-					inpclass: cls,
-					extra: "readonly"
-					};
-				lin	+=	CampoTexto( aux );
-				
-				lin	+=	"<a style='margin-left: 10px; margin-top: 10px;' " +
-								"href='javascript:trocaReg( " + original.IDFUNI + " )' " +
-								"class='btn btn-circle btn-info btn-xs ' " +
-								"title=\"Troca o regime do funcionário\" >" +
-								"<i class='glyphicon glyphicon-random'></i></a>";
-
-				lin	+=	FimLinha();
-				}
-			ret += lin;
 			//	aparelhos do funcionário
 			var url	=	"partes/queries.php?query=obtaparelhosfunc&funiid=" + original.IDFUNI;
 			var	resu	=	remoto( url );
@@ -748,14 +687,16 @@ include 'partes/pagebody.php';
 			}
 		///////////////////////////////////////////////////////////////////////
 
+		$("#eddt_new").hide();
 		setAjax( 0 );
+		/*
 		var handler = function() 
 			{
 				alert( "passou aqui" );
 			};
 		$('#eddt_new').unbind( "click" );
 		$('#eddt_new').bind( "click", handler );
-		
+		*/
 		</script>
 	</body>	
 </html>
