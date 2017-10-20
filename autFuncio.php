@@ -22,7 +22,9 @@ include 'partes/pagebody.php';
 			a <input type="text" size="10" id="dtfim" 
 							 style="margin-left: 20px; margin-right: 20px; "/>
 			Saldo <input type="text" size="10" id="sldant" 
-							 style="margin-left: 20px; "/>
+							 style="margin-left: 20px; margin-right: 20px; "/>
+			Registros do dia<input type="text" size="25" id="reghoje" 
+														 style="margin-left: 20px; margin-right: 20px; "/>
 		</div>
 										<table class="table table-striped table-hover table-bordered" id="eddt">
 											<thead><tr role="row"></tr></thead>
@@ -672,8 +674,28 @@ include 'partes/Scripts.php';
 			dtini = $.datepicker.formatDate("yymmdd", dt );
 			dt = $("#dtfim").datepicker("getDate");
 			dtfim = $.datepicker.formatDate("yymmdd", dt );
-			if( del != 0 )
-				tableDestroy();
+			tableDestroy();
+			
+			var pessoa = sshd.substr( 1 );
+			parms = "&pessoa="+pessoa+"&dtinic="+dtfim+"&dtterm="+dtfim;
+			var resu = Select( "reprpmspessoa", parms );
+			if( resu == null )
+				throw new Error("Problemas de acesso ao banco de dados. Por favor, tente mais tarde.");
+			if( resu.linhas > 0 )
+				{
+				var regs = "";
+				for( var i=0; i<resu.linhas; i++ )
+					{
+					if( regs.length != 0 )
+						regs += " ";
+					var reg = resu.dados[i].PONTO;
+					regs += reg.substr( 11 );
+					}
+				$("#reghoje").val( regs )
+				}
+			else
+				$("#reghoje").val( "sem registros" )
+			
 			AjaxSource	=	"partes/tableData.php?query=funaces&sshd=" + sshdfunc.toUpperCase() + 
 												"&dtini="+dtini+"&dtfim="+dtfim;
 			inicializa.init();

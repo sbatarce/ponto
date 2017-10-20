@@ -22,11 +22,9 @@ include 'partes/pagebody.php';
 			a <input type="text" size="10" id="dtfim" 
 							 style="margin-left: 20px; margin-right: 20px; "/>
 			Saldo <input type="text" size="10" id="sldant" 
-							 style="margin-left: 20px; "/>
-		</div>
-		<div class='row input-append date linha' style='margin-bottom: 10px; margin-left:4px'>
-			Registros do dia<input type="text" size="40" id="reghoje" 
-											 style="margin-left: 20px; margin-right: 20px; "/>
+							 style="margin-left: 20px; margin-right: 20px; "/>
+			Registros do dia<input type="text" size="25" id="reghoje" 
+														 style="margin-left: 20px; margin-right: 20px; "/>
 		</div>
 										<table class="table table-striped table-hover table-bordered" id="eddt">
 											<thead><tr role="row"></tr></thead>
