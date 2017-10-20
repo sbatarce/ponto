@@ -4,7 +4,8 @@
 //													de término maior
 //	dtfecha( sshd ) - obtem a data do último fechamento no formato YYYY-MM-DD
 //	qtdbiom( fdtrid ) - conta a quantidade de batidas de biometria de um FDTR 
-//	reprpmspessoa( pessoa(sshd), dtinic, dtterm ) - obtem os registro na biometria de uma pessoa num período
+//	reprpmspessoa( pessoa(sshd), dtinic, dtterm ) - 
+//					obtem os registro na biometria de uma pessoa num período
 //	saldoant( funiid, dtinic ) - obter saldo anterior do FUNI_ID em uma data
 //	funiid( sshd ) - obter FUNI_ID do SSHD
 //	sshd( funiid ) - obter SSHD do FUNI_ID
@@ -24,13 +25,10 @@ if( !isset( $_GET["query"] ) && !isset( $_GET["debug"] ) )
 //	prepara o query
 $sql	=	"";
 $dbg = false;
-if( isset( $_GET["query"] ) )
-	$qry	=	$_GET["query"];
-else
-	{
-	$qry	=	$_GET["debug"];
+if( isset( $_GET["dbg"] ) )
 	$dbg	=	true;
-	}
+
+$qry = $_GET["query"];
 	
 ////////////////////////////////////////////////////////////////////////////////
 //	
@@ -258,15 +256,14 @@ if( $qry == "reprpmspessoa" )
 	$pessoa	=	$_GET["pessoa"];
 	$dtinic	=	$_GET["dtinic"];
 	$dtterm	=	$_GET["dtterm"];
-	$sql = "SELECT DISTINCT to_char( REPR.REPR_DTREGISTROPRESENCA, 'DD/MM/YYYY HH24:mi' ) as ponto, " .
-					"to_char( REPR.REPR_DTREGISTROPRESENCA, 'YYYYMMDDHH24mi' ) as ordem " .
-					"FROM BIOMETRIA.REPR_REGISTROPRESENCA REPR  " .
-					"WHERE REPR.PMS_IDPMSPESSOA='" . $pessoa . "' " .
-					"and trunc( REPR_DTREGISTROPRESENCA ) >= to_date( '" .
-					$dtinic . "', 'YYYYMMDD' ) " .
-					"and trunc( REPR_DTREGISTROPRESENCA ) <= to_date( '" . 
-					$dtterm . "', 'YYYYMMDD' ) " .
-					"ORDER BY ordem";
+	$sql = "SELECT DISTINCT 
+							to_char( REPR_DTREGISTROPRESENCA, 'DD/MM/YYYY HH24:mi' ) as ponto, 
+							to_char( REPR_DTREGISTROPRESENCA, 'YYYYMMDDHH24mi' ) as ordem 
+						FROM BIOMETRIA.REPR_REGISTROPRESENCA  
+						WHERE	PMS_IDPMSPESSOA='$pessoa' AND
+									TRUNC( REPR_DTREGISTROPRESENCA )>=TO_DATE( '$dtinic', 'YYYYMMDD' ) AND
+									TRUNC( REPR_DTREGISTROPRESENCA )<=TO_DATE( '$dtterm', 'YYYYMMDD' ) 
+						ORDER BY ordem";
 	}
 
 ////////////////////////////////////////////////////////////////////////////////
