@@ -661,6 +661,10 @@ include 'partes/Scripts.php';
 		function setAjax( del )
 			{
 			//
+			if( typeof funiid == 'undefined' )
+				return;
+			if( funiid == null )
+				return;
 			parms = "&funiid="+funiid+"&dtinic="+dtini;
 			var resu = Select( "saldoant", parms );
 			if( resu == null )
@@ -761,20 +765,7 @@ include 'partes/Scripts.php';
 				dtfim = $.datepicker.formatDate("yymmdd", dt );
 				setAjax(1);
 				});
-		/*
-		$("#dtini").change( 
-		function( dat )
-			{
-			console.log(dat.date);
-			setAjax( 1 );
-			} );
-		$("#dtfim").change( 
-		function()
-			{
-			setAjax( 1 );
-			} );
-		*/
-	
+
 	/////////////// PRINCIPAL ////////////////////////
 	$('#eddt_new').hide();
 	//	tabelas de definição da tabela de presenças
@@ -791,6 +782,42 @@ include 'partes/Scripts.php';
 	var mensgs = [];			//	lista de mensagens
 	var salvos = [];			//	s-salvo
 	var acum = 0;
+
+	var sshd = obterCookie( "user" );
+	if( sshd == null )
+		{
+		Deslogar();
+		window.history.back();
+		window.location = "index.php";
+		}
+
+	var idfunc = obterCookie( "idfunc" );
+	if( idfunc == null )
+		{
+		Deslogar();
+		window.history.back();
+		window.location = "index.php";
+		}
+
+	var nofunc = obterCookie( "nofunc" );
+	if( nofunc == null )
+		{
+		Deslogar();
+		window.history.back();
+		window.location = "index.php";
+		}
+
+	var sshdfunc = obterCookie( "sshdfunc" );
+	if( sshdfunc == null )
+		{
+		Deslogar();
+		window.history.back();
+		window.location = "index.php";
+		}
+
+	$("#titwidget").html( "Ponto de " + nofunc );
+	matarCookie( "sshdfunc" );
+			
 		//	formatadores ligados ao datatables
 		//		ticamp:		tipo de campo t/n/l = texto, numérico ou legenda
 		//		inputs:		nomes dos campos no banco relativamente aos inputs
@@ -807,35 +834,6 @@ include 'partes/Scripts.php';
 						"Mensagens": "",
 						"Totais": ""
 						};
-		var sshd = obterCookie( "user" );
-		if( sshd == null )
-			window.location = "index.php";
-			
-		var idfunc = obterCookie( "idfunc" );
-		if( idfunc == null )
-			{
-			window.history.back();
-			window.location = "index.php";
-			}
-
-		var nofunc = obterCookie( "nofunc" );
-		if( nofunc == null )
-			{
-			window.history.back();
-			window.location = "index.php";
-			}
-
-		var sshdfunc = obterCookie( "sshdfunc" );
-		if( sshdfunc == null )
-			{
-			window.history.back();
-			window.location = "index.php";
-			}
-			
-		matarCookie( "sshdfunc" );
-			
-		$("#titwidget").html( "Ponto de " + nofunc );
-			
 		//	acerta as datas
 		var hoje = new Date();
 		var dtfim = $.datepicker.formatDate("yymmdd", hoje );

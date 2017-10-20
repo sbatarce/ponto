@@ -270,6 +270,7 @@ include 'partes/Scripts.php';
 		if( sshd == null )
 			{
 			Deslogar();
+			window.history.back();
 			window.location = "index.php";
 			}
 		//	obtem FUNI_ID do autorizador
@@ -308,6 +309,9 @@ include 'partes/Scripts.php';
 			window.history.back();
 			window.location = "index.php";
 			}
+			
+		$("#titwidget").html( "Ausências autorizadas de " + nofunc );
+		matarCookie( "sshdfunc" );
 
 		//	acha a data do último fechamento e acerta as datas iniciais
 		var parms = "&sshd=" + sshdfunc;
