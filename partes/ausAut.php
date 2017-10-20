@@ -10,6 +10,8 @@
 //		mins		minutos de ausência autorizada a cada dia
 
 include '../partes/fmtErro.php';
+include 'ambiente.php';
+include 'ORAConn.php';
 
 if( isset( $_GET["dbg"]) )
 	$dbg = true;
@@ -63,9 +65,6 @@ $dtfim = $_GET["dtfim"];
 if( $dbg )
 	echo "funiid=$funiid autid=$autid taauid=$taauid iduor=$iduor dtini=$dtini dtfim=$dtfim<br>";
 //	prepara a conexão
-include 'ambiente.php';
-include 'ORAConn.php';
-
 $ora = new ORAConn();
 $res = $ora->connect($userb, $passb, $amb, $chset);
 if( $dbg )
@@ -76,7 +75,6 @@ if( $res != "OK" )
 	return;
 	}
 //	verifica a validade da sequencia de ausências
-	
 //	obtem a quantidade de horas normais do funcionário
 $sql = "SELECT MAX(RTAT.RTAT_NITMPDIARIO) AS TMP
 					FROM        BIOMETRIA.FRTR_FUNCIONARIOREGIMETRABALHO FRTR
@@ -231,39 +229,54 @@ if( !$pode )
 	$ora->libStmt();
 	}
 
-//	verifica pre-existencia de ausências autorizadas neste período
-//	verifica se o total de ausências ultrapassou o maximo
-$sql = "SELECT TOTAL
-					FROM  
-						( SELECT SUM( FAAU.FAAU_NITMPDIARIO ) AS TOTAL
-								FROM BIOMETRIA.FAAU_FUNCAUSENCIAAUTORIZADA FAAU
-								WHERE ( TO_DATE( '$dtini', 'YYYYMMDD' ) BETWEEN
-											FAAU.FAAU_DTINI AND FAAU.FAAU_DTFIM OR
-											TO_DATE( '$dtfim', 'YYYYMMDD' ) BETWEEN
-											FAAU.FAAU_DTINI AND FAAU.FAAU_DTFIM ) AND
-											FAAU.FUNI_ID=$funiid )
-					WHERE TOTAL + $mins > $tmpdia";
-$res = $ora->execSelect($sql);
-$jres = json_decode($res);
+//	verifica os acumulados de tempo de ausência a cada dia entre dtini e dtfim
+$refdt = date_create_from_format('Ymd', $dtini );
+$fimdt = date_create_from_format('Ymd', $dtfim );
+$inter = new DateInterval('P1D');
 if( $dbg )
 	{
-	echo "Verificando tempo diario sql=$sql/resultado:";
-	var_dump($jres);
+	var_dump($inter);
+	var_dump($refdt);
+	var_dump($fimdt);
 	}
-if( $jres->status != "OK" )
+while( $refdt <= $fimdt )
 	{
-	fmtErro( "erro", "Verificando tempo diario: $jres->erro" );
-	$ora->disconnect();
-	return;
+	$dt = $refdt->format('Ymd');
+	$sql = "SELECT SUM( FAAU.FAAU_NITMPDIARIO ) AS TOTAL
+						FROM BIOMETRIA.FAAU_FUNCAUSENCIAAUTORIZADA FAAU
+						WHERE TO_DATE( '$dt', 'YYYYMMDD' ) BETWEEN
+									FAAU.FAAU_DTINI AND FAAU.FAAU_DTFIM AND
+									FAAU.FUNI_ID=$funiid";
+	$res = $ora->execSelect($sql);
+	$jres = json_decode($res);
+	if( $dbg )
+		{
+		echo "Verificando tempo diario sql=$sql/resultado:";
+		var_dump($jres);
+		}
+	if( $jres->status != "OK" )
+		{
+		fmtErro( "erro", "Verificando tempo diario: $jres->erro" );
+		$ora->disconnect();
+		return;
+		}
+	if( $jres->linhas > 0 )
+		{
+		$total = $jres->dados[0]->TOTAL;
+		if( $total+$mins > $tmpdia )
+			{
+			$aux = $refdt->format('d/m/Y');
+			$tot = $total+$mins;
+			fmtErro( "erro",	"No dia $aux o total de ausências ($tot) ".
+												"ultrapassa tempo diário ($tmpdia) " );
+			$ora->disconnect();
+			return;
+			}
+		}
+	$ora->libStmt();
+	$refdt->add( $inter );
 	}
-if( $jres->linhas > 0 )
-	{
-	fmtErro( "erro", "Soma de ausências acima do total diário não permitida" );
-	$ora->disconnect();
-	return;
-	}
-$ora->libStmt();
-	
+
 //	inicia a transaction
 $ora->beginTransaction();
 
