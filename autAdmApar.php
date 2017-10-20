@@ -291,7 +291,7 @@ include 'partes/Scripts.php';
 										"SSHD": resu.data[ix].SSHD,
 										"NOME": resu.data[ix].NOME,
 										"BIOS": resu.data[ix].QTBIO,
-										"UORPONTO": resu.data[ix].SIGLAUORSAU,
+										"UORPONTO": resu.data[ix].SIGALUORPONTO,
 										"PRESENTE": "não",
 										"MANTER": "sim",
 										"action": act
