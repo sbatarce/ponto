@@ -129,21 +129,35 @@
 				var resul = remoto( aux );
 				if( resul.status == "OK" )
 					{
-					$(".usu").show();
-					$(".aut").hide();
-					$(".adm").hide();
 					matarCookie("uoraut");
 					matarCookie("super");
+					criarCookie("tiuser", resul.PERF_ID, 1);
 					
-					if( resul.UOR_ID != "" )
+						
+					if( resul.PERF_ID == "4" || resul.PERF_ID == 5 )
 						{
+						if( resul.UOR_ID != "" )
+							criarCookie("uoraut", resul.UOR_ID, 0, 10 );
+						criarCookie("super", "1", 0, 10 );
+						$(".fun").show();
 						$(".aut").show();
-						criarCookie("uoraut", resul.UOR_ID, 1);
-						}
-					if( resul.PERF_ID > "3" )
-						{
 						$(".adm").show();
-						criarCookie("super", "1", 1);
+						}
+					else
+						{
+						if( resul.UOR_ID != "" )
+							{
+							criarCookie("uoraut", resul.UOR_ID, 0, 10 );
+							$(".fun").show();
+							$(".aut").show();
+							$(".adm").hide();
+							}
+						else
+							{
+							$(".fun").show();
+							$(".aut").hide();
+							$(".adm").hide();
+							}
 						}
 					$("#menupri").collapse("show");
 					$("#menu").show();
@@ -158,8 +172,6 @@
 						$("#resul").val(resul.erro + "-" + resul.dbmens);
 					matarCookie("user");
 					matarCookie("pass");
-					matarCookie("loguser");
-					matarCookie("logpass");
 					matarCookie("uoraut");
 					matarCookie("idfunc");
 					$(".usu").hide();
@@ -191,10 +203,8 @@
 					return false;
 				if( VerUser(user.toUpperCase(), user.toUpperCase(), pass ) )
 					{
-					criarCookie("user", user.toUpperCase(), 1);
-					criarCookie("pass", pass, 1);
-					criarCookie("loguser", user.toUpperCase(), 1);
-					criarCookie("logpass", pass, 1);
+					criarCookie("user", user.toUpperCase(), 0, 10 );
+					criarCookie("pass", pass, 0, 10 );
 					}
 				}
 				

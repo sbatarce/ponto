@@ -1,4 +1,9 @@
 <?php
+//	infuau	-	insert FUAU( funiid, uorid, dtini, dtfim )
+//	insert diálogo
+//	insert FDTE
+//	insert FAAU
+//	insert FUCO
 if( !isset( $_GET["query"] ) )
 	{
 	echo	'{ "status": "erro", "erro": "parametro query obrigatorio" }';
@@ -10,7 +15,7 @@ if( isset( $_GET["sequence"] ) )
 //	prepara o query
 $sql	=	"";
 $qry	=	$_GET["query"];
-//
+//	
 if( $qry == "insger" )
 	{
 	if( !isset( $_GET["tbl"] ) )
@@ -33,6 +38,40 @@ if( $qry == "insger" )
 	$vals	=	$_GET["vals"];
 	$sql	=	"insert into $tbl($cmps) values($vals)";
 	}
+
+//	infuau	-	insert FUAU( funiid, uorid, dtini, dtfim )
+if( $qry == "infuau" )
+	{
+	if( !isset( $_GET["funiid"] ) )
+		{
+		echo	'{ "status": "erro", "erro": "parametro funiid obrigatorio" }';
+		return;
+		}
+	if( !isset( $_GET["uorid"] ) )
+		{
+		echo	'{ "status": "erro", "erro": "parametro uorid obrigatorio" }';
+		return;
+		}
+	if( !isset( $_GET["dtini"] ) )
+		{
+		echo	'{ "status": "erro", "erro": "parametro dtini obrigatorio" }';
+		return;
+		}
+	if( !isset( $_GET["dtfim"] ) )
+		{
+		echo	'{ "status": "erro", "erro": "parametro dtfim obrigatorio" }';
+		return;
+		}
+	$funiid	=	$_GET["funiid"];
+	$uorid	=	$_GET["uorid"];
+	$dtini	=	$_GET["dtini"];
+	$dtfim	=	$_GET["dtfim"];
+
+	$sql	=	"INSERT INTO BIOMETRIA.FDTM_FUNCDIATRABALHOMENSAGEM
+						( FDTM_ID, FDTR_ID, FDTM_TPFUNCAUT, FDTM_DLMENS, FDTM_DTMENS, FDTM_STEMAIL )
+            VALUES( BIOMETRIA.SQ_FDTM.NEXTVAL, $fdtrid, 'F', '$msg', sysdate, 0  )";
+	}
+
 //	insert diálogo
 if( $qry == "indial" )
 	{
@@ -53,6 +92,7 @@ if( $qry == "indial" )
 						( FDTM_ID, FDTR_ID, FDTM_TPFUNCAUT, FDTM_DLMENS, FDTM_DTMENS, FDTM_STEMAIL )
             VALUES( BIOMETRIA.SQ_FDTM.NEXTVAL, $fdtrid, 'F', '$msg', sysdate, 0  )";
 	}
+
 //	insert FDTE
 if( $qry == "infdte" )
 	{
@@ -88,6 +128,7 @@ if( $qry == "infdte" )
 										NULL, 
 										TO_DATE( '$hora', 'DD/MM/YYYY HH24:mi' ) )";
 	}
+
 //	insert FAAU
 if( $qry == "infaau" )
 	{
@@ -135,6 +176,7 @@ if( $qry == "infaau" )
 										TO_DATE( '$dtini', 'YYYYMMDD' ), 
 										TO_DATE( '$dtfim', 'YYYYMMDD' ), $mins )";
 	}
+
 //	insert FUCO
 if( $qry == "infuco" )
 	{

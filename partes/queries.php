@@ -1,4 +1,5 @@
 <?php
+//	parametos()	-	retorna todos os parametros da PAGL
 //	horasdia( sshd, data) - obtem a quantidade de hora do dia de um funcionário
 //	ausaut( sshd, data ) -	obtem ids de todos as ausencias autorizadas com data 
 //													de término maior
@@ -41,6 +42,17 @@ if( $qry == "" )
 		}
 	$xpto	=	$_GET["xpto"];
 	$sql = "select * FROM XPTO WHERE XPTO=$xpto";
+	}
+
+////////////////////////////////////////////////////////////////////////////////
+//	parametros()
+if( $qry == "parametros" )
+	{
+	$sql = "SELECT  PAGL_NIPRAZORESPOSTA AS TRESPOSTA, 
+									PAGL_NIPRAZOJUSTIFICATIVA AS TJUSTIF, 
+									TO_CHAR( PAGL_DTPROCESSADA, 'YYYYMMDD' ) AS DTUPROC 
+						FROM  BIOMETRIA.PAGL_PARAMETROSGLOBAIS 
+						WHERE ROWNUM=1";
 	}
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -303,7 +315,7 @@ if( $qry == "funiid" )
 	
 
 ////////////////////////////////////////////////////////////////////////////////
-//	funiid( sshd ) - obter FUNI_ID do SSHD
+//	sshd( funiid ) - obter FUNI_ID do SSHD
 if( $qry == "sshd" )
 	{
 	if( !isset( $_GET["funiid"] ) )

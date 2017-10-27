@@ -1,4 +1,11 @@
 <?php
+//	delfuau	-	delete FUAU
+//	update FLTR
+//	delete FLTR
+//	delete fdte
+//	seta FDTR em analise
+//	update FDTE
+//	update diálogo
 if( !isset( $_GET["query"] ) )
 	{
 	echo	'{ "data": [{"erro": "parametro query obrigatório"}] }';
@@ -31,6 +38,18 @@ if( $qry == "upd" )
 		return;
 		}	
 	$sql	=	"update ".$_GET["tbl"]." set ".$_GET["alter"]." where ".$_GET["selec"];
+	}
+
+//	delfuau	-	delete FUAU
+if( $qry == "delfuau" )
+	{
+	if( !isset( $_GET["fuauid"] ) )
+		{
+		echo	'{ "status": "erro", "erro": "parametro fuauid obrigatorio" }';
+		return;
+		}
+	$fuauid = $_GET["fuauid"];
+	$sql	=	"DELETE FROM BIOMETRIA.FUAU_FUNCIONARIOAUTORIZADOR WHERE FUAU_ID=$fuauid"; 
 	}
 
 //	update FLTR
@@ -81,6 +100,7 @@ if( $qry == "delfdte" )
 	$sql	=	"DELETE BIOMETRIA.FDTE_FUNCDIATRABALHOREGISTRO 
 						WHERE FDTE_ID=$fdteid"; 
 	}
+
 //	seta FDTR em analise
 if( $qry == "settsdt" )
 	{
@@ -100,6 +120,7 @@ if( $qry == "settsdt" )
 						SET TSDT_ID=$tsdt
 						WHERE FDTR_ID=$fdtrid"; 
 	}
+
 //	update FDTE
 if( $qry == "upfdte" )
 	{
@@ -134,6 +155,7 @@ if( $qry == "upfdte" )
 							FDTE_DTHORARIO=TO_DATE( '$hora', 'DD/MM/YYYY HH24:mi' )
 							WHERE FDTE_ID=$fdteid";
 	}
+
 //	update diálogo
 if( $qry == "updial" )
 	{
@@ -178,4 +200,3 @@ if( $res != "OK" )
 $res = $ora->execDelUpd($sql);
 echo $res;
 $ora->disconnect();
-

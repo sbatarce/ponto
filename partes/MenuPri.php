@@ -4,15 +4,65 @@
 				<!-- menu de navegação -->
 				<div class="navigation" id="menupri" >
 					<div class="row">
-						<!-- Navigation Menu Link Lists -->
+						<!-- Menus por tipo de usuário   -->
+						<!-- Menu dos super usuários     -->
+						<div class="col-md-2 col-sm-5 col-xs-7 adm">
+							<div class="menu adm">
+								<span class="br-green"><i class="glyphicon glyphicon-adjust"></i> &nbsp; Administradores</span>
+								<div class="menu-list">
+									<ul>
+										<li>
+											<a href="autAtribuir.php" ttip="ttip" data-placement="bottom" 
+												 data-original-title="Administração de Autorizadores" 
+												 class="adm" >
+												<i class="glyphicon glyphicon-user yellow"></i> 
+												Autorizadores
+											</a>
+										</li>
+										<li>
+											<a href="admUsuarios.php" ttip="ttip" data-placement="bottom" 
+												 data-original-title="Cadastramento de usuários" 
+												 class="adm" >
+												<i class="glyphicon glyphicon-user yellow"></i> 
+												Usuários
+											</a>
+										</li>
+										<li>
+											<a href="admParametros.php" ttip="ttip" data-placement="bottom" 
+												 data-original-title="Adequar parametros do sistema" 
+												 class="adm" >
+												<i class="glyphicon glyphicon-adjust red"></i> 
+												Parametros
+											</a>
+										</li>
+										<li>
+											<a href="admLog.php" ttip="ttip" data-placement="bottom" 
+												 data-original-title="Acesso ao Log do sistema" 
+												 class="adm" >
+												<i class="glyphicon glyphicon-list red"></i> 
+												LOG
+											</a>
+										</li>
+									</ul>
+								</div>
+							</div>
+						</div>
 						<!-- Menu dos autorizadores     -->
 						<div class="col-md-2 col-sm-4 col-xs-6 aut">
-							<div class="menu" >
+							<div class="menu aut" >
 								<span class="br-lblue" class="admmenu">
 									<i class="glyphicon glyphicon-eye-open"></i> &nbsp; Autorizadores
 								</span>
 								<div class="menu-list">
 									<ul>
+										<li>
+											<a href="autAtribuir.php" ttip="ttip" data-placement="bottom" 
+												 data-original-title="Cadastro de funcionários" 
+												 class="aut" style="color:gold ;" >
+												<i class="glyphicon glyphicon-user" ></i>
+												Autorizadores
+											</a>
+										</li>
 										<li>
 											<a href="autCadFunc.php" ttip="ttip" data-placement="bottom" 
 												 data-original-title="Cadastro de funcionários" 
@@ -20,6 +70,7 @@
 												<i class="glyphicon glyphicon-user" ></i>
 												Cadastro
 											</a>
+										</li>
 										<li>
 											<a href="autAlocaFunc.php" ttip="ttip" data-placement="bottom" 
 												 data-original-title="Alocar pessoas" 
@@ -76,41 +127,9 @@
 								</div>
 							</div>
 						</div>
-						<div class="col-md-2 col-sm-5 col-xs-7 adm">
-							<div class="menu">
-								<span class="br-green"><i class="glyphicon glyphicon-adjust"></i> &nbsp; Administradores</span>
-								<div class="menu-list">
-									<ul>
-										<li>
-											<a href="admUsuarios.php" ttip="ttip" data-placement="bottom" 
-												 data-original-title="Cadastramento de usuários" 
-												 class="adm" >
-												<i class="glyphicon glyphicon-user yellow"></i> 
-												Usuários
-											</a>
-										</li>
-										<li>
-											<a href="admParametros.php" ttip="ttip" data-placement="bottom" 
-												 data-original-title="Adequar parametros do sistema" 
-												 class="adm" >
-												<i class="glyphicon glyphicon-adjust red"></i> 
-												Parametros
-											</a>
-										</li>
-										<li>
-											<a href="admLog.php" ttip="ttip" data-placement="bottom" 
-												 data-original-title="Acesso ao Log do sistema" 
-												 class="adm" >
-												<i class="glyphicon glyphicon-list red"></i> 
-												LOG
-											</a>
-										</li>
-									</ul>
-								</div>
-							</div>
-						</div>
-						<div class="col-md-3 col-sm-5 col-xs-7">
-							<div class="menu">
+						<!-- Menu dos funcionários     -->
+						<div class="col-md-3 col-sm-5 col-xs-7 fun">
+							<div class="menu fun">
 								<span class="br-pastel"><i class="glyphicon glyphicon-file"></i> &nbsp; Funcionários</span>
 								<div class="menu-list">
 									<ul>

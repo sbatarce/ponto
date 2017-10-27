@@ -1,13 +1,13 @@
 <?php
 //	seleção de dados com retorno para o DataTables
-//	funuorbio	tabela de pessoas em uma UOR do SAU com contagem de BIOMETRIA
-//	autfuuor	tabela de funcionários de uma UOR para inclusão
-//	ausaut	tabela de ausências autorizadas de um funcionário
-//	funcindex	-	índice dos funcionários de um autorizador com contagem de eventos
-//	pendencias - obtem todas as pendencias de um sshd
-//	funaces
-//	funcapar	funcionários da funi em um aparelho dado pelo apalid
-//	fuornapar - funcionários de uma FUOR que não esteja no IDAPAL
+//	funuorbio		-	tabela de pessoas em uma UOR do SAU com contagem de BIOMETRIA
+//	autfuuor		-	tabela de funcionários de uma UOR para inclusão
+//	ausaut			-	tabela de ausências autorizadas de um funcionário
+//	funcindex		-	índice dos funcionários de um autorizador com contagem de eventos
+//	pendencias	- obtem todas as pendencias de um sshd
+//	funaces			-	dados de acesso dos funcionários comuns
+//	funcapar		-	funcionários da funi em um aparelho dado pelo apalid
+//	fuornapar		- funcionários de uma FUOR que não esteja no IDAPAL
 header('Content-Type: text/html; charset=UTF8');
 
 if( !isset( $_GET["query"] )  )
@@ -21,6 +21,47 @@ $dbg = FALSE;
 if( isset( $_GET["dbg"] ) )
 	$dbg = TRUE;
 $sql	=	"";
+
+////////////////////////////////////////////////////////////////////////////////
+//	xpto	- 
+if( $qry == "xpto" )
+	{
+	if( !isset( $_GET["xpto"] ) )
+		{
+		echo	'{ "data": [{"erro": "parametro xpto obrigatorio"}] }';
+		return;
+		}
+	$xpto = $_GET["xpto"];
+	
+	$sql	=	"";
+	}
+	
+////////////////////////////////////////////////////////////////////////////////
+//	uorautos	- todos os autorizadores de uma determinada FUOR
+//			uorid	-	PMS_IDSAUUOR
+if( $qry == "uorautos" )
+	{
+	if( !isset( $_GET["uorid"] ) )
+		{
+		echo	'{ "data": [{"erro": "parametro uorid obrigatorio"}] }';
+		return;
+		}
+	$uorid = $_GET["uorid"];
+	
+	$sql	=	"SELECT	FUAU.FUAU_ID AS FUAUID, FUAU.FUNI_ID, PESS.IUN AS SSHD, PESS.NOME, 
+									TO_CHAR( FUAU.FUAU_DTINICIO, 'DD/MM/YYYY') AS INICIO, 
+									TO_CHAR( FUAU.FUAU_DTFIM, 'DD/MM/YYYY') AS TERMINO
+						FROM        BIOMETRIA.FUAU_FUNCIONARIOAUTORIZADOR FUAU
+						INNER JOIN  BIOMETRIA.FUNI_FUNCIONARIO FUNI ON
+												FUNI.FUNI_ID=FUAU.FUNI_ID
+						INNER JOIN  (SELECT IUN, NOME 
+													FROM SAU.VWPESSOA_SSHD 
+													WHERE REGISTRO_FUNCIONAL_ATIVO = 1 ) PESS ON
+												IUN = FUNI.PMS_IDPMSPESSOA
+						WHERE FUAU.PMS_IDSAUUOR=$uorid
+					  ORDER BY PESS.NOME, FUAU.FUAU_DTINICIO";
+	}
+	
 ////////////////////////////////////////////////////////////////////////////////
 //	fuornapar - funcionários de uma FUOR que não esteja no IDAPAL
 if( $qry == "fuornapar" )
@@ -304,53 +345,51 @@ if( $qry == "funcindex" )
 		return;
 		}
 	$autsshd = $_GET["autsshd"];
-	$sql	=	"SELECT FUNI.FUNI_ID AS IDFUNC, FUNI.PMS_IDPMSPESSOA AS SSHDFUNC, 
-									VUPU.UOR_DLSIGLAUNIDADE AS UNIDADE, FUOR.PMS_IDSAUUOR AS UORFUNC, 
+	$sql	=	"SELECT	FUNI.FUNI_ID AS IDFUNC, FUNI.PMS_IDPMSPESSOA AS SSHDFUNC, 
+									VUPU.UOR_DLSIGLAUNIDADE AS UNIDADE, 
 									(SELECT VPSS.NOME 
-										 FROM SAU.VWPESSOA_SSHD VPSS 
+										FROM SAU.VWPESSOA_SSHD VPSS 
 										WHERE VPSS.REGISTRO_FUNCIONAL_ATIVO = 1 AND 
 													VPSS.IUN = FUNI.PMS_IDPMSPESSOA AND 
 													ROWNUM = 1) AS NOFUNC, 
 									TO_CHAR(FSHM.FSHM_DTREFERENCIA, 'DD/MM/YYYY') AS DTUFECHAMENTO, 
-									SUM(CASE WHEN FDTR.TSDT_ID IS NULL THEN 1 ELSE 0 END) AS QTOK, 
-									SUM(CASE WHEN FDTR.TSDT_ID = 1 THEN 1 ELSE 0 END) AS QTPENDENTE, 
-									SUM(CASE WHEN FDTR.TSDT_ID = 2 THEN 1 ELSE 0 END) AS QTACEITO, 
-									SUM(CASE WHEN FDTR.TSDT_ID = 3 THEN 1 ELSE 0 END) AS QTNEGADO, 
-									SUM(CASE WHEN FDTR.TSDT_ID = 4 THEN 1 ELSE 0 END) AS QTANALISE
-							FROM BIOMETRIA.FUNI_FUNCIONARIO FUNIA 
-							INNER JOIN BIOMETRIA.FUAU_FUNCIONARIOAUTORIZADOR FUAU ON 
-												 SYSDATE BETWEEN FUAU.FUAU_DTINICIO AND NVL(FUAU.FUAU_DTFIM, TO_DATE('31/12/3000', 'DD/MM/YYYY')) AND 
-												 FUAU.FUNI_ID = FUNIA.FUNI_ID 
-							INNER JOIN BIOMETRIA.FUOR_FUNCUNIDADEORGANIZACIONAL FUOR ON 
-												 SYSDATE BETWEEN 
-												 FUOR.FUOR_DTINICIO AND 
-												 NVL(FUOR.FUOR_DTFIM, TO_DATE('31/12/3000', 'DD/MM/YYYY')) AND 
-												 FUOR.PMS_IDSAUUOR = FUAU.PMS_IDSAUUOR AND 
-												 FUOR.FUNI_ID <> FUNIA.FUNI_ID 
-							INNER JOIN SAU.VWUORPUBLICA VUPU ON 
-												 VUPU.UOR_IDUNIDADEORGANIZACIONAL = FUOR.PMS_IDSAUUOR 
-							INNER JOIN BIOMETRIA.FUNI_FUNCIONARIO FUNI ON 
-												 FUNI.FUNI_ID = FUOR.FUNI_ID 
-							INNER JOIN BIOMETRIA.FRTR_FUNCIONARIOREGIMETRABALHO FRTR ON 
-												 SYSDATE BETWEEN FUOR.FUOR_DTINICIO AND NVL(FUOR.FUOR_DTFIM, TO_DATE('31/12/3000', 'DD/MM/YYYY')) AND 
-												 FRTR.FUNI_ID = FUOR.FUNI_ID 
-							INNER JOIN BIOMETRIA.FSHM_FUNCSALDOHORAMENSAL FSHM ON
-												 FSHM.FUNI_ID = FUNI.FUNI_ID AND
-												 FSHM.FSHM_DTREFERENCIA = 
-												 (SELECT FSHM1.FSHM_DTREFERENCIA
-														FROM (SELECT FSHMI.FUNI_ID, FSHMI.FSHM_DTREFERENCIA
-																		FROM BIOMETRIA.FSHM_FUNCSALDOHORAMENSAL FSHMI
-																	 ORDER BY FSHMI.FSHM_DTREFERENCIA DESC) FSHM1
+										SUM(CASE WHEN FDTR.FDTR_ID IS NOT NULL AND FDTR.TSDT_ID IS NULL THEN 1 ELSE 0 END) AS QTOK, 
+										SUM(CASE WHEN FDTR.TSDT_ID = 1 THEN 1 ELSE 0 END) AS QTPENDENTE, 
+										SUM(CASE WHEN FDTR.TSDT_ID = 2 THEN 1 ELSE 0 END) AS QTACEITO, 
+										SUM(CASE WHEN FDTR.TSDT_ID = 3 THEN 1 ELSE 0 END) AS QTNEGADO, 
+										SUM(CASE WHEN FDTR.TSDT_ID = 4 THEN 1 ELSE 0 END) AS QTANALISE 
+						FROM        BIOMETRIA.FUNI_FUNCIONARIO FUNIA 
+						INNER JOIN  BIOMETRIA.FUAU_FUNCIONARIOAUTORIZADOR FUAU ON 
+												SYSDATE BETWEEN FUAU.FUAU_DTINICIO AND 
+														NVL(FUAU.FUAU_DTFIM, TO_DATE('31/12/3000', 'DD/MM/YYYY')) AND 
+												FUAU.FUNI_ID = FUNIA.FUNI_ID 
+						INNER JOIN  BIOMETRIA.FUOR_FUNCUNIDADEORGANIZACIONAL FUOR ON 
+												FUOR.FUOR_DTFIM IS NULL AND 
+												FUOR.PMS_IDSAUUOR = FUAU.PMS_IDSAUUOR AND 
+												FUOR.FUNI_ID <> FUNIA.FUNI_ID 
+						INNER JOIN  SAU.VWUORPUBLICA VUPU ON 
+												VUPU.UOR_IDUNIDADEORGANIZACIONAL = FUOR.PMS_IDSAUUOR 
+						INNER JOIN  BIOMETRIA.FUNI_FUNCIONARIO FUNI ON 
+												FUNI.FUNI_ID = FUOR.FUNI_ID 
+						INNER JOIN  BIOMETRIA.FRTR_FUNCIONARIOREGIMETRABALHO FRTR ON 
+												FRTR.FRTR_DTFIM IS NULL AND 
+												FRTR.FUNI_ID = FUOR.FUNI_ID 
+						INNER JOIN  BIOMETRIA.FSHM_FUNCSALDOHORAMENSAL FSHM ON
+												FSHM.FUNI_ID = FUNI.FUNI_ID AND
+												FSHM.FSHM_DTREFERENCIA = 
+													(SELECT FSHM1.FSHM_DTREFERENCIA
+														FROM 
+															(SELECT FSHMI.FUNI_ID, FSHMI.FSHM_DTREFERENCIA
+																FROM BIOMETRIA.FSHM_FUNCSALDOHORAMENSAL FSHMI
+																ORDER BY FSHMI.FSHM_DTREFERENCIA DESC) FSHM1
 														WHERE FSHM1.FUNI_ID = FUNI.FUNI_ID AND
-																	ROWNUM = 1)           
-							INNER JOIN BIOMETRIA.FDTR_FUNCIONARIODIATRABALHO FDTR ON 
-												 FDTR.FDTR_DTREFERENCIA BETWEEN 
-												 FSHM.FSHM_DTREFERENCIA AND SYSDATE AND 
-												 FDTR.FRTR_ID = FRTR.FRTR_ID
-							WHERE	FUNIA.PMS_IDPMSPESSOA = '$autsshd' 
-							GROUP BY	FUNI.FUNI_ID, FUNI.PMS_IDPMSPESSOA, 
-												VUPU.UOR_DLSIGLAUNIDADE, FUOR.PMS_IDSAUUOR, FSHM.FSHM_DTREFERENCIA 
-							ORDER BY	UNIDADE, QTPENDENTE DESC";
+																	ROWNUM = 1) 
+						LEFT JOIN   BIOMETRIA.FDTR_FUNCIONARIODIATRABALHO FDTR ON 
+												FDTR.FDTR_DTREFERENCIA BETWEEN FSHM.FSHM_DTREFERENCIA AND SYSDATE AND 
+												FDTR.FRTR_ID = FRTR.FRTR_ID 
+						WHERE     FUNIA.PMS_IDPMSPESSOA = '$autsshd' 
+						GROUP BY  FUNI.FUNI_ID, FUNI.PMS_IDPMSPESSOA, VUPU.UOR_DLSIGLAUNIDADE, FSHM.FSHM_DTREFERENCIA 
+						ORDER BY  UNIDADE, QTPENDENTE DESC";
 	}
 ////////////////////////////////////////////////////////////////////////////////
 //	pendencias - obtem todas as pendencias de um sshd
@@ -494,7 +533,7 @@ if( $qry == "pendencias" )
 		$sql .= "WHERE       FUNI.PMS_IDPMSPESSOA = '$sshdfunc'";
 	}
 ////////////////////////////////////////////////////////////////////////////////
-//	funaces
+//	funaces		-	dados de acesso dos funcionários comuns
 if( $qry == "funaces" )
 	{
 	if( !isset( $_GET["sshd"] ) )
@@ -514,37 +553,50 @@ if( $qry == "funaces" )
 	
 	$dtini = $_GET["dtini"];
 	$dtfim = $_GET["dtfim"];
-	$sql	=	"SELECT		FUNI.FUNI_ID, FDTR.FDTR_ID, FDTR.TSDT_ID, FUNI.PMS_IDPMSPESSOA as SSHD, PESS.NOME,
+	$sql	=	"SELECT		FUNI.FUNI_ID, FDTR.FDTR_ID, FDTR.TSDT_ID, 
+										FUNI.PMS_IDPMSPESSOA as SSHD, PESS.NOME,
 										to_char( FDTR.FDTR_DTREFERENCIA, 'DD/MM/YYYY' ) as Data,
-										(SELECT LISTAGG(FDTE.FDTE_ID, ';') WITHIN GROUP (ORDER BY FDTE.FDTE_DTHORARIO)
-														FROM BIOMETRIA.FDTE_FUNCDIATRABALHOREGISTRO FDTE
-														WHERE FDTE.FDTR_ID = FDTR.FDTR_ID) AS FDTEIDS,
-										(SELECT LISTAGG(TO_CHAR(FDTE.FDTE_DTHORARIO, 'HH24:MI'), ';') WITHIN GROUP (ORDER BY FDTE.FDTE_DTHORARIO)
-														FROM BIOMETRIA.FDTE_FUNCDIATRABALHOREGISTRO FDTE
-														WHERE FDTE.FDTR_ID = FDTR.FDTR_ID) AS HORARIOS,
-										(SELECT LISTAGG(NVL( FDTE.TORG_ID, '0'), ';') WITHIN GROUP (ORDER BY FDTE.FDTE_DTHORARIO)
-														FROM BIOMETRIA.FDTE_FUNCDIATRABALHOREGISTRO FDTE
-														WHERE FDTE.FDTR_ID = FDTR.FDTR_ID) AS OPERACOES,
-										(SELECT LISTAGG(NVL( FDTE.TORE_ID, '0'), ';') WITHIN GROUP (ORDER BY FDTE.FDTE_DTHORARIO)
-														FROM BIOMETRIA.FDTE_FUNCDIATRABALHOREGISTRO FDTE
-														WHERE FDTE.FDTR_ID = FDTR.FDTR_ID) AS ORIGENS,
-										to_char( to_date(BIOMETRIA.SF_CALCULATEMPODIATRABALHO( FUNI.FUNI_ID, FDTR.FDTR_DTREFERENCIA )*60, 'SSSSS' ), 'HH24:MI' ) AS TOTAL,
-										(SELECT LISTAGG(TMEN.TMEN_DCMENS, '; ') WITHIN GROUP (ORDER BY FDTN.FDTN_ID)
-                             FROM BIOMETRIA.FDTN_FDTR_TMEN FDTN
-                             INNER JOIN BIOMETRIA.TMEN_TIPOMENSAGEM TMEN ON
-                                        TMEN.TMEN_ID = FDTN.TMEN_ID
-                             WHERE FDTN.FDTR_ID = FDTR.FDTR_ID) AS TIPOMENSAGEM, 
+										(SELECT LISTAGG(FDTE.FDTE_ID, ';') 
+														WITHIN GROUP (ORDER BY FDTE.FDTE_DTHORARIO)
+												FROM BIOMETRIA.FDTE_FUNCDIATRABALHOREGISTRO FDTE
+												WHERE FDTE.FDTR_ID = FDTR.FDTR_ID) AS FDTEIDS,
+										(SELECT LISTAGG(TO_CHAR(FDTE.FDTE_DTHORARIO, 'HH24:MI'), ';') 
+														WITHIN GROUP (ORDER BY FDTE.FDTE_DTHORARIO)
+												FROM BIOMETRIA.FDTE_FUNCDIATRABALHOREGISTRO FDTE
+												WHERE FDTE.FDTR_ID = FDTR.FDTR_ID) AS HORARIOS,
+										(SELECT LISTAGG(NVL( FDTE.TORG_ID, '0'), ';') 
+														WITHIN GROUP (ORDER BY FDTE.FDTE_DTHORARIO)
+												FROM BIOMETRIA.FDTE_FUNCDIATRABALHOREGISTRO FDTE
+												WHERE FDTE.FDTR_ID = FDTR.FDTR_ID) AS OPERACOES,
+										(SELECT LISTAGG(NVL( FDTE.TORE_ID, '0'), ';') 
+														WITHIN GROUP (ORDER BY FDTE.FDTE_DTHORARIO)
+												FROM BIOMETRIA.FDTE_FUNCDIATRABALHOREGISTRO FDTE
+												WHERE FDTE.FDTR_ID = FDTR.FDTR_ID) AS ORIGENS,
+										to_char( to_date
+												(BIOMETRIA.SF_CALCULATEMPODIATRABALHO( 
+														FUNI.FUNI_ID, FDTR.FDTR_DTREFERENCIA )*60, 'SSSSS' ), 
+														'HH24:MI' ) AS TOTAL,
+										(SELECT LISTAGG(TMEN.TMEN_DCMENS, '; ') 
+														WITHIN GROUP (ORDER BY FDTN.FDTN_ID)
+                        FROM				BIOMETRIA.FDTN_FDTR_TMEN FDTN
+                        INNER JOIN	BIOMETRIA.TMEN_TIPOMENSAGEM TMEN ON
+                                    TMEN.TMEN_ID = FDTN.TMEN_ID
+                        WHERE FDTN.FDTR_ID = FDTR.FDTR_ID) AS TIPOMENSAGEM, 
 										FDTM_ID, FDTM.FDTM_DLMENS,
-										(SELECT  LISTAGG( TAAU.TAAU_DLAUSENCIAAUTORIZADA || '=' || FDTF.FDTF_NITMPREAL, ';')
-																WITHIN GROUP( ORDER BY FDTF.FDTF_NITMPREAL )
-											FROM BIOMETRIA.FDTF_FUNCDIATRABALHO_FAAU FDTF
-											INNER JOIN BIOMETRIA.FAAU_FUNCAUSENCIAAUTORIZADA FAAU ON FAAU.FAAU_ID=FDTF.FAAU_ID
-											INNER JOIN BIOMETRIA.TAAU_TIPOAUSENCIAAUTORIZADA TAAU ON TAAU.TAAU_ID=FAAU.TAAU_ID 
+										(SELECT	LISTAGG(	TAAU.TAAU_DLAUSENCIAAUTORIZADA || '=' || 
+																			FDTF.FDTF_NITMPREAL, ';')
+														WITHIN GROUP( ORDER BY FDTF.FDTF_NITMPREAL )
+											FROM				BIOMETRIA.FDTF_FUNCDIATRABALHO_FAAU FDTF
+											INNER JOIN	BIOMETRIA.FAAU_FUNCAUSENCIAAUTORIZADA FAAU ON 
+																	FAAU.FAAU_ID=FDTF.FAAU_ID
+											INNER JOIN	BIOMETRIA.TAAU_TIPOAUSENCIAAUTORIZADA TAAU ON 
+																	TAAU.TAAU_ID=FAAU.TAAU_ID 
 											WHERE FDTR_ID=FDTR.FDTR_ID) AS AUTORIZADAS,
 										CASE FUCO_DCDBCR 
 														WHEN 'DB' THEN -FUCO_NITMP
 														WHEN 'CR' THEN FUCO_NITMP END  AS CORRECAO, 
-										BIOMETRIA.SF_CALCULASALDOINICIAL( FUNI.FUNI_ID, FDTR.FDTR_DTREFERENCIA+1) AS SALDO
+										BIOMETRIA.SF_CALCULASALDOINICIAL( 
+															FUNI.FUNI_ID, FDTR.FDTR_DTREFERENCIA+1) AS SALDO
 							FROM        BIOMETRIA.FUNI_FUNCIONARIO FUNI
 							INNER JOIN  SAU.VWPESSOA_SSHD PESS ON
 													PESS.REGISTRO_FUNCIONAL_ATIVO = 1 
@@ -581,6 +633,12 @@ if( $dbg )
 	}
 //	
 include 'ambiente.php';
+if( isset( $_SERVER['PHP_AUTH_USER'] ) )
+	{
+	$userb = $_SERVER['PHP_AUTH_USER'];
+	$passb = $_SERVER['PHP_AUTH_PW'];
+	}
+	
 include 'ORAConn.php';
 
 if( $dbg )
