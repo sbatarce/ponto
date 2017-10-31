@@ -680,7 +680,7 @@ include 'partes/Scripts.php';
 			dtfim = $.datepicker.formatDate("yymmdd", dt );
 			tableDestroy();
 			
-			var pessoa = sshd.substr( 1 );
+			var pessoa = sshdfunc.substr( 1 );
 			parms = "&pessoa="+pessoa+"&dtinic="+dtfim+"&dtterm="+dtfim;
 			var resu = Select( "reprpmspessoa", parms );
 			if( resu == null )
@@ -808,7 +808,7 @@ include 'partes/Scripts.php';
 		}
 
 	var sshdfunc = obterCookie( "sshdfunc" );
-	if( sshdfunc == null )
+	if( sshdfunc == null || sshdfunc == "" )
 		{
 		Deslogar();
 		window.history.back();

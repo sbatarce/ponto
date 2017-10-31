@@ -14,15 +14,15 @@
 										<li>
 											<a href="autAtribuir.php" ttip="ttip" data-placement="bottom" 
 												 data-original-title="Administração de Autorizadores" 
-												 class="adm" >
-												<i class="glyphicon glyphicon-user yellow"></i> 
+												 class="adm" style="color:red ;">
+												<i class="glyphicon glyphicon-eye-open red"></i> 
 												Autorizadores
 											</a>
 										</li>
 										<li>
 											<a href="admUsuarios.php" ttip="ttip" data-placement="bottom" 
 												 data-original-title="Cadastramento de usuários" 
-												 class="adm" >
+												 class="adm" style="color:goldenrod ;" >
 												<i class="glyphicon glyphicon-user yellow"></i> 
 												Usuários
 											</a>
@@ -31,7 +31,7 @@
 											<a href="admParametros.php" ttip="ttip" data-placement="bottom" 
 												 data-original-title="Adequar parametros do sistema" 
 												 class="adm" >
-												<i class="glyphicon glyphicon-adjust red"></i> 
+												<i class="glyphicon glyphicon-wrench red"></i> 
 												Parametros
 											</a>
 										</li>
@@ -58,8 +58,8 @@
 										<li>
 											<a href="autAtribuir.php" ttip="ttip" data-placement="bottom" 
 												 data-original-title="Cadastro de funcionários" 
-												 class="aut" style="color:gold ;" >
-												<i class="glyphicon glyphicon-user" ></i>
+												 class="aut" style="color:red ;" >
+												<i class="glyphicon glyphicon-eye-open red" ></i>
 												Autorizadores
 											</a>
 										</li>
@@ -83,8 +83,8 @@
 											<a href="autAdmApar.php" ttip="ttip" data-placement="bottom" 
 												 data-original-title="Administrar aparelhos" 
 												 class="aut" style="color: blueviolet;">
-												<i class="glyphicon "></i>
-												Administrar aparelhos
+												<i class="glyphicon glyphicon-scale"></i>
+												Aparelhos
 											</a>
 										</li>
 										<li>
@@ -95,32 +95,12 @@
 												Todos Funcionários 
 											</a>
 										</li>
-										<!-- pendencias só via todosFuncionarios
-										<li>
-											<a href="autPenden.php" ttip="ttip" data-placement="bottom" 
-												 data-original-title="Mostra pendencias de funcionários" 
-												 class="aut" style="color: DarkGoldenRod;" >
-												<i class="glyphicon glyphicon-time"></i> 
-												Pendências
-											</a>
-										</li>
-										-->
-										<!-- autorização de ausências e correção a partir de todos Funcionarios
-										<li>
-											<a href="autAusencias.php" ttip="ttip" data-placement="bottom" 
-												 data-original-title="Autorizar ausencias a funcionários"  
-												 class="aut" style="color: green;" >
-												<i class="glyphicon glyphicon-log-out"></i> 
-												Autorizar ausências
-											</a>
-										</li>
-										-->
 										<li>
 											<a href="autFechamento.php" ttip="ttip" data-placement="bottom" 
-												 data-original-title="Fechamento mensal de UOR"  
+												 data-original-title="Fechamento de um ou mais funcionários da UOR"  
 												 class="aut" style="color: blue;">
 												<i class="glyphicon glyphicon-calendar" ></i> 
-												Fechamento Mensal
+												Fechamento
 											</a>
 										</li>
 									</ul>

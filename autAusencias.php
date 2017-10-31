@@ -270,8 +270,6 @@ include 'partes/Scripts.php';
 		if( sshd == null )
 			{
 			Deslogar();
-			window.history.back();
-			window.location = "index.php";
 			}
 		//	obtem FUNI_ID do autorizador
 		var parms = "&sshd=" + sshd;

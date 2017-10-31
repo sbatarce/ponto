@@ -13,9 +13,19 @@
 						</div>
 					</div>
           <div class="btn-group col-md-2 col-sm-3" role="group">
-            <button type="button" onclick="javascript:logout()"
-                    ttip="ttip" data-placement="bottom" data-original-title="sair do sistema"
-                    class="btn btn-default">logout</button>
+            <button type="button" onclick="javascript:Deslogar()"
+                    ttip="ttip" data-placement="bottom" 
+										data-original-title="encerrar a sessão do usuário"
+                    class="btn btn-default">
+							logout
+						</button>
+            <button type="button" onclick="javascript:Voltar()"
+										style="margin-left: 20px; "
+                    ttip="ttip" data-placement="bottom" 
+										data-original-title="Voltar à página anterior"
+                    class="btn">
+							voltar
+						</button>
           </div>          
 				</div>
 			</div>

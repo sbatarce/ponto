@@ -23,11 +23,15 @@ include 'partes/pageheader.php';
 include 'partes/pagebody.php';
 ?>
 		<div class='row form-group' 
-				 style='margin-bottom: 5px; margin-left:4px;' data-toggle="buttons">
-			<div class="col-lg-6" style='width:50%;'>
+				 style='margin-bottom: 5px; ' data-toggle="buttons">
+			<div class="col-lg-6" style='width:100%;'>
 			UOR
 			<input type="text" id="fuors" class="fuors"
-								style="width: 50%; margin-left: 20px; margin-right: 20px; "/>
+								style="width: 25%; margin-right: 30px; " />
+			<input type="text" id="dtuprc" class="dtuprc"
+					 style="margin-left: 10px; width: 15%;  float: right;
+					 font-size: 20px; font-weight: bold; " readonly/>
+			<label style="float: right; font-weight: bold; ">último processamento</label>
 			</div>
 		</div>
 										<table class="table table-striped table-hover table-bordered" id="eddt">
@@ -245,7 +249,7 @@ include 'partes/Scripts.php';
 
 	function encerra( id )
 		{
-		dtfim = $.datepicker.formatDate("yymmdd", hoje )
+		dtfim = $.datepicker.formatDate("yymmdd", dtuprc )
 		var url = "partes/alteraFUAU.php?fuauid="+ id;
 		url += "&dtfim=" + dtfim;
 		var resul = remoto( url );
@@ -406,6 +410,8 @@ include 'partes/Scripts.php';
 		var dtuinv = resu.dados[0].DTUPROC;
 		var dtudir = toDateDir( dtuinv );
 		var dtuprc = toDate( dtudir );
+		
+		$('#dtuprc').val( dtudir );
 
 		//	datepickers
 		$( ".dtinicria" ).datepicker(

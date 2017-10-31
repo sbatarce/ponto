@@ -293,6 +293,12 @@ function Deslogar()
   matarCookie("tiuser");
   window.location.href = "index.php";
   }
+  
+ function Voltar()
+  {
+  window.history.back();
+  window.location = "index.php";
+  }
 
 function remoto( url, us, ps )
   {
