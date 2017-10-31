@@ -1,4 +1,5 @@
 //	geral.js		rotinas de uso geral
+//
 
 var user;
 var basicAuth = {};
