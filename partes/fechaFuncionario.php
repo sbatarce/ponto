@@ -52,7 +52,8 @@ if( $dbg )
 //	verifica o fechamento do funcionário
 $sql = "SELECT FSHM_ID AS FSHMID, TO_CHAR( FSHM_DTREFERENCIA, 'YYYYMMDD' ) AS DTUFECH
 					FROM BIOMETRIA.FSHM_FUNCSALDOHORAMENSAL 
-					WHERE FUNI_ID==$funiid";
+					WHERE FUNI_ID=$funiid
+					ORDER BY FSHM_DTREFERENCIA DESC";
 $res = $ora->execSelect($sql);
 $jres = json_decode($res);
 if( $dbg )
@@ -72,8 +73,13 @@ if( $jres->linhas < 1 )
 	$ora->disconnect();
 	return;
 	}
-$dtufch = $jres->dados[0]->DTUFECH;
+$dtufech = $jres->dados[0]->DTUFECH;
+$fshmid =  $jres->dados[0]->FSHMID;
 $ora->libStmt();
+if( $dbg )
+	{
+	echo "Ultimo fechamento=$dtufech / id fshm=$fshmid<br>";
+	}
 
 //	verifica se há pendências desde a data do fechamento até a nova data
 $sql = "SELECT COUNT(1) AS QTD
@@ -116,50 +122,62 @@ if( $qtpend > 0 )
 	return;
 	}
 	
-//	calcula os saldos no dia do fechamento para compor o novo FSHM
-
-//	inicia uma transação 
-$ora->beginTransaction();
-
-//	atualiza o FSHM antigo
-	$sql = "UPDATE BIOMETRIA.FRTR_FUNCIONARIOREGIMETRABALHO 
-						SET FRTR_DTFIM=SYSDATE
-						WHERE FRTR_ID=$idregiant";
-	$res = $ora->execDelUpd($sql);
-	$jres = json_decode( $res );
-	if( $dbg )
-		{
-		echo "update FUOR anterio SQL=$sql/resultado:";
-		var_dump($jres);
-		}
-	if( $jres->status != "OK" )
-		{
-		fmtErro( "erro", "Encerrando alocacao anterior: $jres->erro" );
-		$ora->rollback();
-		$ora->disconnect();
-		return;
-		}	
-	}
-	
-//	cria a nova alocação
-$sql = "INSERT INTO BIOMETRIA.FRTR_FUNCIONARIOREGIMETRABALHO VALUES
-					( BIOMETRIA.SQ_FRTR.NEXTVAL, $funiid, $reginovo, null, 
-						SYSDATE+1, null )";
-$res = $ora->execInsert( $sql, "BIOMETRIA.SQ_FRTR" );
-$jres = json_decode( $res );
+//	obtem saldo e médias no dia do novo fechamento para compor o novo FSHM
+$sql = "SELECT  BIOMETRIA.SF_CALCULASALDOINICIAL( $funiid, TO_DATE('$data','YYYYMMDD')) AS SALDO,
+								NIQUANTIDADEHORARIO1 AS QTDENTRA, NISOMAHORARIO1 AS MEDENTRA, 
+								NIQUANTIDADEHORARIO2 AS QTDINTER, NISOMAHORARIO2 AS MEDINTER, 
+								NIQUANTIDADEHORARIO3 AS QTDVOLTA, NISOMAHORARIO3 AS MEDVOLTA, 
+								NIQUANTIDADEHORARIO4 AS QTDSAIDA, NISOMAHORARIO4 AS MEDSAIDA
+					FROM	TABLE(BIOMETRIA.SF_CALCULAMEDIAHORARIOBATIDAS
+										($funiid, TO_DATE( '$dtufech', 'YYYYMMDD' ), 
+															TO_DATE( '$data', 'YYYYMMDD' )))";
+$res = $ora->execSelect($sql);
+$jres = json_decode($res);
 if( $dbg )
 	{
-	echo "insere o novo regime SQL=$sql / resultado:";
+	echo "resultado obtem medias sql=$sql/resultado:";
 	var_dump($jres);
 	}
 if( $jres->status != "OK" )
 	{
-	fmtErro( "erro", "Iniciando a alocacao: $jres->erro" );
+	fmtErro( "erro", "Obtendo medias: $jres->erro" );
+	$ora->disconnect();
+	return;
+	}
+if( $jres->linhas < 1 )
+	{
+	fmtErro( "erro", "Retornou 0 linhas de media" );
+	$ora->disconnect();
+	return;
+	}
+$ora->libStmt();
+
+//	inicia uma transação 
+$ora->beginTransaction();
+//	cria o FSHM novo
+$sql = "INSERT INTO BIOMETRIA.FSHM_FUNCSALDOHORAMENSAL VALUES
+					( BIOMETRIA.SQ_FSHM.NEXTVAL, $funiid, TO_DATE( '$data', 'YYYYMMDD' ), ".
+						$jres->dados[0]->SALDO.", 0, 0, ".
+						$jres->dados[0]->QTDENTRA.", ".$jres->dados[0]->MEDENTRA.",".
+						$jres->dados[0]->QTDINTER.", ".$jres->dados[0]->MEDINTER.",".
+						$jres->dados[0]->QTDVOLTA.", ".$jres->dados[0]->MEDVOLTA.",".
+						$jres->dados[0]->QTDSAIDA.", ".$jres->dados[0]->MEDSAIDA." )";
+$res = $ora->execInsert($sql, 'BIOMETRIA.SQ_FSHM' );
+$jres = json_decode( $res );
+if( $dbg )
+	{
+	echo "INSERT de FSHM SQL=$sql/resultado:";
+	var_dump($jres);
+	}
+if( $jres->status != "OK" )
+	{
+	fmtErro( "erro", "Inserindo FSHM: $jres->erro" );
 	$ora->rollback();
 	$ora->disconnect();
 	return;
 	}	
 $id = $jres->idnovo;
+	
 //	commita e encerra
 if( $dbg )
 	{

@@ -258,19 +258,15 @@ include 'partes/Scripts.php';
 	function fechaFunc( sshd, data )
 		{
 		//	funiid do funcionário
-		parms = "&sshd=" + sshd;
-		resu = Select( "funiid", parms );
+		let parms = `&sshd=${sshd}`;
+		let resu = Select( "funiid", parms );
 		if( resu == null )
 			throw new Error("Problemas de acesso ao banco de dados. Por favor, tente mais tarde.");
-		var funiid = resu.dados[0].FUNI_ID;
+		let funiid = resu.dados[0].FUNI_ID;
 		//	verifica se o funcionário tem pendências anteriores à data de fechamento
-		parms = "&funiid=" + funiid + "&data=" + data;
-		resu = Select( "qtpenden", parms );
-		if( resu == null )
-			throw new Error("Problemas de acesso ao banco de dados. Por favor, tente mais tarde.");
-		if( resu.linhas < 1 )
-			return false;
-		if( resu.dados.QTD > 0 )
+		let url = `partes/fechaFuncionario.php?funiid=${funiid}&data=${data}`;
+		resu = remoto( url );
+		if( resu.status != "OK" )
 			return false;
 		return true;
 		}
