@@ -783,19 +783,15 @@ include 'partes/Scripts.php';
 		$("#titwidget").html( "Análise de pendencias de " + nofunc );
 		
 		//	acha a data do último fechamento e acerta as datas iniciais
-		var parms = "&sshd=" + sshd;
+		var parms = "&sshd=" + sshdfunc;
 		var resu = Select( "dtfecha", parms );
 		if( resu == null )
 			throw new Error("Problemas de acesso ao banco de dados. Por favor, tente mais tarde.");
 		var dtfecha = resu.dados[0].DTFECHA;
-		var afecha = Number(dtfecha.substring( 0, 4 ));
-		var mfecha = Number(dtfecha.substring( 5, 7 ))-1;
-		var dfecha = Number(dtfecha.substring( 8 ));
-		
 		var hoje = new Date();
 		var dtfim = $.datepicker.formatDate("yymmdd", hoje );
 		$("#dtfim").val( $.datepicker.formatDate("dd/mm/yy", hoje ) );
-		var dtufech = new Date( afecha, mfecha, dfecha, 0, 0, 0 );
+		var dtufech = toDate( dtfecha );
 		$("#dtini").val( $.datepicker.formatDate("dd/mm/yy", dtufech ));
 		var dtini = $.datepicker.formatDate("yymmdd", dtufech );
 

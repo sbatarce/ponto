@@ -222,12 +222,31 @@ function com2Digs(number)
   return res;
   }
   
-// de DD/MM/YYYY => Date()
+// de DD/MM/YYYY => Date() ou
+// de YYYY-MM-DD => Date() ou
+// de YYYYMMDD   => Date()
 function toDate( data )
   {
-  var ano = data.substr( 6 );
-  var mes = data.substr( 3, 2 );
-  var dia = data.substr( 0, 2 );
+  let ano, mes, dia;
+  if( data.indexOf( "/" ) >= 0 )
+    {
+    ano = data.substr( 6 );
+    mes = data.substr( 3, 2 );
+    dia = data.substr( 0, 2 );
+    }
+  if( data.indexOf( "-" ) >= 0 )
+    {
+    ano = data.substr( 0, 4 );
+    mes = data.substr( 5, 2 );
+    dia = data.substr( 8, 2 );
+    }
+  if( data.indexOf( "-" ) < 0 && data.indexOf( "-" ) < 0 )
+    {
+    ano = data.substr( 0, 4 );
+    mes = data.substr( 4, 2 );
+    dia = data.substr( 6, 2 );
+    }
+     
   return new Date( ano, mes-1, dia );
   }
   

@@ -357,7 +357,8 @@ include 'partes/Scripts.php';
 			else
 				return hh+":"+mm;
 			}
-			
+		
+		/*
 		//	chama a página de pendências do funcionário
 		function pendencias( sshd )
 			{
@@ -389,7 +390,7 @@ include 'partes/Scripts.php';
 			criarCookie( "sshdfunc", sshd );
 			window.location = "autFuncio.php";
 			}
-			
+		*/
 		//	tratamento inicial das datas e inicialização do datatables
 		function setAjax(  )
 			{

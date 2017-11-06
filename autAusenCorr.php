@@ -198,10 +198,7 @@ include 'partes/Scripts.php';
 				return;
 				}
 			var aux = resu.dados[0].DTFECHA;
-			var afecha = Number(aux.substring( 0, 4 ));
-			var mfecha = Number(aux.substring( 5, 7 ))-1;
-			var dfecha = Number(aux.substring( 8 ));
-			dtfecha = new Date( afecha, mfecha, dfecha, 0, 0, 0 );
+			dtfecha = toDate( aux );
 			}
 			
 		function escoUor( tipo, id )

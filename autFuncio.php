@@ -815,6 +815,15 @@ include 'partes/Scripts.php';
 		window.location = "index.php";
 		}
 
+	//	obtem data do fechamento
+	parms = "&sshd=" + sshdfunc;
+	resu = Select( "dtfecha", parms );
+	if( resu == null )
+		throw new Error("Problemas de acesso ao banco de dados. Por favor, tente mais tarde.");
+	if( resu.linhas < 1 )
+		throw new Error("Problemas de acesso ao banco de dados. Por favor, tente mais tarde.");
+	var dtfecha = toDate( resu.dados[0].DTFECHA );
+
 	$("#titwidget").html( "Ponto de " + nofunc );
 	matarCookie( "sshdfunc" );
 			
@@ -839,8 +848,8 @@ include 'partes/Scripts.php';
 		var dtfim = $.datepicker.formatDate("yymmdd", hoje );
 		$("#dtfim").val( $.datepicker.formatDate("dd/mm/yy", hoje ) );
 		hoje.setDate(1);
-		$("#dtini").val( $.datepicker.formatDate("dd/mm/yy", hoje ));
-		var dtini = $.datepicker.formatDate("yymmdd", hoje );
+		$("#dtini").val( $.datepicker.formatDate("dd/mm/yy", dtfecha ));
+		var dtini = $.datepicker.formatDate("yymmdd", dtfecha );
 
 		//	obtem FUNI_ID
 		var parms = "&sshd=" + sshdfunc;

@@ -320,7 +320,7 @@ include 'partes/Scripts.php';
 		var afecha = Number(dtfecha.substring( 0, 4 ));
 		var mfecha = Number(dtfecha.substring( 5, 7 ))-1;
 		var dfecha = Number(dtfecha.substring( 8 ));
-		var dtufech = new Date( afecha, mfecha, dfecha, 0, 0, 0 );
+		var dtufech = toDate( dtfecha );
 		dtfecha = $.datepicker.formatDate("yymmdd", dtufech );
 		$("#dtfrom").val( $.datepicker.formatDate("dd/mm/yy", dtufech ));
 		var dtfrom = $.datepicker.formatDate("yymmdd", dtufech );

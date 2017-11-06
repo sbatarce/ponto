@@ -731,6 +731,7 @@ include 'partes/Scripts.php';
 	
 	/////////////// PRINCIPAL ////////////////////////
 	$('#eddt_new').hide();
+	
 	//	tabelas de definição da tabela de presenças
 	var funiid = null;
 	var flmod = 0;
@@ -745,6 +746,37 @@ include 'partes/Scripts.php';
 	var mensgs = [];			//	lista de mensagens
 	var salvos = [];			//	s-salvo
 	var acum = 0;
+
+	//	obtem FUNI_ID
+	var sshd = obterCookie( "user" );
+	if( sshd == null )
+		{
+		Deslogar();
+		}
+
+	var parms = "&sshd=" + sshd;
+	var resu = Select( "funiid", parms );
+	if( resu == null )
+		throw new Error("Problemas de acesso ao banco de dados. Por favor, tente mais tarde.");
+	funiid = resu.dados[0].FUNI_ID;
+	
+	//	obtem data do fechamento
+	parms = "&sshd=" + sshd;
+	resu = Select( "dtfecha", parms );
+	if( resu == null )
+		throw new Error("Problemas de acesso ao banco de dados. Por favor, tente mais tarde.");
+	if( resu.linhas < 1 )
+		throw new Error("Problemas de acesso ao banco de dados. Por favor, tente mais tarde.");
+	var dtfecha = toDate( resu.dados[0].DTFECHA );
+
+	//	acerta as datas
+	var hoje = new Date();
+	var dtfim = $.datepicker.formatDate("yymmdd", hoje );
+	$("#dtfim").val( $.datepicker.formatDate("dd/mm/yy", hoje ) );
+	hoje.setDate(1);
+	$("#dtini").val( $.datepicker.formatDate("dd/mm/yy", dtfecha ));
+	var dtini = $.datepicker.formatDate("yymmdd", hoje );
+
 		//	formatadores ligados ao datatables
 		//		ticamp:		tipo de campo t/n/l = texto, numérico ou legenda
 		//		inputs:		nomes dos campos no banco relativamente aos inputs
@@ -761,27 +793,6 @@ include 'partes/Scripts.php';
 						"Mensagens": "",
 						"Totais": ""
 						};
-		var sshd = obterCookie( "user" );
-		if( sshd == null )
-			{
-			Deslogar();
-			}
-
-		//	acerta as datas
-		var hoje = new Date();
-		var dtfim = $.datepicker.formatDate("yymmdd", hoje );
-		$("#dtfim").val( $.datepicker.formatDate("dd/mm/yy", hoje ) );
-		hoje.setDate(1);
-		$("#dtini").val( $.datepicker.formatDate("dd/mm/yy", hoje ));
-		var dtini = $.datepicker.formatDate("yymmdd", hoje );
-
-		//	obtem FUNI_ID
-		var parms = "&sshd=" + sshd;
-		var resu = Select( "funiid", parms );
-		if( resu == null )
-			throw new Error("Problemas de acesso ao banco de dados. Por favor, tente mais tarde.");
-		funiid = resu.dados[0].FUNI_ID;
-
 		//	monta o datatables
 		var	order	=	[];											//	sem classificação 
 		//	prepara a definiçao das colunas
