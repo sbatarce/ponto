@@ -12,7 +12,7 @@
 <?php
 include 'partes/Head.php';
 ?>
-		<!-- Favicon -->
+		<!-- icone da PMS -->
 		<link rel="shortcut icon" href="/imagens/PMSICO.png">
 	</head>
 	
