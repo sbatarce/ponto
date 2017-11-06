@@ -389,7 +389,7 @@ include 'partes/Scripts.php';
 			todayHighlight: true			
 			}).on('change.dp', function(e)
 				{ 
-				var dt = $(".dtinicria").datepicker("getDate");
+				var dt = $("#dtfecha").datepicker("getDate");
 				dtfecha = $.datepicker.formatDate("yymmdd", dt );
 				});
 
