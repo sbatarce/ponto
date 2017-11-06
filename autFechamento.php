@@ -272,6 +272,7 @@ include 'partes/Scripts.php';
 			return false;
 		if( resu.dados.QTD > 0 )
 			return false;
+		return true;
 		}
 		
 	function executar()
