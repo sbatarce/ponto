@@ -1,10 +1,13 @@
 <?php
+//	qtpenden( funiid, dtfecha )
+//	parametos()	-	retorna todos os parametros da PAGL
 //	horasdia( sshd, data) - obtem a quantidade de hora do dia de um funcionário
 //	ausaut( sshd, data ) -	obtem ids de todos as ausencias autorizadas com data 
 //													de término maior
 //	dtfecha( sshd ) - obtem a data do último fechamento no formato YYYY-MM-DD
 //	qtdbiom( fdtrid ) - conta a quantidade de batidas de biometria de um FDTR 
-//	reprpmspessoa( pessoa(sshd), dtinic, dtterm ) - obtem os registro na biometria de uma pessoa num período
+//	reprpmspessoa( pessoa(sshd), dtinic, dtterm ) - 
+//					obtem os registro na biometria de uma pessoa num período
 //	saldoant( funiid, dtinic ) - obter saldo anterior do FUNI_ID em uma data
 //	funiid( sshd ) - obter FUNI_ID do SSHD
 //	sshd( funiid ) - obter SSHD do FUNI_ID
@@ -24,13 +27,10 @@ if( !isset( $_GET["query"] ) && !isset( $_GET["debug"] ) )
 //	prepara o query
 $sql	=	"";
 $dbg = false;
-if( isset( $_GET["query"] ) )
-	$qry	=	$_GET["query"];
-else
-	{
-	$qry	=	$_GET["debug"];
+if( isset( $_GET["dbg"] ) )
 	$dbg	=	true;
-	}
+
+$qry = $_GET["query"];
 	
 ////////////////////////////////////////////////////////////////////////////////
 //	
@@ -43,6 +43,49 @@ if( $qry == "" )
 		}
 	$xpto	=	$_GET["xpto"];
 	$sql = "select * FROM XPTO WHERE XPTO=$xpto";
+	}
+	
+////////////////////////////////////////////////////////////////////////////////
+//	qtpenden	-	contagem das pendencia do último fechamento até a data
+//	( funiid, data ) data a fechar o funcionário => YYYYMMDD
+if( $qry == "qtpenden" )
+	{
+	if( !isset( $_GET["funiid"] ) )
+		{
+		echo	'{ "status": "erro", "erro": "parametro funiid obrigatorio" }';
+		return;
+		}
+	if( !isset( $_GET["data"] ) )
+		{
+		echo	'{ "status": "erro", "erro": "parametro data obrigatorio" }';
+		return;
+		}
+	$funiid	=	$_GET["funiid"];
+	$data	=	$_GET["data"];
+	$sql = "SELECT COUNT(1) AS QTD
+						FROM BIOMETRIA.FDTR_FUNCIONARIODIATRABALHO FDTR
+						INNER JOIN  BIOMETRIA.FRTR_FUNCIONARIOREGIMETRABALHO FRTR ON
+												FRTR.FRTR_ID=FDTR.FRTR_ID AND
+												FRTR.FRTR_DTFIM IS NULL
+						INNER JOIN  ( SELECT FUNI_ID AS ID, MAX( FSHM_DTREFERENCIA ) AS DTFECH
+														FROM BIOMETRIA.FSHM_FUNCSALDOHORAMENSAL 
+														GROUP BY FUNI_ID) FSHM ON
+												FSHM.ID=FRTR.FUNI_ID
+						WHERE (FDTR.TSDT_ID=1 OR FDTR.TSDT_ID=4) AND
+									FDTR.FDTR_DTREFERENCIA BETWEEN 
+									FSHM.DTFECH AND TO_DATE( '$data', 'YYYYMMDD' ) AND
+									FRTR.FUNI_ID=$funiid";
+	}
+
+////////////////////////////////////////////////////////////////////////////////
+//	parametros()
+if( $qry == "parametros" )
+	{
+	$sql = "SELECT  PAGL_NIPRAZORESPOSTA AS TRESPOSTA, 
+									PAGL_NIPRAZOJUSTIFICATIVA AS TJUSTIF, 
+									TO_CHAR( PAGL_DTPROCESSADA, 'YYYYMMDD' ) AS DTUPROC 
+						FROM  BIOMETRIA.PAGL_PARAMETROSGLOBAIS 
+						WHERE ROWNUM=1";
 	}
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -211,7 +254,7 @@ if( $qry == "dtfecha" )
 		return;
 		}
 	$sshd	=	$_GET["sshd"];
-	$sql = "select TO_CHAR( FSHM.FSHM_DTREFERENCIA, 'YYYY-MM-DD' ) AS DTFECHA
+	$sql = "select TO_CHAR( MAX(FSHM.FSHM_DTREFERENCIA), 'YYYY-MM-DD' ) AS DTFECHA
     FROM BIOMETRIA.FSHM_FUNCSALDOHORAMENSAL FSHM
     INNER JOIN BIOMETRIA.FUNI_FUNCIONARIO FUNI ON
                 FUNI.FUNI_ID=FSHM.FUNI_ID
@@ -258,15 +301,14 @@ if( $qry == "reprpmspessoa" )
 	$pessoa	=	$_GET["pessoa"];
 	$dtinic	=	$_GET["dtinic"];
 	$dtterm	=	$_GET["dtterm"];
-	$sql = "SELECT DISTINCT to_char( REPR.REPR_DTREGISTROPRESENCA, 'DD/MM/YYYY HH24:mi' ) as ponto, " .
-					"to_char( REPR.REPR_DTREGISTROPRESENCA, 'YYYYMMDDHH24mi' ) as ordem " .
-					"FROM BIOMETRIA.REPR_REGISTROPRESENCA REPR  " .
-					"WHERE REPR.PMS_IDPMSPESSOA='" . $pessoa . "' " .
-					"and trunc( REPR_DTREGISTROPRESENCA ) >= to_date( '" .
-					$dtinic . "', 'YYYYMMDD' ) " .
-					"and trunc( REPR_DTREGISTROPRESENCA ) <= to_date( '" . 
-					$dtterm . "', 'YYYYMMDD' ) " .
-					"ORDER BY ordem";
+	$sql = "SELECT DISTINCT 
+							to_char( REPR_DTREGISTROPRESENCA, 'DD/MM/YYYY HH24:mi' ) as ponto, 
+							to_char( REPR_DTREGISTROPRESENCA, 'YYYYMMDDHH24mi' ) as ordem 
+						FROM BIOMETRIA.REPR_REGISTROPRESENCA  
+						WHERE	PMS_IDPMSPESSOA='$pessoa' AND
+									TRUNC( REPR_DTREGISTROPRESENCA )>=TO_DATE( '$dtinic', 'YYYYMMDD' ) AND
+									TRUNC( REPR_DTREGISTROPRESENCA )<=TO_DATE( '$dtterm', 'YYYYMMDD' ) 
+						ORDER BY ordem";
 	}
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -306,7 +348,7 @@ if( $qry == "funiid" )
 	
 
 ////////////////////////////////////////////////////////////////////////////////
-//	funiid( sshd ) - obter FUNI_ID do SSHD
+//	sshd( funiid ) - obter FUNI_ID do SSHD
 if( $qry == "sshd" )
 	{
 	if( !isset( $_GET["funiid"] ) )
@@ -368,9 +410,9 @@ if( $qry == "medioperio" )
 									NIQUANTIDADEHORARIO2 AS QTDINTER, NISOMAHORARIO2 AS MEDINTER, 
 									NIQUANTIDADEHORARIO3 AS QTDVOLTA, NISOMAHORARIO3 AS MEDVOLTA, 
 									NIQUANTIDADEHORARIO4 AS QTDSAIDA, NISOMAHORARIO4 AS MEDSAIDA
-							FROM TABLE(BIOMETRIA.SF_CALCULAMEDIAHORARIOBATIDAS
-												($funiid,TO_DATE( '$dtini', 'YYYYMMDD' ), 
-														TO_DATE( '$dtfim', 'YYYYMMDD' )))";
+						FROM	TABLE(BIOMETRIA.SF_CALCULAMEDIAHORARIOBATIDAS
+											($funiid,TO_DATE( '$dtini', 'YYYYMMDD' ), 
+													TO_DATE( '$dtfim', 'YYYYMMDD' )))";
 	}
 	
 ////////////////////////////////////////////////////////////////////////////////

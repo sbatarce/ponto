@@ -764,8 +764,24 @@ include 'partes/Scripts.php';
 			}
 			
 		var sshdfunc = obterCookie( "sshdfunc" );
+		if( sshdfunc == null )
+			{
+			Deslogar();
+			window.history.back();
+			window.location = "index.php";			
+			}
+		var nofunc = obterCookie( "nofunc" );
+		if( nofunc == null )
+			{
+			Deslogar();
+			window.history.back();
+			window.location = "index.php";
+			}
+
 		matarCookie( "sshdfunc" );
 
+		$("#titwidget").html( "Análise de pendencias de " + nofunc );
+		
 		//	acha a data do último fechamento e acerta as datas iniciais
 		var parms = "&sshd=" + sshd;
 		var resu = Select( "dtfecha", parms );

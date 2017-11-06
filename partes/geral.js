@@ -1,7 +1,45 @@
 //	geral.js		rotinas de uso geral
+//
 
 var user;
+var basicAuth = {};
+var flbasic = false;
+var tocoo = 10;
 
+//  combina 2 objetos tipo { k1: v1, k2: v2,... }
+//  adiciona ou modifica obj2[kx] em obj1
+function combina( obj1, obj2 )
+  {
+  for( key in obj2 )
+    {
+    obj1[key] = obj2[key];
+    }
+  }
+
+function setBasicAuth( us, ps )
+  {
+  if( us == undefined || ps == undefined )
+    {
+    basicAuth = {};
+    flbasic = false;
+    return;
+    }
+   if( us == null || ps == null )
+    {
+    basicAuth = {};
+    flbasic = false;
+    return;
+    }
+   if( us == "" || ps == "" )
+    {
+    basicAuth = {};
+    flbasic = false;
+    return;
+    }
+  basicAuth = { Authorization: "Basic " + btoa(us+":"+ps) };
+  flbasic = true;
+  }
+  
 function repserviceA( metodo, funcao, ip, mac, sistema, adhea )
   {
   var resul = { };
@@ -15,6 +53,8 @@ function repserviceA( metodo, funcao, ip, mac, sistema, adhea )
   hea["REPIP"] = ip;
   hea["REPMAC"] = mac;
   hea["REPSIS"] = sistema;
+  if( flbasic )
+    combina( hea, basicAuth );
   $.ajax(
     {
     headers: hea,
@@ -56,6 +96,8 @@ function repserviceB( metodo, funcao, idapal, sistema, adhea, body )
     hea = adhea;
   hea["IDAPAL"] = idapal;
   hea["REPSIS"] = sistema;
+  if( flbasic )
+    combina( hea, basicAuth );
   $.ajax(
     {
     headers: hea,
@@ -92,6 +134,8 @@ function repservice( metodo, funcao, idapal, sistema, adhea )
     hea = adhea;
   hea["IDAPAL"] = idapal;
   hea["REPSIS"] = sistema;
+  if( flbasic )
+    combina( hea, basicAuth );
   $.ajax(
     {
     headers: hea,
@@ -177,6 +221,26 @@ function com2Digs(number)
   res += data.substr( 0, 2 );
   return res;
   }
+  
+// de DD/MM/YYYY => Date()
+function toDate( data )
+  {
+  var ano = data.substr( 6 );
+  var mes = data.substr( 3, 2 );
+  var dia = data.substr( 0, 2 );
+  return new Date( ano, mes-1, dia );
+  }
+  
+//  de YYYYMMDD => DD/MM/YYYY
+ function toDateDir( data )
+  {
+  var res = data.substr( 6 );
+  res += "/";
+  res += data.substr( 4, 2 );
+  res += "/";
+  res += data.substr( 0, 4 );
+  return res;
+  }
 
 //  minutos => hh:mm
 function minToHHMM( minutos )
@@ -224,16 +288,38 @@ function Deslogar()
   {
   $( "#menupri" ).collapse( 'hide' );
   $( "#menu" ).hide();
-  matarCookie( "biouser" );
-  matarCookie( "biopass" );
+  matarCookie("user");
+  matarCookie("uoraut");
+  matarCookie("super");
+  matarCookie("tiuser");
   window.location.href = "index.php";
   }
-
-function remoto( url )
+  
+ function Voltar()
   {
+  window.history.back();
+  window.location = "index.php";
+  }
+
+function remoto( url, us, ps )
+  {
+  if( $('#modwait').length ) 
+    $('#modwait').show();
+  var hea = { };
+  if( us != undefined && ps != undefined )
+    {
+    if( us != null && ps != null )
+      {
+      if( us != "" && ps != "" )
+        hea["Authorization"] = "Basic " + btoa(us+":"+ps);
+      }
+    }
   var resul = { };
+  if( flbasic )
+    combina( hea, basicAuth );
   $.ajax(
     {
+    headers: hea,
     type: 'POST',
     dataType: "json",
     async: false,
@@ -248,6 +334,8 @@ function remoto( url )
       resul.erro = errorThrown;
       }
     });
+  if( $('#modwait').length ) 
+    $('#modwait').hide();
   return resul;
   }
 
@@ -293,18 +381,29 @@ function Insert( query, parms, sequence )
   return remoto( url );
   }
 
-function criarCookie( name, value, horas )
+function criarCookie( name, value, horas, minutos )
   {
-  if( horas )
+  var ho = 0;
+  var mi = 0;
+  var sec = 0;
+  var maxage = "";
+  if( horas == null )
+    ho = horas;
+  if( minutos == null )
+    mi = minutos;
+  
+  if( ho != 0 || mi != 0 )
     {
-      var date = new Date();
-      date.setTime( date.getTime() + ( horas * 60 * 60 * 1000 ) );
-      var expires = "; expires=" + date.toGMTString();
+     /*
+    var date = new Date();
+    date.setTime( date.getTime() + ((( horas * 60 ) + mi) * 60 * 1000 ) );
+    var expires = "; expires=" + date.toGMTString();
+    */
+    maxage = "; max-age=" + ((ho*60)+mi)*60;
     }
   else
-    var expires = "";
-  var fixedName = '<%= Request["formName"] %>';
-  document.cookie = name + "=" + value + expires + "; path=/";
+    maxage = "";
+  document.cookie = name + "=" + value + maxage + "; path=/";
   }
 function matarCookie( name )
   {
@@ -345,23 +444,27 @@ function getUser(  )
 
 function SelOptions( url )
   {
-    var resul = "";
-    $.ajax(
+  var resul = "";
+  var hea = {};
+  if( flbasic )
+    combina( hea, basicAuth );
+  $.ajax(
+    {
+    headers: hea,
+    type: 'GET',
+    async: false,
+    crossDomain: true,
+    url: url,
+    success: function( resp, textStatus, jqXHR )
       {
-      type: 'GET',
-      async: false,
-      crossDomain: true,
-      url: url,
-      success: function( resp, textStatus, jqXHR )
-        {
-        resul = resp;
-        },
-      error: function( responseData, textStatus, errorThrown )
-        {
-        alert( "Erro obtendo Options: " + textStatus );
-        }
-      } );
-    return resul;
+      resul = resp;
+      },
+    error: function( responseData, textStatus, errorThrown )
+      {
+      alert( "Erro obtendo Options: " + textStatus );
+      }
+    } );
+  return resul;
   }
 
 //	carrega os dados de uma Select2
@@ -374,12 +477,16 @@ function SelOptions( url )
 function SelInit( sel, url, id, text, func, minlen )
   {
   var min;
+  var hea = { };
   if( minlen == undefined || minlen == null )
     min = 0;
   else
     min = minlen;
+  if( flbasic )
+    combina( hea, basicAuth );
   $.ajax(
     {
+    headers: hea,
     type: 'GET',
     url: "partes/" + url,
     success: function( data )

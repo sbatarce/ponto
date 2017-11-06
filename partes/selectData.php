@@ -4,15 +4,19 @@
 //			parametros opcionais
 //				semzero		-	não gerar o { "id": "0", "text": "Escolha abaixo:" }
 //				maisum e numais - gerar { "id": "$numais", "text": "$maisum" }
-//				
-//	aparelhos - lista de aparelhos associados ao PONTO siin=100
-//	uor - lista de todas as UORS do sau
-//	funcfuni	-	todos os funcionários na funi
-//	funcsuor - funcionários na funi pertencentes a uma UOR
-//	funcfuor - funcionário pertencentes a uma FUOR
-//	funcapar - funcionários em um aparelho
-//	uorsaut - uors que um autorizador autoriza
-//	tiaus - tipos de ausencias autorizadas
+//
+//	candidauto	- candidatos a autorizador de uma fuor
+//	fuors				-	todas as UORS (fuors) de um autorizador ou todas UORS (fuors)
+//	funcsauto		-	funcionários de um autorizador
+//	funcsshd		-	todos os funcionários que tenham SSHD
+//	funcfuni		- todos os funcionários na funi
+//	regimes			-	regimes de trabalho
+//	aparelhos		- lista de todos os aparelhos associados ao PONTO siin=100 
+//	uor					- todas as UORS do sau
+//	funcfuor		- funcionários na funi pertencentes a uma FUOR
+//	funcsuor		- funcionários na funi pertencentes a uma UOR do SAU
+//	uorsaut			- uors que um autorizador autoriza
+//	tiaus				- tipos de ausencias autorizadas
 
 function toHex($string)
 	{
@@ -26,11 +30,12 @@ function toHex($string)
 
 header('Content-Type: text/html; charset=utf-8');
 
-if( !isset( $_GET["query"] ) && !isset( $_GET["debug"] ) )
+if( !isset( $_GET["query"] ) )
 	{
 	echo '[ {"id": "00", "text": "parametro query obrigatorio" } ]';
 	return;
 	}
+	
 if( isset( $_GET["semzero"] ) )
 	$sem0 = true;
 else
@@ -54,16 +59,14 @@ else
 
 //	prepara o select
 $sql	=	"";
-$debug = false;
 
-if( isset( $_GET["query"] )  )
-	$qry = $_GET["query"];
+if( isset( $_GET["dbg"] ) )
+	$dbg	=	true;
 else
-	{
-	$qry = $_GET["debug"];
-	$debug = true;
-	}
-	
+	$dbg = false;
+
+$qry = $_GET["query"];
+
 ////////////////////////////////////////////////////////////////////////////////
 //	
 if( $qry == "xpto" )
@@ -79,6 +82,115 @@ if( $qry == "xpto" )
 	}
 
 ////////////////////////////////////////////////////////////////////////////////
+//	candidauto	- candidatos a autorizador de uma fuor
+//	
+if( $qry == "candidauto" )
+	{
+	if( !isset( $_GET["fuorid"] ) )
+		{
+		echo '[ {"id": "00", "text": "parametro fuorid obrigatorio" } ]';
+		return;
+		}
+	$fuorid	=	$_GET["fuorid"];
+
+	$sql =	"SELECT	FUAT.FUNI_ID, 
+									FUAT.IUN || '-' || FUAT.NOME || ' - ' || FUAT.UOR_DLSIGLAUNIDADE ||
+									CASE 
+										WHEN FUAT.DSSIMBOLO IS NOT NULL THEN ' - ' || FUAT.DSSIMBOLO 
+										ELSE '' 
+										END AS DLNOMEFUNC
+						FROM  (SELECT DISTINCT FUNI.FUNI_ID, FUNI.PMS_IDPMSPESSOA, 
+													VFAT.NOME, VFAT.IUN, VUPU.UOR_DLSIGLAUNIDADE, VVNE.DSSIMBOLO,
+													CASE 
+														WHEN  FUOR.PMS_IDSAUUOR = $fuorid THEN '   ' || 
+																	VUPU.UOR_DLSIGLAUNIDADE 
+														ELSE VUPU.UOR_DLSIGLAUNIDADE 
+														END AS SGORDEM
+											FROM      BIOMETRIA.FUNI_FUNCIONARIO FUNI
+											LEFT JOIN BIOMETRIA.VWFUNCIONARIOATIVO VFAT ON
+																VFAT.IUN = FUNI.PMS_IDPMSPESSOA
+											LEFT JOIN BIOMETRIA.FUOR_FUNCUNIDADEORGANIZACIONAL FUOR ON
+																SYSDATE BETWEEN 
+																	FUOR.FUOR_DTINICIO AND 
+																	NVL(FUOR.FUOR_DTFIM, TO_DATE('31/12/3000', 'DD/MM/YYYY')) AND
+																FUOR.FUNI_ID = FUNI.FUNI_ID
+											LEFT JOIN SAU.VWUORPUBLICA VUPU ON
+																VUPU.UOR_IDUNIDADEORGANIZACIONAL = FUOR.PMS_IDSAUUOR
+											LEFT JOIN SIGEP.VWVAGASNIVELESPECIAL VVNE ON
+																VUPU.UOR_IDUNIDADEORGANIZACIONAL = $fuorid AND
+																( VVNE.CDCENTROCUSTO = 
+																	REPLACE(REPLACE(VUPU.UOR_CDCENTROCUSTO, '.', ''), ',', '') OR
+																VVNE.SGUNIDADEORGANIZACIONAL = VUPU.UOR_DLSIGLAUNIDADE) AND
+																VFAT.REGISTRO_FUNCIONAL = VVNE.NRREGISTROFUNCIONAL) FUAT
+						ORDER BY FUAT.DSSIMBOLO, FUAT.SGORDEM, FUAT.NOME";
+	}
+
+////////////////////////////////////////////////////////////////////////////////
+//	fuors			-	todas as UORS (fuors) de um autorizador ou todas UORS (fuors)
+//							data fim do autorizador deve ser nula ou não mostra nada
+//			sshd dado:
+//				obtem todas a UORS que o autorizador autoriza
+//			sshd omitido:
+//				obtem todas as UORS contantes da FUOR
+if( $qry == "fuors" )
+	{
+	if( isset( $_GET["sshd"] ) )
+		{
+		$sshd	=	$_GET["sshd"];
+		$sql	=	"SELECT  PUOR.UOR_IDUNIDADEORGANIZACIONAL, PUOR.UOR_DLSIGLAUNIDADE
+							FROM        BIOMETRIA.FUNI_FUNCIONARIO FUNIA
+							INNER JOIN  BIOMETRIA.FUAU_FUNCIONARIOAUTORIZADOR FUAU ON 
+													SYSDATE BETWEEN 
+														FUAU.FUAU_DTINICIO AND 
+														NVL(FUAU.FUAU_DTFIM, TO_DATE('31/12/3000', 'DD/MM/YYYY')) AND 
+													FUAU.FUNI_ID = FUNIA.FUNI_ID 
+							INNER JOIN  SAU.VWUORPUBLICA PUOR ON 
+													PUOR.UOR_IDUNIDADEORGANIZACIONAL=FUAU.PMS_IDSAUUOR
+							WHERE FUNIA.PMS_IDPMSPESSOA='$sshd'";
+		}
+	else
+		{
+		$sql = "SELECT DISTINCT PUOR.UOR_IDUNIDADEORGANIZACIONAL, PUOR.UOR_DLSIGLAUNIDADE
+							FROM        BIOMETRIA.FUAU_FUNCIONARIOAUTORIZADOR FUAU
+							INNER JOIN  SAU.VWUORPUBLICA PUOR ON 
+													PUOR.UOR_IDUNIDADEORGANIZACIONAL=FUAU.PMS_IDSAUUOR
+							ORDER BY    PUOR.UOR_DLSIGLAUNIDADE";
+		}
+	}
+
+////////////////////////////////////////////////////////////////////////////////
+//	funcsauto( sshd do atutorizador )
+if( $qry == "funcsauto" )
+	{
+	if( !isset( $_GET["sshd"] ) )
+		{
+		echo '[ {"id": "00", "text": "parametro sshd obrigatorio" } ]';
+		return;
+		}
+	$sshd	=	$_GET["sshd"];
+
+	$sql	=	"SELECT	FUNI.FUNI_ID AS IDFUNC, 
+									(SELECT IUN || '-' || NOME FROM SAU.VWPESSOA_SSHD
+										WHERE	REGISTRO_FUNCIONAL_ATIVO = 1 AND 
+													IUN = FUNI.PMS_IDPMSPESSOA AND 
+													ROWNUM = 1) AS NOFUNC
+						FROM        BIOMETRIA.FUNI_FUNCIONARIO FUNIA
+						INNER JOIN  BIOMETRIA.FUAU_FUNCIONARIOAUTORIZADOR FUAU ON 
+												SYSDATE BETWEEN  FUAU.FUAU_DTINICIO AND 
+												NVL(FUAU.FUAU_DTFIM, TO_DATE('31/12/3000', 'DD/MM/YYYY')) AND 
+												FUAU.FUNI_ID = FUNIA.FUNI_ID 
+						INNER JOIN  BIOMETRIA.FUOR_FUNCUNIDADEORGANIZACIONAL FUOR ON 
+												SYSDATE BETWEEN FUOR.FUOR_DTINICIO AND 
+												NVL(FUOR.FUOR_DTFIM, TO_DATE('31/12/3000', 'DD/MM/YYYY')) AND 
+												FUOR.PMS_IDSAUUOR = FUAU.PMS_IDSAUUOR AND 
+												FUOR.FUNI_ID <> FUNIA.FUNI_ID    
+						INNER JOIN BIOMETRIA.FUNI_FUNCIONARIO FUNI ON
+											 FUNI.FUNI_ID = FUOR.FUNI_ID 
+						WHERE	FUNIA.PMS_IDPMSPESSOA = '$sshd' 
+						ORDER BY NOFUNC";
+	}
+
+////////////////////////////////////////////////////////////////////////////////
 //	funcfuni - todos os funcionários na funi
 if( $qry == "funcfuni" )
 	{
@@ -91,7 +203,6 @@ if( $qry == "funcfuni" )
 	}
 
 ////////////////////////////////////////////////////////////////////////////////
-//	
 if( $qry == "regimes" )
 	{
 	$sql	=	"SELECT RETR_ID, RETR_DLNOME FROM  BIOMETRIA.RETR_REGIMETRABALHO";
@@ -194,6 +305,15 @@ if( $qry == "tiaus" )
 	
 //
 include 'ambiente.php';
+if( isset( $_SERVER['PHP_AUTH_USER'] ) )
+	{
+	$userb = $_SERVER['PHP_AUTH_USER'];
+	$passb = $_SERVER['PHP_AUTH_PW'];
+	}
+	
+if( $dbg )
+	echo "user=$userb<br>";
+
 include 'ORAConn.php';
 //	obre o oracle
 $ora = new ORAConn();
@@ -204,10 +324,10 @@ if( $res != "OK" )
 	return;
 	}
 //	executa o query
-if( $debug )
+if( $dbg )
 	echo "SQL=$sql<br>\r\n";
 $res = $ora->execSelect($sql);
-if( $debug )
+if( $dbg )
 	{
 	$alf = trim( preg_replace("/([\\x00-\\x1f])/e", "", $res) );
 	echo "alfa: $alf<br>";
@@ -216,14 +336,14 @@ if( $debug )
 	}
 //	monta a resposta { "data": ["cmp": "val"
 $jsres	= json_decode(preg_replace("/([\\x00-\\x1f])/e", "", $res));
-if( $debug )
+if( $dbg )
 	{
 	echo "=================json convertido======================<br>\r\n";
 	var_dump( $jsres );
 	echo "<br>\r\n";
 	}
 $qtcmp	=	$jsres->linhas;
-if( $debug )
+if( $dbg )
 	echo "linhas=$qtcmp<br>\r\n";
 
 $data = '[ ';

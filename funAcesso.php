@@ -22,7 +22,9 @@ include 'partes/pagebody.php';
 			a <input type="text" size="10" id="dtfim" 
 							 style="margin-left: 20px; margin-right: 20px; "/>
 			Saldo <input type="text" size="10" id="sldant" 
-							 style="margin-left: 20px; "/>
+							 style="margin-left: 20px; margin-right: 20px; "/>
+			Registros do dia<input type="text" size="25" id="reghoje" 
+														 style="margin-left: 20px; margin-right: 20px; "/>
 		</div>
 										<table class="table table-striped table-hover table-bordered" id="eddt">
 											<thead><tr role="row"></tr></thead>
@@ -112,47 +114,47 @@ include 'partes/pagebody.php';
 		</div>
 	</div>
 			
-		<!-- modal de entrada de diálogo: adiciona uma ou mais mensagens de diálogo -->
-		<div id="moddialogo" class="modal fade bs-modal-sm" role="dialog"
-				aria-labelledby="mySmallModalLabel" aria-hidden="true"
-				style="width: 500px; max-width: 500px;" >
-			<div class="modal-dialog modal-sm" style="width: 500px; max-width: 500px;">
-				<div class="modal-content">
-					<div class="modal-header">
-						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-										&times;
-						</button>
-						<h4 class="modal-title">Diálogo de justificativa</h4>
+	<!-- modal de entrada de diálogo: adiciona uma ou mais mensagens de diálogo -->
+	<div id="moddialogo" class="modal fade bs-modal-sm" role="dialog"
+			aria-labelledby="mySmallModalLabel" aria-hidden="true"
+			style="width: 500px; max-width: 500px;" >
+		<div class="modal-dialog modal-sm" style="width: 500px; max-width: 500px;">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+									&times;
+					</button>
+					<h4 class="modal-title">Diálogo de justificativa</h4>
+				</div>
+				<div class="modal-body" id="bdymodal">
+					<div class='row linha' style='margin-top: 10px; margin-left:30px;'>
+						<table id="tbmensg" cellspacing="50" border="2">
+						</table>
 					</div>
-					<div class="modal-body" id="bdymodal">
-						<div class='row linha' style='margin-top: 10px; margin-left:30px;'>
-							<table id="tbmensg" cellspacing="50" border="2">
-							</table>
-						</div>
-						<div class='row linha' style='margin-top: 10px; margin-left:30px;'>
-							<h5>Nova mensagem</h5>
-							<input	style='width:90%;' class='input-small syss' 
-											id="novamens" title="mensagem a adicionar ao diálogo"/>
-							<a href='javascript:inclMensg();' class='btn btn-circle btn-primary btn-xs'>
-								<i class='typcn typcn-plus-outline'></i></a>
-							
-						</div>
-					</div>
-					<div class="modal-footer">
-					<center>
-						<button type="button" class="btn btn-primary"
-										onclick="javascript:dialogoOK()"
-										title="Persiste as eventuais modificações">
-										OK
-						</button>
-						<button type="button" class="btn btn-default"
-										onclick="javascript:dlgSairOK()"
-										title="Encerra alterações sem salvar eventuais alterações">
-										Cancelar
-						</button>
-					</center>
+					<div class='row linha' style='margin-top: 10px; margin-left:30px;'>
+						<h5>Nova mensagem</h5>
+						<input	style='width:90%;' class='input-small syss' 
+										id="novamens" title="mensagem a adicionar ao diálogo"/>
+						<a href='javascript:inclMensg();' class='btn btn-circle btn-primary btn-xs'>
+							<i class='typcn typcn-plus-outline'></i></a>
+
 					</div>
 				</div>
+				<div class="modal-footer">
+				<center>
+					<button type="button" class="btn btn-primary"
+									onclick="javascript:dialogoOK()"
+									title="Persiste as eventuais modificações">
+									OK
+					</button>
+					<button type="button" class="btn btn-default"
+									onclick="javascript:dlgSairOK()"
+									title="Encerra alterações sem salvar eventuais alterações">
+									Cancelar
+					</button>
+				</center>
+				</div>
+			</div>
 		</div>
 	</div>
 		
@@ -491,8 +493,31 @@ include 'partes/Scripts.php';
 			$("#moddialogo").modal("hide");
 			}
 
+		//	adiciona uma mensagem ao grid de diálogo
+		function inclMensg()
+			{
+			var mens = $("#novamens").val();
+			if( mens.length < 1 )
+				{
+				dialogoOK();
+				return;
+				}
+			flmod = 1;
+			var agora = new Date();
+			var msg = "F " + $.datepicker.formatDate("dd/mm ", agora ) +
+								toHora(agora) + " - " + mens;
+			var html =	"<tr><th> " + msg +
+							"</th></tr>";
+			$("#tbmensg tr:last").after(html);
+			mensgs.push( msg );
+			$("#novamens").val("");
+			}
+		//	salva as eventuais mensagens e fecha o diálogo
 		function dialogoOK()
 			{
+			var mens = $("#novamens").val();
+			if( mens.length > 0 )
+				inclMensg();
 			if( flmod )
 				{
 				var aux = "";
@@ -540,7 +565,6 @@ include 'partes/Scripts.php';
 			if( hh < 10 )
 				hh = "0" + hh;
 			var mm = data.getMinutes();
-			var mm = data.getHours();
 			if( mm < 10 )
 				mm = "0" + mm;
 			return hh + ":" + mm;
@@ -558,25 +582,6 @@ include 'partes/Scripts.php';
 				return "-"+hh+":"+mm;
 			else
 				return hh+":"+mm;
-			}
-
-		function inclMensg()
-			{
-			var mens = $("#novamens").val();
-			if( mens.length < 1 )
-				{
-				dialogoOK();
-				return;
-				}
-			flmod = 1;
-			var agora = new Date();
-			var msg = "F " + $.datepicker.formatDate("dd/mm ", agora ) +
-								toHora(agora) + " - " + mens;
-			var html =	"<tr><th> " + msg +
-							"</th></tr>";
-			$("#tbmensg tr:last").after(html);
-			mensgs.push( msg );
-			$("#novamens").val("");
 			}
 
 		//	mostra os horários para alteração
@@ -635,8 +640,29 @@ include 'partes/Scripts.php';
 			dtini = $.datepicker.formatDate("yymmdd", dt );
 			dt = $("#dtfim").datepicker("getDate");
 			dtfim = $.datepicker.formatDate("yymmdd", dt );
-			if( del != 0 )
-				tableDestroy();
+			
+			var pessoa = sshd.substr( 1 );
+			parms = "&pessoa="+pessoa+"&dtinic="+dtfim+"&dtterm="+dtfim;
+			var resu = Select( "reprpmspessoa", parms );
+			if( resu == null )
+				throw new Error("Problemas de acesso ao banco de dados. Por favor, tente mais tarde.");
+			if( resu.linhas > 0 )
+				{
+				var regs = "";
+				for( var i=0; i<resu.linhas; i++ )
+					{
+					if( regs.length != 0 )
+						regs += " ";
+					var reg = resu.dados[i].PONTO;
+					regs += reg.substr( 11 );
+					}
+				$("#reghoje").val( regs )
+				}
+			else
+				$("#reghoje").val( "sem registros" )
+			
+
+			tableDestroy();
 			AjaxSource	=	"partes/tableData.php?query=funaces&sshd=" + sshd.toUpperCase() + 
 												"&dtini="+dtini+"&dtfim="+dtfim;
 			inicializa.init();
