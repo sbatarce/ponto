@@ -31,7 +31,7 @@ include 'partes/pagebody.php';
 			<input type="text" id="dtuprc" class="dtuprc"
 					 style="margin-left: 10px; width: 15%;  float: right;
 					 font-size: 20px; font-weight: bold; " readonly/>
-			<label style="float: right; font-weight: bold; ">último processamento</label>
+			<label style="float: right; font-weight: bold; ">última coleta completada em</label>
 			</div>
 		</div>
 										<table class="table table-striped table-hover table-bordered" id="eddt">
@@ -486,7 +486,7 @@ include 'partes/Scripts.php';
 			throw new Error("Problemas de acesso ao banco de dados. Por favor, tente mais tarde.");
 		var autorid = resu.dados[0].FUNI_ID;
 
-		$("#titwidget").html( "Autorizações de " + sshd );
+		$("#titwidget").html( "" );
 
 		//	tratamento das datas 	
 		//	combo de UORS
