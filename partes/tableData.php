@@ -1,5 +1,6 @@
 <?php
 //	seleção de dados com retorno para o DataTables
+//	funcfuor		-	funcionários em uma UOR do ponto
 //	funuorbio		-	tabela de pessoas em uma UOR do SAU com contagem de BIOMETRIA
 //	autfuuor		-	tabela de funcionários de uma UOR para inclusão
 //	ausaut			-	tabela de ausências autorizadas de um funcionário
@@ -34,6 +35,35 @@ if( $qry == "xpto" )
 	$xpto = $_GET["xpto"];
 	
 	$sql	=	"";
+	}
+	
+////////////////////////////////////////////////////////////////////////////////
+//	funcfuor		-	funcionários em uma UOR do ponto
+//	
+if( $qry == "funcfuor" )
+	{
+	if( !isset( $_GET["uor"] ) )
+		{
+		echo	'{ "data": [{"erro": "parametro uor obrigatorio"}] }';
+		return;
+		}
+	$uor = $_GET["uor"];
+	
+	$sql	=	"SELECT	FUNI.PMS_IDPMSPESSOA AS SSHD,
+									(SELECT PESS.NOME FROM SAU.VWPESSOA_SSHD PESS 
+										WHERE PESS.REGISTRO_FUNCIONAL_ATIVO = 1 AND
+													PESS.IUN = FUNI.PMS_IDPMSPESSOA AND
+													ROWNUM = 1) AS NOME,
+									FSHM.DTFECH AS FECHAMENTO, 0 AS FECHAR
+						FROM        BIOMETRIA.FUOR_FUNCUNIDADEORGANIZACIONAL FUOR
+						INNER JOIN  BIOMETRIA.FUNI_FUNCIONARIO FUNI ON
+												FUNI.FUNI_ID=FUOR.FUNI_ID AND
+												FUNI.FUNI_STATIVO=1
+						INNER JOIN  ( SELECT FUNI_ID AS ID, MAX( FSHM_DTREFERENCIA ) AS DTFECH
+														FROM BIOMETRIA.FSHM_FUNCSALDOHORAMENSAL 
+														GROUP BY FUNI_ID) FSHM ON
+												FSHM.ID=FUNI.FUNI_ID
+						WHERE FUOR.PMS_IDSAUUOR=$uor";
 	}
 	
 ////////////////////////////////////////////////////////////////////////////////
@@ -237,6 +267,7 @@ if( $qry == "funuorbio" )
 	
 ////////////////////////////////////////////////////////////////////////////////
 //	autfuuor	tabela de funcionários de uma UOR para inclusão
+//						excluidos os funcionários já presentes na FUNI
 //	Parametros 
 //			iduor		-	id da UOR do SAU a selecionar pessoas
 if( $qry == "autfuuor" )
@@ -248,17 +279,18 @@ if( $qry == "autfuuor" )
 		}
 	$iduor = $_GET["iduor"];
 	
-	$sql = "SELECT	FUNI.FUNI_ID, VFAT.IUN, VFAT.NOME, VFAT.IDUOR AS IDUORSAU, VFAT.DCSIGLAUOR AS SIGLAUORSAU,
+	$sql = "SELECT	FUNI.FUNI_ID, VFAT.IUN, VFAT.NOME, VFAT.IDUOR AS IDUORSAU, 
+									VFAT.DCSIGLAUOR AS SIGLAUORSAU,
 									NULL AS IDRETR, NULL AS REGIME,
 									NULL AS IDUORPONTO, NULL AS SIGALUORPONTO,
 									(SELECT COUNT(1) 
 										 FROM BIOMETRIA.PEBI_PESSOABIOMETRIA PEBI
 										WHERE PEBI.SIIN_ID = 100 AND 
 													PEBI.PMS_IDPMSPESSOA = TO_NUMBER(SUBSTR(VFAT.IUN, 2, 8))) AS QTBIO
-						FROM	BIOMETRIA.VWFUNCIONARIOATIVO VFAT
-									LEFT JOIN BIOMETRIA.FUNI_FUNCIONARIO FUNI ON
-														FUNI.FUNI_STATIVO = 1 AND
-														FUNI.PMS_IDPMSPESSOA = VFAT.IUN
+						FROM			BIOMETRIA.VWFUNCIONARIOATIVO VFAT
+						LEFT JOIN BIOMETRIA.FUNI_FUNCIONARIO FUNI ON
+											FUNI.FUNI_STATIVO = 1 AND
+											FUNI.PMS_IDPMSPESSOA = VFAT.IUN
 						WHERE VFAT.IDUOR = $iduor AND
 									FUNI.FUNI_ID IS NULL
 						ORDER BY NOME";

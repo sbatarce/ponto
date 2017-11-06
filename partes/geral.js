@@ -303,6 +303,8 @@ function Deslogar()
 
 function remoto( url, us, ps )
   {
+  if( $('#modwait').length ) 
+    $('#modwait').show();
   var hea = { };
   if( us != undefined && ps != undefined )
     {
@@ -332,6 +334,8 @@ function remoto( url, us, ps )
       resul.erro = errorThrown;
       }
     });
+  if( $('#modwait').length ) 
+    $('#modwait').hide();
   return resul;
   }
 

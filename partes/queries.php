@@ -1,4 +1,5 @@
 <?php
+//	qtpenden( funiid, dtfecha )
 //	parametos()	-	retorna todos os parametros da PAGL
 //	horasdia( sshd, data) - obtem a quantidade de hora do dia de um funcionário
 //	ausaut( sshd, data ) -	obtem ids de todos as ausencias autorizadas com data 
@@ -42,6 +43,38 @@ if( $qry == "" )
 		}
 	$xpto	=	$_GET["xpto"];
 	$sql = "select * FROM XPTO WHERE XPTO=$xpto";
+	}
+	
+////////////////////////////////////////////////////////////////////////////////
+//	qtpenden	-	contagem das pendencia do último fechamento até a data
+//	( funiid, data ) data a fechar o funcionário => YYYYMMDD
+if( $qry == "qtpenden" )
+	{
+	if( !isset( $_GET["funiid"] ) )
+		{
+		echo	'{ "status": "erro", "erro": "parametro funiid obrigatorio" }';
+		return;
+		}
+	if( !isset( $_GET["data"] ) )
+		{
+		echo	'{ "status": "erro", "erro": "parametro data obrigatorio" }';
+		return;
+		}
+	$funiid	=	$_GET["funiid"];
+	$data	=	$_GET["data"];
+	$sql = "SELECT COUNT(1) AS QTD
+						FROM BIOMETRIA.FDTR_FUNCIONARIODIATRABALHO FDTR
+						INNER JOIN  BIOMETRIA.FRTR_FUNCIONARIOREGIMETRABALHO FRTR ON
+												FRTR.FRTR_ID=FDTR.FRTR_ID AND
+												FRTR.FRTR_DTFIM IS NULL
+						INNER JOIN  ( SELECT FUNI_ID AS ID, MAX( FSHM_DTREFERENCIA ) AS DTFECH
+														FROM BIOMETRIA.FSHM_FUNCSALDOHORAMENSAL 
+														GROUP BY FUNI_ID) FSHM ON
+												FSHM.ID=FRTR.FUNI_ID
+						WHERE (FDTR.TSDT_ID=1 OR FDTR.TSDT_ID=4) AND
+									FDTR.FDTR_DTREFERENCIA BETWEEN 
+									FSHM.DTFECH AND TO_DATE( '$data', 'YYYYMMDD' ) AND
+									FRTR.FUNI_ID=$funiid";
 	}
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -221,7 +254,7 @@ if( $qry == "dtfecha" )
 		return;
 		}
 	$sshd	=	$_GET["sshd"];
-	$sql = "select TO_CHAR( FSHM.FSHM_DTREFERENCIA, 'YYYY-MM-DD' ) AS DTFECHA
+	$sql = "select TO_CHAR( MAX(FSHM.FSHM_DTREFERENCIA), 'YYYY-MM-DD' ) AS DTFECHA
     FROM BIOMETRIA.FSHM_FUNCSALDOHORAMENSAL FSHM
     INNER JOIN BIOMETRIA.FUNI_FUNCIONARIO FUNI ON
                 FUNI.FUNI_ID=FSHM.FUNI_ID
@@ -377,9 +410,9 @@ if( $qry == "medioperio" )
 									NIQUANTIDADEHORARIO2 AS QTDINTER, NISOMAHORARIO2 AS MEDINTER, 
 									NIQUANTIDADEHORARIO3 AS QTDVOLTA, NISOMAHORARIO3 AS MEDVOLTA, 
 									NIQUANTIDADEHORARIO4 AS QTDSAIDA, NISOMAHORARIO4 AS MEDSAIDA
-							FROM TABLE(BIOMETRIA.SF_CALCULAMEDIAHORARIOBATIDAS
-												($funiid,TO_DATE( '$dtini', 'YYYYMMDD' ), 
-														TO_DATE( '$dtfim', 'YYYYMMDD' )))";
+						FROM	TABLE(BIOMETRIA.SF_CALCULAMEDIAHORARIOBATIDAS
+											($funiid,TO_DATE( '$dtini', 'YYYYMMDD' ), 
+													TO_DATE( '$dtfim', 'YYYYMMDD' )))";
 	}
 	
 ////////////////////////////////////////////////////////////////////////////////
