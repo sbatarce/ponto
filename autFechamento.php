@@ -392,6 +392,7 @@ include 'partes/Scripts.php';
 				{ 
 				var dt = $("#dtfecha").datepicker("getDate");
 				dtfecha = $.datepicker.formatDate("yymmdd", dt );
+				dtudir = $.datepicker.formatDate("dd/mm/yy", dt );
 				});
 
 		//	obtem FUNI_ID do autorizador
