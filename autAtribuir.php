@@ -247,10 +247,11 @@ include 'partes/Scripts.php';
 			atuatab();
 			}
 
-	function encerra( id )
+	function encerra( id, ini, fim )
 		{
 		dtfim = $.datepicker.formatDate("yymmdd", dtuprc )
 		var url = "partes/alteraFUAU.php?fuauid="+ id;
+		url += "&dtini=" + ini;
 		url += "&dtfim=" + dtfim;
 		var resul = remoto( url );
 		if( resul.status != "OK" )
@@ -272,8 +273,8 @@ include 'partes/Scripts.php';
 		var url = "partes/alteraFUAU.php?fuauid="+ fuauid;
 		if( dtini != null )
 			url += "&dtini=" + dtini;
-		if( dtfim != null )
-			url += "&dtfim=" + dtfim;
+		//if( dtfim != null )
+		url += "&dtfim=" + dtfim;
 		var resul = remoto( url );
 		if( resul.status == "OK" )
 			$("#modaltautor").modal('hide');
@@ -296,7 +297,7 @@ include 'partes/Scripts.php';
 		inidir = toDateDir(""+iniinv);
 		dtini	=	toDate(""+inidir);
 		
-		if( fiminv != "" )
+		if( typeof fiminv != 'undefined' && fiminv != "" )
 			{
 			fimdir = toDateDir(""+fiminv);
 			dtfim = toDate(""+fimdir);
@@ -594,7 +595,8 @@ include 'partes/Scripts.php';
 										"class='btn btn-circle btn-info btn-xs' " +
 										"title=\"Remove este período de autorização\" >" +
 										"<i class='glyphicon glyphicon-remove'></i></a>";
-				var acenc = "<a href='#' onClick='javascript:encerra(" + row.FUAUID + ");' " +
+				var acenc = "<a href='#' onClick='javascript:encerra(" + row.FUAUID + 
+										"," + stini + "," + stter + ");' " +
 										"class='btn btn-circle btn-info btn-xs' " +
 										"title=\"Encerra o período de autorização\" >" +
 										"<i class='glyphicon glyphicon-log-in'></i></a>";

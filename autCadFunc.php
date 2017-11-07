@@ -44,10 +44,15 @@ include 'partes/pagebody.php';
 						<h4 class="modal-title">Alteração de UOR</h4>
 					</div>
 					<div class="modal-body" id="bdymodal" ng>
+						<h5 id="xuornome"></h5>
+						<h5 id="xuorfech"></h5>
+						<h5 id="xuoratua"></h5>
+						<h5 id="xuornova"></h5>
 						<div class='row linha' style='margin-top: 10px; margin-left:30px;'>
-							<h5>Escolha a nova UOR </h5>
-							<input style='width:90%;' class='input-small uors' 
-										 id="seluor" title="Escolha a UOR da nova alocação do funcionário"/>
+							<h5>Data em que será efetivada a alocação.</h5>
+							<h5>A alocação anterior (se houver) se encerrará.</h5>
+							<input id="xuordata" class='input-small inp' style='width: 40%; ' 
+										 title="data da transferencia de UOR" readonly />
 						</div>
 					</div>
 					<div class="modal-footer">
@@ -345,11 +350,9 @@ include 'partes/pagebody.php';
 				idapal	=	id;
 			}
 
-		function setAjax( del )
+		function setAjax()
 			{
-			//
-			if( del != 0 )
-				tableDestroy();
+			tableDestroy();
 			AjaxSource	=	"partes/tableData.php?query=autcadas&sshd=" + sshd;
 			inicializa.init();
 			}
@@ -360,9 +363,33 @@ include 'partes/pagebody.php';
 		var uoralo = null;
 		var uorant = null;
 		
+		//	variáveis e rotinas de atualização
+		var ixedt = -1;			//	row sendo editada
+		var iduor = -1;			//	última uor escolhida
+		var idreg = -1;			//	último regime escolhido
+		var dtxuor = "";		//	data do fechamento escolhida
+		
+		
 		var sshd, nofunc, idapal;
 		var idfltr, idapalant;
 		
+		$( "#xuordata" ).datepicker(
+			{
+			dateFormat: "dd/mm/yy",
+			altFormat: "yymmdd",
+			startView: 2,
+			todayBtn: true,
+			daysOfWeekHighlighted: "0,6",
+			autoclose: true,
+			todayHighlight: true			
+			})
+			.on('change.dp', function(e)
+				{ 
+				var dt = $("#dtcor").datepicker("getDate");
+				dtxuor = $.datepicker.formatDate("yymmdd", dt );
+				$("#dtcor").datetimepicker('hide');
+				});
+
 		var url = "selectData.php?query=uor";
 		SelInit( ".uors", url, 0, "Escolha abaixo", escouor, 2 );
 
@@ -421,7 +448,7 @@ include 'partes/pagebody.php';
 			"aTargets": [ ++col ],
 			"mData": "SSHD",
 			"sTitle":"SSHD",
-			"width": "10%",
+			"width": "15%",
 			"defaultContent": " "
 			};
 		colDefs.push( aux );
@@ -434,7 +461,20 @@ include 'partes/pagebody.php';
 			"aTargets": [ ++col ],
 			"mData": "NOFUNC",
 			"sTitle":"Servidor/Funcionário",
-			"width": "20%",
+			"width": "25%",
+			"defaultContent": " "
+			};
+		colDefs.push( aux );
+
+		aux	=
+			{
+			"tipo": "t",
+			"editavel": false,
+			"vanovo": "",
+			"aTargets": [ ++col ],
+			"mData": "DTFECHA",
+			"sTitle":"Fechamento",
+			"width": "10%",
 			"defaultContent": " "
 			};
 		colDefs.push( aux );
@@ -450,7 +490,7 @@ include 'partes/pagebody.php';
 			"selID": "IDLOTADO",
 			"classe": "cbuors",
 			"selVal": "UNIDADE",
-			"selminlen": 1,
+			"selminlen": 0,
 			"selURL": "selectData.php?query=uor",
 			"funcEscolha": escUor,
 			"width": "15%",
@@ -487,32 +527,10 @@ include 'partes/pagebody.php';
 			"aTargets": [ ++col ],
 			"orderable":false,
 			"mData":null,
-			"width": "5%",
+			"width": "10%",
 			"defaultContent": acsoalt
 			};
 		colDefs.push( aux );
-		
-		/*
-		aux	=	
-			{
-			"tipo": null,
-			"editavel": false,
-			"vanovo": "",
-			"bSortable": false,
-			"searchable": false,
-			"aTargets": [ ++col ],
-			"orderable":false,
-			"mData":null,
-			"width": "10%",
-			"defaultContent": acremove
-			};
-		colDefs.push( aux );
-		*/
-	 
-		//	variáveis e rotinas de atualização
-		var ixedt = -1;			//	row sendo editada
-		var iduor = -1;			//	última uor escolhida
-		var idreg = -1;
 		
 		function escRegi( tipo, id )
 			{
@@ -520,10 +538,23 @@ include 'partes/pagebody.php';
 				idreg	=	id;
 			}
 
-		function escUor( tipo, id )
+		function escUor( tipo, id, text )
 			{
 			if( id >= 0 )
+				{
 				iduor	=	id;
+				let aData = Table.fnGetData(ixedt);
+				let aux = `Funcionário: ${aData.NOFUNC}`;
+				$('#xuornome').html(aux)
+				aux = `Data Fechamento: ${aData.DTFECHA}`;
+				$('#xuorfech').html(aux)
+				aux = `Uor Atual: ${aData.UNIDADE}`;
+				$('#xuoratua').html(aux)
+				aux = `Nova Uor: ${text}`;
+				$('#xuornova').html(aux)
+				$('#xuordata').val( aData.DTFECHA );
+				$("#uormodal").modal('show');
+				}
 			}
 
 		function deleteRow( oTable, nRow )
@@ -538,6 +569,7 @@ include 'partes/pagebody.php';
 			{
 			ixedt = nRow;
 			iduor = -1;
+			idreg = -1;
 			editRowG( oTable, nRow );
 			}
 		function saveRow( oTable, nRow )
@@ -688,7 +720,7 @@ include 'partes/pagebody.php';
 		///////////////////////////////////////////////////////////////////////
 
 		$("#eddt_new").hide();
-		setAjax( 0 );
+		setAjax();
 		/*
 		var handler = function() 
 			{

@@ -240,7 +240,7 @@ function toDate( data )
     mes = data.substr( 5, 2 );
     dia = data.substr( 8, 2 );
     }
-  if( data.indexOf( "-" ) < 0 && data.indexOf( "-" ) < 0 )
+  if( data.indexOf( "-" ) < 0 && data.indexOf( "/" ) < 0 )
     {
     ano = data.substr( 0, 4 );
     mes = data.substr( 4, 2 );
