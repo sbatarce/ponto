@@ -212,6 +212,38 @@ function com2Digs(number)
   {
   return( number < 10 ? '0' : '' ) + number;
   }
+  
+ // de Date => DD/MM/YYYY ou YYYYMMDD
+ //     tipo 1 ou 2
+ function toStDate( data, tipo )
+  {
+  let ano = data.getFullYear();
+  let mes = data.getMonth()+1;
+  let dia = data.getDate();
+  let sdia, smes, sano;
+  if( dia < 10 )
+    sdia = "0" + dia;
+  else
+    sdia = "" + dia;
+  
+  if( mes < 10 )
+    smes = "0" + mes;
+  else
+    smes = "" + mes;
+  sano = "" + ano;
+  switch( tipo )
+    {
+    case 1:
+      return `${sdia}/${smes}/${sano}`;
+      break;
+    case 2:
+      return `${sano}${smes}${sdia}`;
+      break;
+    default:
+      return `${sano}-${smes}-${sdia}`;
+      break;
+    }
+  }
 
 //  de DD/MM/YYYY => YYYYMMDD
  function toDateInv( data )
@@ -246,7 +278,6 @@ function toDate( data )
     mes = data.substr( 4, 2 );
     dia = data.substr( 6, 2 );
     }
-     
   return new Date( ano, mes-1, dia );
   }
   

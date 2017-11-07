@@ -269,10 +269,11 @@ include 'partes/Scripts.php';
 			$('#modaltautor').modal('hide');
 			return;
 			}
+		if( dtini == null )
+			dtini = $(".dtinialt").datepicker("getDate");
 		//
 		var url = "partes/alteraFUAU.php?fuauid="+ fuauid;
-		if( dtini != null )
-			url += "&dtini=" + dtini;
+		url += "&dtini=" + toStDate( dtini, 2 );
 		//if( dtfim != null )
 		url += "&dtfim=" + dtfim;
 		var resul = remoto( url );
@@ -459,7 +460,7 @@ include 'partes/Scripts.php';
 			todayHighlight: true			
 			}).on('change.dp', function(e)
 				{ 
-				var dt = $(".dtinialt").datepicker("getDate");
+				let dt = $(".dtinialt").datepicker("getDate");
 				dtini = $.datepicker.formatDate("yymmdd", dt );
 				$(".dtfimalt").val( "" );
 				});
