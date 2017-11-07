@@ -317,7 +317,7 @@ function Deslogar()
  function Voltar()
   {
   window.history.back();
-  window.location = "index.php";
+  //window.location = "index.php";
   }
 
 function remoto( url, us, ps )

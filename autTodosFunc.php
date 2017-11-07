@@ -97,26 +97,29 @@ include 'partes/Scripts.php';
 			}
 			
 		//	chama a página de pendências do funcionário
-		function pendencias( sshd )
+		function pendencias( sshd, id, nome, iduorfunc )
 			{
 			criarCookie( "sshdfunc", sshd );
+			criarCookie( "idfunc", id );
+			criarCookie( "nofunc", nome );
+			criarCookie( "iduorfunc", iduorfunc );
 			window.location = "autPenden.php";
 			}
 			
 		function ausencias( sshd, id, nome, iduorfunc )
 			{
+			criarCookie( "sshdfunc", sshd );
 			criarCookie( "idfunc", id );
 			criarCookie( "nofunc", nome );
-			criarCookie( "sshdfunc", sshd );
 			criarCookie( "iduorfunc", iduorfunc );
 			window.location = "autAusencias.php";
 			}
 			
 		function correcoes( sshd, id, nome, iduorfunc )
 			{
+			criarCookie( "sshdfunc", sshd );
 			criarCookie( "idfunc", id );
 			criarCookie( "nofunc", nome );
-			criarCookie( "sshdfunc", sshd );
 			criarCookie( "iduorfunc", iduorfunc );
 			window.location = "autCorrecao.php";
 			}
@@ -124,9 +127,9 @@ include 'partes/Scripts.php';
 		//	chama o detalhe de um funcionário escolhido
 		function detfunc( id, nome, sshd )
 			{
+			criarCookie( "sshdfunc", sshd );
 			criarCookie( "idfunc", id );
 			criarCookie( "nofunc", nome );
-			criarCookie( "sshdfunc", sshd );
 			window.location = "autFuncio.php";
 			}
 
@@ -232,7 +235,9 @@ include 'partes/Scripts.php';
 			"render": function( data, type, full )
 				{
 				res = "";
-				res +=	"<a href='javascript:pendencias(\"" + full.SSHDFUNC + "\");' " +
+				res +=	"<a href='javascript:pendencias(\"" + full.SSHDFUNC +
+								"\", \""+ full.IDFUNC + "\", \"" + full.NOFUNC + 
+								"\", \""+ full.UORFUNC + "\" );' " +
 								"<button type='button' title='Verificar pendências do funcionário' " +
 								"class='btn btn-warning  btn-md'>ANA</button></a>";
 				
