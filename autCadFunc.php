@@ -47,17 +47,16 @@ include 'partes/pagebody.php';
 						<h5 id="xuornome"></h5>
 						<h5 id="xuorfech"></h5>
 						<h5 id="xuoratua"></h5>
-						<h5 id="xuornova"></h5>
-						<div class='row linha' style='margin-top: 10px; margin-left:30px;'>
-							<h5>Data em que será efetivada a alocação.</h5>
-							<h5>A alocação anterior (se houver) se encerrará.</h5>
-							<input id="xuordata" class='input-small inp' style='width: 40%; ' 
-										 title="data da transferencia de UOR" readonly />
-						</div>
+						<h5 id="xuornova"></h5><br>
+						<h5>Data em que será efetivada a alocação.</h5>
+						<h5>A alocação anterior (se houver) se encerrará.</h5>
+						<input id="xuordata" class='input-small inp xuordata' 
+									 style='width: 20%; ' readonly
+									 title="data da transferencia de UOR" />
 					</div>
 					<div class="modal-footer">
 						<center>
-							<button type="button" class="btn btn-primary"
+							<button id="btok" type="button" class="btn btn-primary"
 											onclick="javascript:uorOK()">
 											OK
 							</button>
@@ -373,7 +372,7 @@ include 'partes/pagebody.php';
 		var sshd, nofunc, idapal;
 		var idfltr, idapalant;
 		
-		$( "#xuordata" ).datepicker(
+		$( ".xuordata" ).datepicker(
 			{
 			dateFormat: "dd/mm/yy",
 			altFormat: "yymmdd",
@@ -387,9 +386,8 @@ include 'partes/pagebody.php';
 				{ 
 				var dt = $("#dtcor").datepicker("getDate");
 				dtxuor = $.datepicker.formatDate("yymmdd", dt );
-				$("#dtcor").datetimepicker('hide');
+				$("#btok").focus();
 				});
-
 		var url = "selectData.php?query=uor";
 		SelInit( ".uors", url, 0, "Escolha abaixo", escouor, 2 );
 
