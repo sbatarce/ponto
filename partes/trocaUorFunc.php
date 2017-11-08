@@ -1,5 +1,5 @@
 <?php
-
+//	trocaUorFunc( funiid, uornova, dtefet )
 //	Verifica parametro FUNI_ID
 if( !isset( $_GET["funiid"] ) )
 	{
@@ -15,6 +15,35 @@ if( !isset( $_GET["uornova"] ) )
 	return;
 	}
 $uornova = $_GET["uornova"];
+
+//	verifica parametro uornova = ID da nova UOR do funcionário
+if( !isset( $_GET["dtefet"] ) )
+	{
+	echo	'{ "data": [{"erro": "parametro dtefet obrigatório"}] }';
+	return;
+	}
+$dtefet = $_GET["dtefet"];
+
+if( strlen( $dtefet != 8 ) )
+	{
+	echo	'{ "data": [{"erro": "parametro dtefet invalido (YYYYMMDD)"}] }';
+	return;
+	}
+
+$ano = substr( $dtefet, 0, 4 );
+$mes = substr( $dtefet, 4, 2 );
+$dia = substr( $dtefet, 6, 2 );
+$dt = new DateTime();
+try
+	{
+	$dt->setDate($ano, $mes, $dia);
+	} 
+catch (Exception $ex) 
+	{
+	echo	'{ "data": [{"erro": "parametro dtefet invalido (YYYYMMDD)"}] }';
+	return;
+	}
+
 //
 include '../partes/fmtErro.php';
 include '../partes/ambiente.php';
@@ -72,7 +101,29 @@ if( $jres->linhas < 1 )
 	}
 $ora->libStmt();
 
-//	verifica se há um FUOR aberto para o funcionário
+//	verifica se há um fechamento com data imediatamente anterior à data efetivação
+$sql = "SELECT TO_CHAR( MAX(FSHM_DTREFERENCIA), 'YYYYMMDD' )
+					FROM BIOMETRIA.FSHM_FUNCSALDOHORAMENSAL
+					WHERE FUNI_ID=$funiid";
+$res = $ora->execSelect($sql);
+$jres = json_decode($res);
+if( $dbg )
+	{
+	echo "verifica fechamento sql=$sql/resultado:";
+	var_dump($jres);
+	}
+if( $jres->status != "OK" )
+	{
+	fmtErro( "erro", "verifica fechamento: $jres->erro" );
+	$ora->disconnect();
+	return;
+	}
+if( $jres->linhas > 0 )
+	{
+	}
+$ora->libStmt();
+
+//	obtem o ID de uma eventual FUOR aberta para o funcionário
 $sql = "SELECT FUOR_ID, PMS_IDSAUUOR FROM BIOMETRIA.FUOR_FUNCUNIDADEORGANIZACIONAL
 					WHERE FUOR_DTFIM IS NULL AND
 								FUNI_ID=$funiid";

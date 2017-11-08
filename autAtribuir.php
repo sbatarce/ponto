@@ -2,17 +2,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
     <title>Ponto do funcionário</title>
-		<style>
-		.table thead>tr>th {text-align: center;}
-		.direito {text-align: right;}
-		.centro  {text-align: center;}
-		.esquerdo {text-align: left;}
-		</style>
-<?php
-include 'partes/Head.php';
-?>
-		<!-- Favicon -->
-		<link rel="shortcut icon" href="/imagens/PMSICO.png">
+		<?php
+		include 'partes/Head.php';
+		?>
 	</head>
 	
 	<body onload="javascript:titulo( '<h4>Atribuição de autorizadores</h4>' );">

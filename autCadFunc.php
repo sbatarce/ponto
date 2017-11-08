@@ -8,10 +8,8 @@
   </head>
 
   <body onload="javascript:Titulo( '<h4>Alocação de funcionários</h4>' );">
-  <img src="imagens/carrega.gif" id="carrega" style="display:none" />
-    <!-- Conteúdo específico da página -->
 <?php
-include 'partes/Menu.php';
+include 'partes/MenuPri.php';
 include 'partes/Cabec.php';
 include 'partes/pageheader.php';
 include 'partes/pagebody.php';
@@ -47,9 +45,20 @@ include 'partes/pagebody.php';
 						<h5 id="xuornome"></h5>
 						<h5 id="xuorfech"></h5>
 						<h5 id="xuoratua"></h5>
-						<h5 id="xuornova"></h5><br>
-						<h5>Data em que será efetivada a alocação.</h5>
-						<h5>A alocação anterior (se houver) se encerrará.</h5>
+						<h5 id="xuornova"></h5>
+						<h5>
+							Caso não esteja, será efetuado um fechamento no dia anterior à 
+							<b>data de efetivação</b> abaixo, e portanto não deve haver 
+							pendências anteriores a esta data para este funcionário.<br>
+							A partir da data de efetivação, inclusive, para o futuro, não deve haver 
+							interferências de autorização, isto é, justificativas 
+							<b>aceitas ou negadas</b>. Neste período, pode haver pendências e
+							justificativas em análise que serão resolvidas pelo autorizador
+							da nova UOR.<br>
+							Caso haja alguma alocação anterior, e cumpridas as exigências
+							acima, esta será encerrada com data anterior à de efetivação.
+						</h5>
+						<h5>efetivar em:</h5>
 						<input id="xuordata" class='input-small inp xuordata' 
 									 style='width: 20%; ' readonly
 									 title="data da transferencia de UOR" />
@@ -145,6 +154,198 @@ include 'partes/pagebody.php';
 			Deslogar();
 			}
 
+		function escRegi( tipo, id )
+			{
+			if( id >= 0 )
+				idreg	=	id;
+			}
+
+		function escUor( tipo, id, text )
+			{
+			if( id >= 0 )
+				{
+				iduor	=	id;
+				let aData = Table.fnGetData(ixedt);
+				let dt = toDate( aData.DTFECHA );
+				dt.setDate(dt.getDate()+1);						//	seguinte ao fechamento
+				let aux = `Funcionário: ${aData.NOFUNC}`;
+				$('#xuornome').html(aux)
+				aux = `Data Fechamento: ${aData.DTFECHA}`;
+				$('#xuorfech').html(aux)
+				aux = `Uor Atual: ${aData.UNIDADE}`;
+				$('#xuoratua').html(aux)
+				aux = `Nova Uor: ${text}`;
+				$('#xuornova').html(aux);
+				aux = toStDate( dt, 1 );						//	formata DD/MM/YYYY
+				$('#xuordata').val( aux );
+				$('#xuordata').datepicker( "option", "minDate", dt );
+				dt = dtuprc;
+				dt.setDate(dt.getDate()+1);						//	seguinte ao ultimo processamento
+				$('#xuordata').datepicker( "option", "maxDate", dt );
+				$("#uormodal").modal('show');
+				}
+			}
+
+		function deleteRow( oTable, nRow )
+			{
+			}
+		function restoreRow( oTable, nRow )
+			{
+			restoreRowG( oTable, nRow );
+			ixedt = -1;
+			}
+		function editRow( oTable, nRow )
+			{
+			ixedt = nRow;
+			iduor = -1;
+			idreg = -1;
+			editRowG( oTable, nRow );
+			}
+		function saveRow( oTable, nRow )
+			{
+			var sql = "";
+			var aData = oTable.fnGetData(nRow);
+			if( iduor <= 0 && idreg <= 0 )
+				return;
+			
+			if( iduor > 0 )
+				{
+				var url = "partes/trocaUorFunc.php?funiid="+ aData["IDFUNI"] + 
+									"&uornova="+iduor;
+				var resul = remoto( url );
+				if( resul.status == "OK" )
+					{
+					atuatab( false );
+					}
+				else
+					{
+					alert( "Erro trocando URL " + resul.erro );
+					return null;
+					}
+				}
+				
+			if( idreg > 0 )
+				{
+				var url = "partes/trocaRegiFunc.php?funiid="+ aData["IDFUNI"] + 
+									"&reginovo="+idreg;
+				var resul = remoto( url );
+				if( resul.status == "OK" )
+					{
+					atuatab( false );
+					}
+				else
+					{
+					alert( "Erro trocando URL " + resul.erro );
+					return null;
+					}
+				}
+			//saveRowG( oTable, nRow, idnovo );
+			return true;
+			}
+		function cancelEditRow( oTable, nRow )
+			{
+			cancelEditRowG( oTable, nRow );
+			}
+			
+		function completaChild( original )
+			{
+			return " ";
+			}
+
+		function FormataChild( original )
+			{
+			var lin = "",
+					ret = "";
+			var aux, cls;
+			
+			//	aparelhos do funcionário
+			var url	=	"partes/queries.php?query=obtaparelhosfunc&funiid=" + original.IDFUNI;
+			var	resu	=	remoto( url );
+			if( resu.linhas > 0 )
+				{
+				cls = "clsapa";
+				lin = IniLinha( cls );
+				lin += "<span style='margin-left: 10px'>Aparelho(s) do funcionário/Servidor</span>";
+				lin	+=	"<a style='margin-left: 10px; ' " +
+								"href='javascript:adicApar( " + 
+								original.IDFUNI + ", \"" + original.SSHD + "\", \"" + 
+								original.NOFUNC + "\", " + resu.dados[0].IDAPAL +  " )' " +
+								"class='btn btn-circle btn-info btn-xs ' " +
+								"title=\"Adiciona o funcionário a um aparelho que não o base\" >" +
+								"<i class='glyphicon glyphicon-plus'></i></a>";
+				lin += FimLinha();
+				ret += lin;
+				for( var ix=0; ix<resu.linhas; ix++ )
+					{
+					lin = IniLinha( cls );
+					aux	=	
+						{
+						titulo: "",
+						nocmp: "EHBASE",
+						width: "10%",
+						valor: "",
+						divclass: "col-xs-2",
+						inpclass: cls,
+						extra: "readonly"
+						};
+					if( resu.dados[ix].EHBASE == "1" )
+						aux.valor = "Base";
+					else
+						aux.valor = "Adicional";
+					lin	+=	CampoTexto( aux );
+
+					aux	=	
+						{
+						titulo: "",
+						nocmp: "UNIAPAR",
+						width: "10%",
+						valor: resu.dados[ix].UNIAPAR,
+						divclass: "col-xs-2",
+						inpclass: cls,
+						extra: "readonly"
+						};
+					lin	+=	CampoTexto( aux );
+
+					aux	=	
+						{
+						titulo: "",
+						nocmp: "LOCAAPAR",
+						width: "25%",
+						valor: resu.dados[ix].LOCAAPAR,
+						divclass: "col-xs-2",
+						inpclass: cls,
+						extra: "readonly"
+						};
+					lin	+=	CampoTexto( aux );
+
+					if( resu.dados[ix].EHBASE == "1" )
+						{
+						lin	+=	"<a style='margin-left: 10px; ' " +
+										"href='javascript:trocaBase( " + 
+										original.IDFUNI + ", \"" + original.SSHD + "\", \"" + 
+										original.NOFUNC + "\", " + 
+										resu.dados[ix].IDAPAL + ", " + resu.dados[ix].IDFLTR +  " )' " +
+										"class='btn btn-circle btn-info btn-xs ' " +
+										"title=\"Troca o aparelho base do funcionário\" >" +
+										"<i class='glyphicon glyphicon-random'></i></a>";
+						}
+					else
+						{
+						lin	+=	"<a style='margin-left: 10px; ' " +
+										"href='javascript:removeApar( " + 
+										original.IDFUNI + ", \"" + original.SSHD + "\", " + 
+										resu.dados[ix].IDAPAL +  " )' " +
+										"class='btn btn-circle btn-info btn-xs ' " +
+										"title=\"Troca o regime do funcionário\" >" +
+										"<i class='glyphicon glyphicon-minus'></i></a>";
+						}
+
+					lin	+=	FimLinha();
+					ret += lin;
+					}
+				}
+			return ret;
+			}
 		//	rotinas de manipulação dos aparelhos
 		//	remove o funcionario de um aparelho (apal) e insere em outro (apalnovo)
 		function trocaSSHD( idfltr, sshd, nome, apal, apalnovo )
@@ -372,6 +573,15 @@ include 'partes/pagebody.php';
 		var sshd, nofunc, idapal;
 		var idfltr, idapalant;
 		
+		var parms = "";
+		var resu = Select( "parametros", parms );
+		if( resu == null )
+			throw new Error("Problemas de acesso ao banco de dados. Por favor, tente mais tarde.");
+		var dtuinv = resu.dados[0].DTUPROC;
+		var dtudir = toDateDir( dtuinv );
+		var dtuprc = toDate( dtudir );
+		
+		
 		$( ".xuordata" ).datepicker(
 			{
 			dateFormat: "dd/mm/yy",
@@ -530,191 +740,6 @@ include 'partes/pagebody.php';
 			};
 		colDefs.push( aux );
 		
-		function escRegi( tipo, id )
-			{
-			if( id >= 0 )
-				idreg	=	id;
-			}
-
-		function escUor( tipo, id, text )
-			{
-			if( id >= 0 )
-				{
-				iduor	=	id;
-				let aData = Table.fnGetData(ixedt);
-				let aux = `Funcionário: ${aData.NOFUNC}`;
-				$('#xuornome').html(aux)
-				aux = `Data Fechamento: ${aData.DTFECHA}`;
-				$('#xuorfech').html(aux)
-				aux = `Uor Atual: ${aData.UNIDADE}`;
-				$('#xuoratua').html(aux)
-				aux = `Nova Uor: ${text}`;
-				$('#xuornova').html(aux)
-				$('#xuordata').val( aData.DTFECHA );
-				$("#uormodal").modal('show');
-				}
-			}
-
-		function deleteRow( oTable, nRow )
-			{
-			}
-		function restoreRow( oTable, nRow )
-			{
-			restoreRowG( oTable, nRow );
-			ixedt = -1;
-			}
-		function editRow( oTable, nRow )
-			{
-			ixedt = nRow;
-			iduor = -1;
-			idreg = -1;
-			editRowG( oTable, nRow );
-			}
-		function saveRow( oTable, nRow )
-			{
-			var sql = "";
-			var aData = oTable.fnGetData(nRow);
-			if( iduor <= 0 && idreg <= 0 )
-				return;
-			
-			if( iduor > 0 )
-				{
-				var url = "partes/trocaUorFunc.php?funiid="+ aData["IDFUNI"] + 
-									"&uornova="+iduor;
-				var resul = remoto( url );
-				if( resul.status == "OK" )
-					{
-					atuatab( false );
-					}
-				else
-					{
-					alert( "Erro trocando URL " + resul.erro );
-					return null;
-					}
-				}
-				
-			if( idreg > 0 )
-				{
-				var url = "partes/trocaRegiFunc.php?funiid="+ aData["IDFUNI"] + 
-									"&reginovo="+idreg;
-				var resul = remoto( url );
-				if( resul.status == "OK" )
-					{
-					atuatab( false );
-					}
-				else
-					{
-					alert( "Erro trocando URL " + resul.erro );
-					return null;
-					}
-				}
-			//saveRowG( oTable, nRow, idnovo );
-			return true;
-			}
-		function cancelEditRow( oTable, nRow )
-			{
-			cancelEditRowG( oTable, nRow );
-			}
-			
-		function completaChild( original )
-			{
-			return " ";
-			}
-
-		function FormataChild( original )
-			{
-			var lin = "",
-					ret = "";
-			var aux, cls;
-			
-			//	aparelhos do funcionário
-			var url	=	"partes/queries.php?query=obtaparelhosfunc&funiid=" + original.IDFUNI;
-			var	resu	=	remoto( url );
-			if( resu.linhas > 0 )
-				{
-				cls = "clsapa";
-				lin = IniLinha( cls );
-				lin += "<span style='margin-left: 10px'>Aparelho(s) do funcionário/Servidor</span>";
-				lin	+=	"<a style='margin-left: 10px; ' " +
-								"href='javascript:adicApar( " + 
-								original.IDFUNI + ", \"" + original.SSHD + "\", \"" + 
-								original.NOFUNC + "\", " + resu.dados[0].IDAPAL +  " )' " +
-								"class='btn btn-circle btn-info btn-xs ' " +
-								"title=\"Adiciona o funcionário a um aparelho que não o base\" >" +
-								"<i class='glyphicon glyphicon-plus'></i></a>";
-				lin += FimLinha();
-				ret += lin;
-				for( var ix=0; ix<resu.linhas; ix++ )
-					{
-					lin = IniLinha( cls );
-					aux	=	
-						{
-						titulo: "",
-						nocmp: "EHBASE",
-						width: "10%",
-						valor: "",
-						divclass: "col-xs-2",
-						inpclass: cls,
-						extra: "readonly"
-						};
-					if( resu.dados[ix].EHBASE == "1" )
-						aux.valor = "Base";
-					else
-						aux.valor = "Adicional";
-					lin	+=	CampoTexto( aux );
-
-					aux	=	
-						{
-						titulo: "",
-						nocmp: "UNIAPAR",
-						width: "10%",
-						valor: resu.dados[ix].UNIAPAR,
-						divclass: "col-xs-2",
-						inpclass: cls,
-						extra: "readonly"
-						};
-					lin	+=	CampoTexto( aux );
-
-					aux	=	
-						{
-						titulo: "",
-						nocmp: "LOCAAPAR",
-						width: "25%",
-						valor: resu.dados[ix].LOCAAPAR,
-						divclass: "col-xs-2",
-						inpclass: cls,
-						extra: "readonly"
-						};
-					lin	+=	CampoTexto( aux );
-
-					if( resu.dados[ix].EHBASE == "1" )
-						{
-						lin	+=	"<a style='margin-left: 10px; ' " +
-										"href='javascript:trocaBase( " + 
-										original.IDFUNI + ", \"" + original.SSHD + "\", \"" + 
-										original.NOFUNC + "\", " + 
-										resu.dados[ix].IDAPAL + ", " + resu.dados[ix].IDFLTR +  " )' " +
-										"class='btn btn-circle btn-info btn-xs ' " +
-										"title=\"Troca o aparelho base do funcionário\" >" +
-										"<i class='glyphicon glyphicon-random'></i></a>";
-						}
-					else
-						{
-						lin	+=	"<a style='margin-left: 10px; ' " +
-										"href='javascript:removeApar( " + 
-										original.IDFUNI + ", \"" + original.SSHD + "\", " + 
-										resu.dados[ix].IDAPAL +  " )' " +
-										"class='btn btn-circle btn-info btn-xs ' " +
-										"title=\"Troca o regime do funcionário\" >" +
-										"<i class='glyphicon glyphicon-minus'></i></a>";
-						}
-
-					lin	+=	FimLinha();
-					ret += lin;
-					}
-				}
-			return ret;
-			}
 		///////////////////////////////////////////////////////////////////////
 
 		$("#eddt_new").hide();
