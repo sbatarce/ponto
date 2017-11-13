@@ -229,7 +229,7 @@ include 'ambiente.php';
 include 'ORAConn.php';
 
 $ora = new ORAConn();
-$res = $ora->connect($userb, $passb, $amb, $chset);
+$res = $ora->connect($userb, $passb, $amb, $chset, "");
 if( $res != "OK" )
 	{
 	echo $res;

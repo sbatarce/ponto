@@ -66,7 +66,7 @@ if( $dbg )
 	echo "funiid=$funiid autid=$autid taauid=$taauid iduor=$iduor dtini=$dtini dtfim=$dtfim<br>";
 //	prepara a conexão
 $ora = new ORAConn();
-$res = $ora->connect($userb, $passb, $amb, $chset);
+$res = $ora->connect($userb, $passb, $amb, $chset, "");
 if( $dbg )
 	var_dump( $res );
 if( $res != "OK" )

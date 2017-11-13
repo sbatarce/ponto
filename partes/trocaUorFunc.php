@@ -74,6 +74,7 @@ if(isset($_GET["rle"]))
 $dbg = isset( $_GET["dbg"] );
 //	abre o ORACLE
 $ora = new ORAConn();
+$role = "";
 $res = $ora->connect( $userb, $passb, $amb, $chset, $role );
 if( $res != "OK" )
 	{
