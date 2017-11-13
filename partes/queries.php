@@ -452,8 +452,10 @@ if( $sql == "" )
 include 'ambiente.php';
 include 'ORAConn.php';
 
+if( $dbg )
+	echo "userb=$userb amb=$amb chset=$chset";
 $ora = new ORAConn();
-$res = $ora->connect($userb, $passb, $amb, $chset);
+$res = $ora->connect($userb, $passb, $amb, $chset, "" );
 if( $res != "OK" )
 	{
 	echo $res;
@@ -465,3 +467,10 @@ echo $res;
 $ora->disconnect();
 
 
+/*
+Missing argument 5 for ORAConn::connect(), 
+called in /var/www/docroot/sisponto/partes/queries.php on line 456 and defined in 
+	/var/www/docroot/sisponto/partes/ORAConn.php on line 54
+Notice:  Undefined variable: role in 
+ /var/www/docroot/sisponto/partes/ORAConn.php</b> on line <b>62</b><br />↵{ "status": "OK", "linhas":"1", "dados": [ { "_linha": "1", "TRESPOSTA": "2", "TJUSTIF": "2", "DTUPROC": "20171110"} ] }"
+ */

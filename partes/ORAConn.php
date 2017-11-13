@@ -59,7 +59,7 @@ function connect($user, $pass, $amb, $chset, $role)
 		$e = oci_error();
 		return $this->mErro($e, "oci_connect");
 		}
-	if ($role == NULL)
+	if ($role == NULL OR $role == "" )
 		return "OK";
 	//	libera o acesso do usuario 
 	$this->stid = oci_parse($this->conn, "set role ".$role);
