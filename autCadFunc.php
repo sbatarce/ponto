@@ -28,6 +28,41 @@ include 'partes/pagebody.php';
 			</div> <!-- /Page Container -->
 		</div> <!-- Main Container -->
 		<!--======================================================================-->
+		<!-- modal de troca de REGIME -->
+    <div id="infomodal" class="modal fade bs-modal-sm" role="dialog"
+				 aria-labelledby="mySmallModalLabel" aria-hidden="true"
+				 style="width: 500px; max-width: 500px;" >
+			<div class="modal-dialog modal-sm" style="width: 500px; max-width: 500px;">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true"
+										onclick="javascript:Cancel()">
+							&times;
+						</button>
+						<h4 class="modal-title">Alteração de Regime de trabalho</h4>
+					</div>
+					<div class="modal-body" id="bdymodal" ng>
+						<h5 id="info">
+							A mudança de regime somente será permitida na data seguinte à 
+							<b>data do último processamento</b>.<br>
+							Necessariamente deverá haver um <b>fechamento do funcionário</b>
+							na <b>data do último processamento</b> ou a mudança de regime 
+							não será efetuada.<br>
+							Caso isto ocorra, efetue o fechamento do funcionário na 
+							<b>data do último processamento</b> e volte para modificar 
+							o regime.
+						</h5>
+					</div>
+					<div class="modal-footer">
+						<center>
+							<button type="button" class="btn btn-default" data-dismiss="modal"
+											onclick="javascript:Cancel()">OK</button>
+						</center>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!--======================================================================-->
 		<!-- modal de troca de UOR -->
     <div id="uormodal" class="modal fade bs-modal-sm" role="dialog"
 				 aria-labelledby="mySmallModalLabel" aria-hidden="true"
@@ -36,7 +71,7 @@ include 'partes/pagebody.php';
 				<div class="modal-content">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal" aria-hidden="true"
-										onclick="javascript:cancelUOR()">
+										onclick="javascript:Cancel()">
 							&times;
 						</button>
 						<h4 class="modal-title">Alteração de UOR</h4>
@@ -47,21 +82,19 @@ include 'partes/pagebody.php';
 						<h5 id="xuoratua"></h5>
 						<h5 id="xuornova"></h5>
 						<h5>
-							Caso não esteja, será efetuado um fechamento no dia anterior à 
-							<b>data de efetivação</b> abaixo, e portanto não deve haver 
-							pendências anteriores a esta data para este funcionário.<br>
-							A partir da data de efetivação, inclusive, para o futuro, não deve haver 
+							O início de alocação do funcionário na UOR ocorrerá na 
+							<b>data de efetivação</b> abaixo, que é o dia seguinte ao dia 
+							do fechamento deste funcionário.<br>
+							A partir da data de efetivação para o futuro, não deve haver 
 							interferências de autorização, isto é, justificativas 
-							<b>aceitas ou negadas</b>. Neste período, pode haver pendências e
-							justificativas em análise que serão resolvidas pelo autorizador
-							da nova UOR.<br>
-							Caso haja alguma alocação anterior, e cumpridas as exigências
-							acima, esta será encerrada com data anterior à de efetivação.
+							<b>aceitas ou negadas</b>, sendo que neste período, pode haver 
+							pendências e justificativas em análise que serão resolvidas 
+							oportunamente pelo autorizador da nova UOR.<br>
+							Caso haja alguma alocação a uma UOR anterior, e cumpridas as 
+							exigências acima, esta será encerrada com data anterior 
+							à de efetivação.<br>
 						</h5>
-						<h5>efetivar em:</h5>
-						<input id="xuordata" class='input-small inp xuordata' 
-									 style='width: 20%; ' readonly
-									 title="data da transferencia de UOR" />
+						<h3 id="efetuor">efetivar em:</h3>
 					</div>
 					<div class="modal-footer">
 						<center>
@@ -69,7 +102,8 @@ include 'partes/pagebody.php';
 											onclick="javascript:uorOK()">
 											OK
 							</button>
-							<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+							<button type="button" class="btn btn-default" data-dismiss="modal"
+											onclick="javascript:Cancel()">Cancel</button>
 						</center>
 					</div>
 				</div>
@@ -83,8 +117,7 @@ include 'partes/pagebody.php';
 			<div class="modal-dialog modal-sm" style="width: 500px; max-width: 500px;">
 				<div class="modal-content">
 					<div class="modal-header">
-						<button type="button" class="close" data-dismiss="modal" aria-hidden="true"
-										onclick="javascript:cancel()">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
 							&times;
 						</button>
 						<h4 id="titTrocBase" class="modal-title">Troca do aparelho base</h4>
@@ -118,7 +151,7 @@ include 'partes/pagebody.php';
 				<div class="modal-content">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal" aria-hidden="true"
-										onclick="javascript:cancel()">
+										onclick="javascript:Cancel()">
 							&times;
 						</button>
 						<h4 id="titAdicApar" class="modal-title">Troca do aparelho base</h4>
@@ -154,38 +187,6 @@ include 'partes/pagebody.php';
 			Deslogar();
 			}
 
-		function escRegi( tipo, id )
-			{
-			if( id >= 0 )
-				idreg	=	id;
-			}
-
-		function escUor( tipo, id, text )
-			{
-			if( id >= 0 )
-				{
-				iduor	=	id;
-				let aData = Table.fnGetData(ixedt);
-				let dt = toDate( aData.DTFECHA );
-				dt.setDate(dt.getDate()+1);						//	seguinte ao fechamento
-				let aux = `Funcionário: ${aData.NOFUNC}`;
-				$('#xuornome').html(aux)
-				aux = `Data Fechamento: ${aData.DTFECHA}`;
-				$('#xuorfech').html(aux)
-				aux = `Uor Atual: ${aData.UNIDADE}`;
-				$('#xuoratua').html(aux)
-				aux = `Nova Uor: ${text}`;
-				$('#xuornova').html(aux);
-				aux = toStDate( dt, 1 );						//	formata DD/MM/YYYY
-				$('#xuordata').val( aux );
-				$('#xuordata').datepicker( "option", "minDate", dt );
-				dt = dtuprc;
-				dt.setDate(dt.getDate()+1);						//	seguinte ao ultimo processamento
-				$('#xuordata').datepicker( "option", "maxDate", dt );
-				$("#uormodal").modal('show');
-				}
-			}
-
 		function deleteRow( oTable, nRow )
 			{
 			}
@@ -196,11 +197,15 @@ include 'partes/pagebody.php';
 			}
 		function editRow( oTable, nRow )
 			{
-			ixedt = nRow;
 			iduor = -1;
-			idreg = -1;
 			editRowG( oTable, nRow );
+			ixedt = nRow;
+			let aData = oTable.fnGetData(nRow);			
+			iduorant = aData.IDLOTADO;
+			idfunc = aData.IDFUNI;
+			idreg = aData.IDREG;
 			}
+
 		function saveRow( oTable, nRow )
 			{
 			var sql = "";
@@ -212,14 +217,14 @@ include 'partes/pagebody.php';
 				{
 				var url = "partes/trocaUorFunc.php?funiid="+ aData["IDFUNI"] + 
 									"&uornova="+iduor;
-				var resul = remoto( url );
-				if( resul.status == "OK" )
+				var resu = remoto( url );
+				if( resu.status == "OK" )
 					{
 					atuatab( false );
 					}
 				else
 					{
-					alert( "Erro trocando URL " + resul.erro );
+					alert( "Erro trocando URL " + resu.erro );
 					return null;
 					}
 				}
@@ -228,20 +233,21 @@ include 'partes/pagebody.php';
 				{
 				var url = "partes/trocaRegiFunc.php?funiid="+ aData["IDFUNI"] + 
 									"&reginovo="+idreg;
-				var resul = remoto( url );
-				if( resul.status == "OK" )
+				var resu = remoto( url );
+				if( resu.status == "OK" )
 					{
 					atuatab( false );
 					}
 				else
 					{
-					alert( "Erro trocando URL " + resul.erro );
+					alert( "Erro trocando URL " + resu.erro );
 					return null;
 					}
 				}
 			//saveRowG( oTable, nRow, idnovo );
 			return true;
 			}
+
 		function cancelEditRow( oTable, nRow )
 			{
 			cancelEditRowG( oTable, nRow );
@@ -354,29 +360,29 @@ include 'partes/pagebody.php';
 			var body =	"[ { \"nome\": \"" + nome +
 									"\", \"verifica_biometria\": true, " +
 									"\"referencias\": [ " + sshd.substring(1) +  " ]}]";
-			var resul = repserviceB( "POST", "usuarios", apalnovo, "SISPONTO", null, body );
-			var aux = resul.erro;
+			let resu = repserviceB( "POST", "usuarios", apalnovo, "SISPONTO", null, body );
+			let aux = resu.erro;
 			if( aux.indexOf("000") < 0 && aux.indexOf("023") < 0 )
 				{
-				alert( "Erro inserindo funcionário no novo Local de Trabalho" + resul.erro );
+				alert( "Erro inserindo funcionário no novo Local de Trabalho" + resu.erro );
 				return;
 				}
 			//	remove do aparelho atual
 			var funcao = "usuarios/" + sshd.substring(1);
-			var resul = repserviceB( "DELETE", funcao, apal, "SISPONTO", null, null );
-			var aux = resul.erro;
+			var resu = repserviceB( "DELETE", funcao, apal, "SISPONTO", null, null );
+			var aux = resu.erro;
 			//	000 -> OK
 			//	022 -> não há este usuário no aparelho
 			if( aux.indexOf("000") < 0 && aux.indexOf("022") < 0 )
 				{
-				alert( "Erro removendo funcionário do Local de Trabalho" + resul.erro );
+				alert( "Erro removendo funcionário do Local de Trabalho" + resu.erro );
 				return false;
 				}
 			//	troca no banco
 			var url = "partes/trocaFLTR.php?fltrid="+ idfltr + 
 								"&apalid=" + apal;
-			var resul = remoto( url );
-			if( resul.status == "OK" )
+			var resu = remoto( url );
+			if( resu.status == "OK" )
 				{
 				alert( "OK: alterado" );
 				$("#basemodal").modal('hide');
@@ -384,7 +390,7 @@ include 'partes/pagebody.php';
 				}
 			else
 				{
-				alert( "Erro removendo funcionário do Local de Trabalho" + resul.erro );
+				alert( "Erro removendo funcionário do Local de Trabalho" + resu.erro );
 				return false
 				}
 			}
@@ -394,20 +400,20 @@ include 'partes/pagebody.php';
 			var body =	"[ { \"nome\": \"" + nofunc +
 									"\", \"verifica_biometria\": true, " +
 									"\"referencias\": [ " + sshd.substring(1) +  " ]}]";
-			var resul = repserviceB( "POST", "usuarios", idapal, "SISPONTO", null, body );
-			var aux = resul.erro;
+			let resu = repserviceB( "POST", "usuarios", idapal, "SISPONTO", null, body );
+			let aux = resu.erro;
 			if( aux.indexOf("000") >= 0 || aux.indexOf("023") >= 0 )
 				{
 				var url = "partes/adicionaFLTR.php?funiid="+ idfunc + 
 									"&apalid="+idapal;
-				var resul = remoto( url );
-				if( resul.status == "OK" )
+				let resu = remoto( url );
+				if( resu.status == "OK" )
 					{
 					alert( "OK: UOR atualizada." );
 					}
 				else
 					{
-					alert( "Erro adicionando Local de Trabalho ao funcionário " + resul.erro );
+					alert( "Erro adicionando Local de Trabalho ao funcionário " + resu.erro );
 					return null;
 					}
 				return true;
@@ -418,23 +424,23 @@ include 'partes/pagebody.php';
 		//	remove um SSHD de um aparelho e o FLTR associado
 		function removeSSHD( apalid )
 			{
-			var funcao = "usuarios/" + sshd.substring(1);
-			var resul = repserviceB( "DELETE", funcao, apalid, "SISPONTO", null, null );
-			var aux = resul.erro;
+			let funcao = "usuarios/" + sshd.substring(1);
+			let resu = repserviceB( "DELETE", funcao, apalid, "SISPONTO", null, null );
+			let aux = resu.erro;
 			//	000 -> OK
 			//	022 -> não há este usuário no aparelho
 			if( aux.indexOf("000") >= 0 || aux.indexOf("022") >= 0 )
 				{
-				var url = "partes/removeFLTR.php?funiid="+ idfunc + 
+				let url = "partes/removeFLTR.php?funiid="+ idfunc + 
 									"&apalid="+idapal;
-				var resul = remoto( url );
-				if( resul.status == "OK" )
+				let resu = remoto( url );
+				if( resu.status == "OK" )
 					{
 					alert( "OK: Removido" );
 					}
 				else
 					{
-					alert( "Erro removendo funcionário do Local de Trabalho" + resul.erro );
+					alert( "Erro removendo funcionário do Local de Trabalho" + resu.erro );
 					return null;
 					}
 				return true;
@@ -443,32 +449,111 @@ include 'partes/pagebody.php';
 			return false;
 			}
 			
-		//	funções de chamada e retorno dos modais
-		function trocaUOR( idfuni )
+		//	rotinas de tratamento de escolhas
+		function escapar( tipo, id )
 			{
-			uorant = uoralo;
-			idfunc = idfuni;
-			$("#uormodal").modal('show');
+			if( id > 0 )
+				idapal	=	id;
+			}
+
+		function escRegi( tipo, id, text )
+			{
+			if( id >= 0 )
+				{
+				idreg	=	id;
+				//
+				let aData = Table.fnGetData(ixedt);
+				let dt = toDate( aData.DTFECHA);
+				if( toStDate( dt, 2 ) != toStDate( dtuprc, 2 ) )
+					{
+					let aux = `
+						Funcionário: ${aData.NOFUNC}<br>
+						Data fechamento: ${aData.DTFECHA}<br>
+						Data do último processamento: ${dtudir}<br><br>
+						Não foi possível substituir o regime do funcionário
+						acima.<br>
+						Por favor, faça um fechamento do funcionário antes.
+						`;
+					$('#info').html(aux);
+					$('#infomodal').modal('show');
+					restoreRowG( Table, ixedt );
+					ixedt = -1;
+					return;
+					}
+				//	altera o regime do funcionário
+				let url = "partes/trocaRegiFunc.php?funiid="+ idfunc + 
+									"&retrid=" + idreg;
+				let resu = remoto( url );
+				if( resu.status != "OK" )
+					{
+					alert( "Erro trocando Regime: " + resu.erro );
+					return null;
+					}
+				let row = Table.fnGetData( ixedt );
+				row["IDREG"] = ""+idreg;
+				row["NOREG"] = text;
+				Table.api().row(ixedt).data(row);
+				}
+			}
+
+		function escUor( tipo, id, text )
+			{
+			if( id >= 0 )
+				{
+				iduor	=	id;
+				iduornov = id;
+				nouornov = text;
+				let aData = Table.fnGetData(ixedt);
+				dtaux = toDate( aData.DTFECHA );
+				dtaux.setDate(dtaux.getDate()+1);						//	seguinte ao fechamento
+				let aux = `Funcionário: ${aData.NOFUNC}`;
+				$('#xuornome').html(aux)
+				aux = `Data Fechamento: ${aData.DTFECHA}`;
+				$('#xuorfech').html(aux)
+				aux = `Uor Atual: ${aData.UNIDADE}`;
+				$('#xuoratua').html(aux)
+				aux = `Nova Uor: ${text}`;
+				$('#xuornova').html(aux);
+				aux = `
+						Data de efetivação: <b>${toStDate( dtaux, 1 )}</b>
+						`;
+				$('#efetuor').html(aux);
+				$("#uormodal").modal('show');
+				}
+			}
+
+		//	retornos dos modais
+		function Cancel()
+			{
+			restoreRowG( Table, ixedt );
+			ixedt = -1;
 			}
 			
 		function uorOK()
 			{
-			if( uorant == uoralo )
+			if( iduorant < 0 || iduornov < 0 )
 				return;
-			var url = "partes/trocaUorFunc.php?funiid="+ idfunc + 
-								"&uornova="+uoralo;
-			var resul = remoto( url );
-			if( resul.status == "OK" )
+			if( iduorant == iduornov )
+				return;
+
+			let dtefet = toStDate( dtaux, 2 );
+			let url = "partes/trocaUorFunc.php?funiid="+ idfunc + 
+								"&uornova=" + iduornov +
+								"&dtefet=" + dtefet;
+			let resu = remoto( url );
+			if( resu.status != "OK" )
 				{
-				alert( "OK: UOR atualizada." );
-				}
-			else
-				{
-				alert( "Erro trocando URL " + resul.erro );
+				alert( "Erro trocando URL: " + resu.erro );
 				return null;
 				}
+			let row = Table.fnGetData( ixedt );
+			row["IDLOTADO"] = ""+iduornov;
+			row["UNIDADE"] = nouornov;
+			Table.api().row(ixedt).data(row);
+			
 			$("#uormodal").modal('hide');
-			atuatab( false );
+			restoreRowG( Table, ixedt );
+			ixedt = -1;
 			}
 										
 		var sshd, nofunc, idapal;
@@ -538,18 +623,6 @@ include 'partes/pagebody.php';
 				}
 			}
 			
-		function escouor( tipo, id )
-			{
-			if( id > 0 )
-				uoralo	=	id;
-			}
-
-		function escapar( tipo, id )
-			{
-			if( id > 0 )
-				idapal	=	id;
-			}
-
 		function setAjax()
 			{
 			tableDestroy();
@@ -558,17 +631,20 @@ include 'partes/pagebody.php';
 			}
 			
 /////////////// PRINCIPAL ////////////////////////
-		var idfuni = -1;
 		var idapar = -1;
-		var uoralo = null;
-		var uorant = null;
+		var iduornov = -1;
+		var iduorant = -1;
+		var nouorant = "";
+		var nouornov = "";
 		
 		//	variáveis e rotinas de atualização
 		var ixedt = -1;			//	row sendo editada
+		var idfunc = -1;		//	funiid do funcionario em edição
 		var iduor = -1;			//	última uor escolhida
 		var idreg = -1;			//	último regime escolhido
 		var dtxuor = "";		//	data do fechamento escolhida
 		
+		var dtaux;					//	data auxiliar de passagem entre a tela e OK
 		
 		var sshd, nofunc, idapal;
 		var idfltr, idapalant;
@@ -582,7 +658,7 @@ include 'partes/pagebody.php';
 		var dtuprc = toDate( dtudir );
 		
 		
-		$( ".xuordata" ).datepicker(
+		$( "#xuordata" ).datepicker(
 			{
 			dateFormat: "dd/mm/yy",
 			altFormat: "yymmdd",
@@ -594,12 +670,10 @@ include 'partes/pagebody.php';
 			})
 			.on('change.dp', function(e)
 				{ 
-				var dt = $("#dtcor").datepicker("getDate");
+				let dt = $("#xuordata").datepicker("getDate");
 				dtxuor = $.datepicker.formatDate("yymmdd", dt );
 				$("#btok").focus();
 				});
-		var url = "selectData.php?query=uor";
-		SelInit( ".uors", url, 0, "Escolha abaixo", escouor, 2 );
 
 		url = "selectData.php?query=aparelhos";
 		SelInit( ".lsapar", url, 0, "Escolha abaixo", escapar, 0 );
@@ -644,7 +718,12 @@ include 'partes/pagebody.php';
 			"orderable":false,
 			"mData":null,
 			"width": "5%",
-			"defaultContent": acshow
+			"defaultContent": acshow,
+			"render": function( data, type, row, meta )
+				{
+				return	acshow;
+				}
+
 			};
 		colDefs.push( aux );
 		

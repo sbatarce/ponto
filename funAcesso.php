@@ -554,7 +554,7 @@ include 'partes/Scripts.php';
 					montaPresTab();
 					return;
 					}
-				atuatab();
+				atuatab(false);
 				}
 			$("#moddialogo").modal("hide");
 			}

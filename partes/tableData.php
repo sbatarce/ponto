@@ -54,7 +54,7 @@ if( $qry == "funcfuor" )
 										WHERE PESS.REGISTRO_FUNCIONAL_ATIVO = 1 AND
 													PESS.IUN = FUNI.PMS_IDPMSPESSOA AND
 													ROWNUM = 1) AS NOME,
-									FSHM.DTFECH AS FECHAMENTO, 0 AS FECHAR
+									TO_CHAR( FSHM.DTFECH, 'DD/MM/YYYY' ) AS FECHAMENTO, 0 AS FECHAR
 						FROM        BIOMETRIA.FUOR_FUNCUNIDADEORGANIZACIONAL FUOR
 						INNER JOIN  BIOMETRIA.FUNI_FUNCIONARIO FUNI ON
 												FUNI.FUNI_ID=FUOR.FUNI_ID AND
@@ -63,7 +63,8 @@ if( $qry == "funcfuor" )
 														FROM BIOMETRIA.FSHM_FUNCSALDOHORAMENSAL 
 														GROUP BY FUNI_ID) FSHM ON
 												FSHM.ID=FUNI.FUNI_ID
-						WHERE FUOR.PMS_IDSAUUOR=$uor";
+						WHERE FUOR.FUOR_DTFIM IS NULL AND
+									FUOR.PMS_IDSAUUOR=$uor";
 	}
 	
 ////////////////////////////////////////////////////////////////////////////////
@@ -578,9 +579,10 @@ if( $qry == "pendencias" )
 							LEFT JOIN   BIOMETRIA.FDTM_FUNCDIATRABALHOMENSAGEM FDTM ON
 													FDTM.FDTR_ID = FDTR.FDTR_ID ";
 	if( $sshdfunc == null )
-		$sql .=	"WHERE       FUNI.PMS_IDPMSPESSOA <> '$sshd'";
+		$sql .=	"WHERE       FUNI.PMS_IDPMSPESSOA <> '$sshd' ";
 	else
-		$sql .= "WHERE       FUNI.PMS_IDPMSPESSOA = '$sshdfunc'";
+		$sql .= "WHERE       FUNI.PMS_IDPMSPESSOA = '$sshdfunc' ";
+	$sql .= "ORDER BY FDTR.FDTR_DTREFERENCIA DESC";
 	}
 ////////////////////////////////////////////////////////////////////////////////
 //	funaces		-	dados de acesso dos funcionários comuns

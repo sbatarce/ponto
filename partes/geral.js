@@ -213,8 +213,10 @@ function com2Digs(number)
   return( number < 10 ? '0' : '' ) + number;
   }
   
- // de Date => DD/MM/YYYY ou YYYYMMDD
- //     tipo 1 ou 2
+ // de Date =>  ou 
+ //     tipo 1  DD/MM/YYYY
+ //     tipo 2  YYYYMMDD
+ //     default YYYY-MM-DD
  function toStDate( data, tipo )
   {
   let ano = data.getFullYear();

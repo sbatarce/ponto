@@ -213,11 +213,6 @@ include 'partes/Scripts.php';
 			row["action"] = remo;
 			row["MANTER"] = "sim";
 			Table.api().row(ix).data(row);
-/*
-			Table.fnUpdate( "sim", ix, 5, false );
-			Table.fnUpdate( act, ix, 6 );
-			flalt = true;
-	*/
 			}
 		
 			
