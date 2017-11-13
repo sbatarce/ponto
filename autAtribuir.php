@@ -236,7 +236,7 @@ include 'partes/Scripts.php';
 				alert( "Erro adicionando período de autorização: " + resul.erro );
 				return;
 				}
-			atuatab();
+			atuatab(false);
 			}
 
 	function encerra( id, ini, fim )
@@ -586,10 +586,7 @@ include 'partes/Scripts.php';
 			"width": "10%",
 			"render": function( data, type, row )
 				{
-				var ago = new Date();
-				var stnow = ago.getFullYear() +
-										com2Digs( ago.getMonth()+1 ) +
-										com2Digs( ago.getDate() );
+				var stnow = toStDate( new Date(), 2 );
 				var stini = toDateInv( row.INICIO );
 				var stter = toDateInv( row.TERMINO );
 				
@@ -610,7 +607,7 @@ include 'partes/Scripts.php';
 				
 				if( stini == "" )
 					return "";
-				if( stnow < stini )
+				if( stnow <= stini )
 					return acalt+acrem;
 
 				if( stter == "" )
