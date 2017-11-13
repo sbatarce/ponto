@@ -69,12 +69,11 @@ if(isset($_GET["amb"]))
 if(isset($_GET["chs"]))
   $chset = $_GET["chs"];
 if(isset($_GET["rle"]))
-  $rle = $_GET["rle"];
+  $role = $_GET["rle"];
 
 $dbg = isset( $_GET["dbg"] );
 //	abre o ORACLE
 $ora = new ORAConn();
-$role = "";
 $res = $ora->connect( $userb, $passb, $amb, $chset, $role );
 if( $res != "OK" )
 	{
