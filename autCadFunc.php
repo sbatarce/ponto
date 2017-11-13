@@ -536,6 +536,7 @@ include 'partes/pagebody.php';
 			if( iduorant == iduornov )
 				return;
 
+			setBasicAuth( sshd, pass );
 			let dtefet = toStDate( dtaux, 2 );
 			let url = "partes/trocaUorFunc.php?funiid="+ idfunc + 
 								"&uornova=" + iduornov +
@@ -646,7 +647,7 @@ include 'partes/pagebody.php';
 		
 		var dtaux;					//	data auxiliar de passagem entre a tela e OK
 		
-		var sshd, nofunc, idapal;
+		var nofunc, idapal;
 		var idfltr, idapalant;
 		
 		var parms = "";
@@ -657,7 +658,14 @@ include 'partes/pagebody.php';
 		var dtudir = toDateDir( dtuinv );
 		var dtuprc = toDate( dtudir );
 		
-		
+		var sshd = obterCookie( "user" );
+		if( sshd == null )
+			{
+			Deslogar();
+			}
+			
+		var pass = obterCookie( "pass" );
+
 		$( "#xuordata" ).datepicker(
 			{
 			dateFormat: "dd/mm/yy",
@@ -678,11 +686,6 @@ include 'partes/pagebody.php';
 		url = "selectData.php?query=aparelhos";
 		SelInit( ".lsapar", url, 0, "Escolha abaixo", escapar, 0 );
 
-		var sshd = obterCookie( "user" );
-		if( sshd == null )
-			{
-			Deslogar();
-			}
 		//	formatadores ligados ao datatables
 		//		ticamp:		tipo de campo t/n/l = texto, numÃ©rico ou legenda
 		//		inputs:		nomes dos campos no banco relativamente aos inputs
