@@ -2,17 +2,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
     <title>Ponto do funcionário</title>
-		<style>
-		.table thead>tr>th {text-align: center;}
-		.direito {text-align: right;}
-		.centro  {text-align: center;}
-		.esquerdo {text-align: left;}
-		</style>
-<?php
-include 'partes/Head.php';
-?>
-		<!-- Favicon -->
-		<link rel="shortcut icon" href="/imagens/PMSICO.png">
+		<?php
+		include 'partes/Head.php';
+		?>
 	</head>
 	
 	<body onload="javascript:titulo( '<h4>Atribuição de autorizadores</h4>' );">
@@ -31,7 +23,7 @@ include 'partes/pagebody.php';
 			<input type="text" id="dtuprc" class="dtuprc"
 					 style="margin-left: 10px; width: 15%;  float: right;
 					 font-size: 20px; font-weight: bold; " readonly/>
-			<label style="float: right; font-weight: bold; ">último processamento</label>
+			<label style="float: right; font-weight: bold; ">última coleta completada em</label>
 			</div>
 		</div>
 										<table class="table table-striped table-hover table-bordered" id="eddt">
@@ -247,10 +239,11 @@ include 'partes/Scripts.php';
 			atuatab();
 			}
 
-	function encerra( id )
+	function encerra( id, ini, fim )
 		{
 		dtfim = $.datepicker.formatDate("yymmdd", dtuprc )
 		var url = "partes/alteraFUAU.php?fuauid="+ id;
+		url += "&dtini=" + ini;
 		url += "&dtfim=" + dtfim;
 		var resul = remoto( url );
 		if( resul.status != "OK" )
@@ -268,12 +261,12 @@ include 'partes/Scripts.php';
 			$('#modaltautor').modal('hide');
 			return;
 			}
+		dtini = $(".dtinialt").datepicker("getDate");
 		//
 		var url = "partes/alteraFUAU.php?fuauid="+ fuauid;
-		if( dtini != null )
-			url += "&dtini=" + dtini;
-		if( dtfim != null )
-			url += "&dtfim=" + dtfim;
+		url += "&dtini=" + toStDate( dtini, 2 );
+		//if( dtfim != null )
+		url += "&dtfim=" + dtfim;
 		var resul = remoto( url );
 		if( resul.status == "OK" )
 			$("#modaltautor").modal('hide');
@@ -296,7 +289,7 @@ include 'partes/Scripts.php';
 		inidir = toDateDir(""+iniinv);
 		dtini	=	toDate(""+inidir);
 		
-		if( fiminv != "" )
+		if( typeof fiminv != 'undefined' && fiminv != "" )
 			{
 			fimdir = toDateDir(""+fiminv);
 			dtfim = toDate(""+fimdir);
@@ -304,14 +297,24 @@ include 'partes/Scripts.php';
 			
 		$(".uorpto").val( nouor )
 		$("#dtinialt").val( inidir );
-		if( dtini > dtuprc )
-			$("#dtinialt").datepicker( "option", "minDate", dtuprc );
+		let dt = $(".dtinialt").datepicker("getDate");
+		if( dt < hoje )
+			$("#dtinialt").datepicker( "option", "minDate", dt );
 		else
-			$("#dtinialt").datepicker( "option", "minDate", new Date(2000, 1 , 1) );
+			$("#dtinialt").datepicker( "option", "minDate", hoje );
 		if( fiminv == "" )
 			$("#dtfimalt").val( "" );
 		else
 			$("#dtfimalt").val( fimdir );
+		//	acerta o minimo
+		if( dt < hoje )
+			$("#dtfimalt").datepicker( "option", "minDate", hoje );
+		else
+			{
+			dt.setDate(dt.getDate()+1);
+			$("#dtfimalt").datepicker( "option", "minDate", dt );
+			}
+
 		$("#altautors").val( nome );
 		dtini = null;
 		dtfim = null;
@@ -333,6 +336,9 @@ include 'partes/Scripts.php';
 		e.stopImmediatePropagation();
 		$("#uorpto").val( nouor )
 		$("#dtinicria").val( $.datepicker.formatDate("dd/mm/yy", hoje ) );
+		let amanha = hoje;
+		amanha.setDate(hoje.getDate()+1);
+		$("#dtfimcria").datepicker( "option", "minDate", amanha );
 		$("#dtfimcria").val( "" );
 		$(".autors").select2('val', 0 );
 		$("#modcriaautor").modal('show');
@@ -365,7 +371,6 @@ include 'partes/Scripts.php';
 		SelInit( ".autors", url, 0, "Escolha abaixo", escocandid );
 		//
 		setAjax();
-		$(".fuors").select2('val', 0 );
 		}
 
 	function escoautor( tipo, id, text	 )
@@ -428,7 +433,8 @@ include 'partes/Scripts.php';
 				{ 
 				var dt = $(".dtinicria").datepicker("getDate");
 				dtini = $.datepicker.formatDate("yymmdd", dt );
-				$(".dtfimcria").val( "" );
+				$("#dtfimcria").datepicker( "option", "minDate", dt.getDate()+1 );
+				$("#dtfimcria").val( "" );
 				});
 				
 		$( ".dtfimcria" ).datepicker(
@@ -458,8 +464,10 @@ include 'partes/Scripts.php';
 			todayHighlight: true			
 			}).on('change.dp', function(e)
 				{ 
-				var dt = $(".dtinialt").datepicker("getDate");
+				let dt = $(".dtinialt").datepicker("getDate");
 				dtini = $.datepicker.formatDate("yymmdd", dt );
+				dt.setDate(dt.getDate()+1);
+				$("#dtfimalt").datepicker( "option", "minDate", dt );
 				$(".dtfimalt").val( "" );
 				});
 				
@@ -486,7 +494,7 @@ include 'partes/Scripts.php';
 			throw new Error("Problemas de acesso ao banco de dados. Por favor, tente mais tarde.");
 		var autorid = resu.dados[0].FUNI_ID;
 
-		$("#titwidget").html( "Autorizações de " + sshd );
+		$("#titwidget").html( "" );
 
 		//	tratamento das datas 	
 		//	combo de UORS
@@ -528,7 +536,7 @@ include 'partes/Scripts.php';
 			"tipo": "t",
 			"editavel": true,
 			"vanovo": "",
-			"width": "15%",
+			"width": "40%",
 			"aTargets": [ ++col ],
 			"mData": "NOME",
 			"sTitle":"Autorizador",
@@ -542,7 +550,7 @@ include 'partes/Scripts.php';
 			"tipo": "l",
 			"editavel": true,
 			"vanovo": "",
-			"width": "20%",
+			"width": "15%",
 			"aTargets": [ ++col ],
 			"mData": "INICIO",
 			"sTitle":"Início",
@@ -556,7 +564,7 @@ include 'partes/Scripts.php';
 			"tipo": "t",
 			"editavel": true,
 			"vanovo": "",
-			"width": "20%",
+			"width": "15%",
 			"aTargets": [ ++col ],
 			"mData": "TERMINO",
 			"sTitle":"Término",
@@ -594,7 +602,8 @@ include 'partes/Scripts.php';
 										"class='btn btn-circle btn-info btn-xs' " +
 										"title=\"Remove este período de autorização\" >" +
 										"<i class='glyphicon glyphicon-remove'></i></a>";
-				var acenc = "<a href='#' onClick='javascript:encerra(" + row.FUAUID + ");' " +
+				var acenc = "<a href='#' onClick='javascript:encerra(" + row.FUAUID + 
+										"," + stini + "," + stter + ");' " +
 										"class='btn btn-circle btn-info btn-xs' " +
 										"title=\"Encerra o período de autorização\" >" +
 										"<i class='glyphicon glyphicon-log-in'></i></a>";
@@ -607,7 +616,7 @@ include 'partes/Scripts.php';
 				if( stter == "" )
 					return acalt+acenc;
 					
-				if( stnow < stter )
+				if( stnow <= stter )
 					return acalt;
 				return "";
 				}

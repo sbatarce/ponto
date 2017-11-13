@@ -37,7 +37,7 @@
       .tooltip-inner{
         background-color: #ffff00;
         color: #000000;
-			}
+				}
 
 			.pad{
 				font-size: 24px;
@@ -49,6 +49,11 @@
 				position: absolute;
 				left: 50%;
 				top: 50%;
-      }
+				}
+			
+		.table thead>tr>th {text-align: center;}
+		.direito {text-align: right;}
+		.centro  {text-align: center;}
+		.esquerdo {text-align: left;}
     </style>
 		

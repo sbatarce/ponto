@@ -280,7 +280,8 @@ if( $qry == "qtdbiom" )
 	}
 
 ////////////////////////////////////////////////////////////////////////////////
-//	reprpmspessoa( pessoa(sshd), dtinic, dtterm ) - obtem os registro na biometria de uma pessoa num período
+//	reprpmspessoa( pessoa(sshd), dtinic, dtterm ) - 
+//									obtem os registro na biometria de uma pessoa num período
 if( $qry == "reprpmspessoa" )
 	{
 	if( !isset( $_GET["pessoa"] ) )

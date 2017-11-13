@@ -12,7 +12,7 @@
 <?php
 include 'partes/Head.php';
 ?>
-		<!-- Favicon -->
+		<!-- icone da PMS -->
 		<link rel="shortcut icon" href="/imagens/PMSICO.png">
 	</head>
 	
@@ -32,7 +32,7 @@ include 'partes/pagebody.php';
 				<input type="text" id="dtuprc" class="dtuprc"
 						 style="margin-left: 10px; width: 10%; float: right;
 						 font-size: 20px; font-weight: bold; " readonly/>
-				<label style="float: right; font-weight: bold; ">último processamento</label>
+				<label style="float: right; font-weight: bold; ">última coleta completada em</label>
 			</div>
 			<div class="col-lg-6" style='width:100%; margin-top: 20px; '>
 				<input class="btn btn-danger" type="button" value="Executar"
@@ -258,20 +258,17 @@ include 'partes/Scripts.php';
 	function fechaFunc( sshd, data )
 		{
 		//	funiid do funcionário
-		parms = "&sshd=" + sshd;
-		resu = Select( "funiid", parms );
+		let parms = `&sshd=${sshd}`;
+		let resu = Select( "funiid", parms );
 		if( resu == null )
 			throw new Error("Problemas de acesso ao banco de dados. Por favor, tente mais tarde.");
-		var funiid = resu.dados[0].FUNI_ID;
+		let funiid = resu.dados[0].FUNI_ID;
 		//	verifica se o funcionário tem pendências anteriores à data de fechamento
-		parms = "&funiid=" + funiid + "&data=" + data;
-		resu = Select( "qtpenden", parms );
-		if( resu == null )
-			throw new Error("Problemas de acesso ao banco de dados. Por favor, tente mais tarde.");
-		if( resu.linhas < 1 )
+		let url = `partes/fechaFuncionario.php?funiid=${funiid}&data=${data}`;
+		resu = remoto( url );
+		if( resu.status != "OK" )
 			return false;
-		if( resu.dados.QTD > 0 )
-			return false;
+		return true;
 		}
 		
 	function executar()
@@ -389,8 +386,9 @@ include 'partes/Scripts.php';
 			todayHighlight: true			
 			}).on('change.dp', function(e)
 				{ 
-				var dt = $(".dtinicria").datepicker("getDate");
+				var dt = $("#dtfecha").datepicker("getDate");
 				dtfecha = $.datepicker.formatDate("yymmdd", dt );
+				dtudir = $.datepicker.formatDate("dd/mm/yy", dt );
 				});
 
 		//	obtem FUNI_ID do autorizador
@@ -400,7 +398,7 @@ include 'partes/Scripts.php';
 			throw new Error("Problemas de acesso ao banco de dados. Por favor, tente mais tarde.");
 		var autorid = resu.dados[0].FUNI_ID;
 
-		$("#titwidget").html( "Autorizações de " + sshd );
+		$("#titwidget").html( "" );
 
 		//	tratamento das datas 	
 		//	combo de UORS

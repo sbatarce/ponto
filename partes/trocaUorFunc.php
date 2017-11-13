@@ -1,6 +1,11 @@
 <?php
-
+//	trocaUorFunc( funiid, uornova, dtefet )
 //	Verifica parametro FUNI_ID
+if( !isset( $_GET["dbg"] ) )
+	$dbg=false;
+else
+	$dbg=true;
+
 if( !isset( $_GET["funiid"] ) )
 	{
 	echo	'{ "data": [{"erro": "parametro funiid obrigatório"}] }';
@@ -15,6 +20,39 @@ if( !isset( $_GET["uornova"] ) )
 	return;
 	}
 $uornova = $_GET["uornova"];
+
+//	verifica parametro uornova = ID da nova UOR do funcionário
+if( !isset( $_GET["dtefet"] ) )
+	{
+	echo	'{ "data": [{"erro": "parametro dtefet obrigatório"}] }';
+	return;
+	}
+$dtefet = $_GET["dtefet"];
+if( $dbg )
+	{
+	echo "funiid=$funiid/uornova=$uornova/dtefet=$dtefet/<br>";
+	}
+
+if( strlen( $dtefet ) != 8 )
+	{
+	echo	'{ "data": [{"erro": "parametro dtefet invalido (YYYYMMDD)"}] }';
+	return;
+	}
+
+$ano = substr( $dtefet, 0, 4 );
+$mes = substr( $dtefet, 4, 2 );
+$dia = substr( $dtefet, 6, 2 );
+$dt = new DateTime();
+try
+	{
+	$dt->setDate($ano, $mes, $dia);
+	} 
+catch (Exception $ex) 
+	{
+	echo	'{ "data": [{"erro": "parametro dtefet invalido (YYYYMMDD)"}] }';
+	return;
+	}
+
 //
 include '../partes/fmtErro.php';
 include '../partes/ambiente.php';
@@ -72,9 +110,74 @@ if( $jres->linhas < 1 )
 	}
 $ora->libStmt();
 
-//	verifica se há um FUOR aberto para o funcionário
-$sql = "SELECT FUOR_ID, PMS_IDSAUUOR FROM BIOMETRIA.FUOR_FUNCUNIDADEORGANIZACIONAL
-					WHERE FUOR_DTFIM IS NULL AND
+//	obtem a data do dia seguinte ao último fechamento no formato YYYYMMDD
+$sql = "SELECT TO_CHAR( MAX(FSHM_DTREFERENCIA)+1, 'YYYYMMDD' ) as POSFECH
+					FROM BIOMETRIA.FSHM_FUNCSALDOHORAMENSAL
+					WHERE FUNI_ID=$funiid";
+$res = $ora->execSelect($sql);
+$jres = json_decode($res);
+if( $dbg )
+	{
+	echo "verifica fechamento sql=$sql/resultado:";
+	var_dump($jres);
+	}
+if( $jres->status != "OK" )
+	{
+	fmtErro( "erro", "verifica fechamento: $jres->erro" );
+	$ora->disconnect();
+	return;
+	}
+if( $jres->linhas > 0 )
+	{
+	}
+$ora->libStmt();
+$posfech = $jres->dados[0]->POSFECH;
+if( $dbg )
+	echo "dia seguinte ao fechamento=$posfech<br>";
+
+//	
+if( $posfech < $dtefet )
+	{
+	fmtErro( "erro", "a data de transferencia de UOR deve estar em um período fechado" );
+	$ora->disconnect();
+	return;
+	}
+
+//	verifica se houve interferencias do autorizador após a data de efetivaçãp
+$sql = "SELECT COUNT(1) AS QTINTER
+					FROM BIOMETRIA.FDTR_FUNCIONARIODIATRABALHO FDTR
+					INNER JOIN  BIOMETRIA.FRTR_FUNCIONARIOREGIMETRABALHO FRTR ON
+											FRTR.FRTR_ID=FDTR.FRTR_ID
+					WHERE FRTR.FUNI_ID=$funiid AND
+								FDTR.FDTR_DTREFERENCIA >= TO_DATE( '$dtefet', 'YYYYMMDD' ) AND
+								FDTR.TSDT_ID BETWEEN 2 and 3";
+$res = $ora->execSelect($sql);
+$jres = json_decode($res);
+if( $dbg )
+	{
+	echo "verifica interferencias sql=$sql/resultado:";
+	var_dump($jres);
+	}
+if( $jres->status != "OK" )
+	{
+	fmtErro( "erro", "verifica interferencias: $jres->erro" );
+	$ora->disconnect();
+	return;
+	}
+$ora->libStmt();
+$qtinter = $jres->dados[0]->QTINTER;
+if( $qtinter > 0 )
+	{
+	fmtErro( "erro", "ha interferencias do autorizador atual após a data de efetivação" );
+	$ora->disconnect();
+	return;
+	}
+
+//	obtem o ID de uma eventual FUOR aberta para o funcionário
+$sql = "SELECT	FUOR_ID, PMS_IDSAUUOR, 
+								TO_CHAR( FUOR_DTINICIO, 'YYYYMMDD' ) AS INI
+					FROM	BIOMETRIA.FUOR_FUNCUNIDADEORGANIZACIONAL
+					WHERE	FUOR_DTFIM IS NULL AND
 								FUNI_ID=$funiid";
 $res = $ora->execSelect($sql);
 $jres = json_decode($res);
@@ -90,15 +193,17 @@ if( $jres->status != "OK" )
 	return;
 	}
 $idfuorant = -1;
+$iniant = '';
 if( $jres->linhas > 0 )
 	{
 	$dado = $jres->dados[0];
 	if( $dbg )
 		var_dump( $dado );
 	$idfuorant = $dado->FUOR_ID;
+	$iniant = $dado->INI;
 	}
 if( $dbg )
-	echo "uor anterior=$idfuorant<br>";
+	echo "uor anterior=$idfuorant inicio anterior=$iniant<br>";
 $ora->libStmt();
 
 //	inicia uma transação 
@@ -109,28 +214,65 @@ if( $dbg )
 	echo "id da uor anterior: $idfuorant<br>";
 if( $idfuorant >= 0 )
 	{
-	$sql = "UPDATE BIOMETRIA.FUOR_FUNCUNIDADEORGANIZACIONAL 
-						SET FUOR_DTFIM=SYSDATE 
-						WHERE FUOR_ID=$idfuorant";
-	$res = $ora->execDelUpd($sql);
-	$jres = json_decode( $res );
-	if( $dbg )
+	if( $iniant != $dtefet )
 		{
-		echo "update FUOR anterio SQL=$sql/resultado:";
-		var_dump($jres);
+		$sql = "UPDATE BIOMETRIA.FUOR_FUNCUNIDADEORGANIZACIONAL 
+							SET FUOR_DTFIM=TO_DATE( '$dtefet', 'YYYYMMDD' ) -1
+							WHERE FUOR_ID=$idfuorant";
+		$res = $ora->execDelUpd($sql);
+		$jres = json_decode( $res );
+		if( $dbg )
+			{
+			echo "update FUOR anterio SQL=$sql/resultado:";
+			var_dump($jres);
+			}
+		if( $jres->status != "OK" )
+			{
+			fmtErro( "erro", "Encerrando alocacao anterior: $jres->erro" );
+			$ora->rollback();
+			$ora->disconnect();
+			return;
+			}
 		}
-	if( $jres->status != "OK" )
+	else
 		{
-		fmtErro( "erro", "Encerrando alocacao anterior: $jres->erro" );
-		$ora->rollback();
+		$sql = "UPDATE	BIOMETRIA.FUOR_FUNCUNIDADEORGANIZACIONAL 
+							SET		FUOR_DTFIM=NULL,
+										PMS_IDSAUUOR=$uornova
+							WHERE FUOR_ID=$idfuorant";
+		$res = $ora->execDelUpd($sql);
+		$jres = json_decode( $res );
+		if( $dbg )
+			{
+			echo "Substitui FUOR anterior SQL=$sql/resultado:";
+			var_dump($jres);
+			}
+		if( $jres->status != "OK" )
+			{
+			fmtErro( "erro", "Substituindo alocacao anterior: $jres->erro" );
+			$ora->rollback();
+			$ora->disconnect();
+			return;
+			}
+		if( $dbg )
+			{
+			echo "{ \"status\": \"warn\", \"warn\": \"debug ativado=>rollback\", \"id\": \"$id\" }";
+			$ora->rollback();
+			}
+		else
+			{
+			echo "{ \"status\": \"OK\", \"id\": \"$id\" }";
+			$ora->commit();
+			}
 		$ora->disconnect();
 		return;
-		}	
+		}
 	}
 	
 //	cria a nova alocação
 $sql = "INSERT INTO BIOMETRIA.FUOR_FUNCUNIDADEORGANIZACIONAL VALUES
-				  ( BIOMETRIA.SQ_FUOR.NEXTVAL, $funiid, $uornova, SYSDATE+1, null )";
+				  ( BIOMETRIA.SQ_FUOR.NEXTVAL, $funiid, $uornova, 
+						TO_DATE( '$dtefet', 'YYYYMMDD' ), null )";
 $res = $ora->execInsert( $sql, "BIOMETRIA.SQ_FUOR" );
 $jres = json_decode( $res );
 if( $dbg )

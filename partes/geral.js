@@ -212,6 +212,40 @@ function com2Digs(number)
   {
   return( number < 10 ? '0' : '' ) + number;
   }
+  
+ // de Date =>  ou 
+ //     tipo 1  DD/MM/YYYY
+ //     tipo 2  YYYYMMDD
+ //     default YYYY-MM-DD
+ function toStDate( data, tipo )
+  {
+  let ano = data.getFullYear();
+  let mes = data.getMonth()+1;
+  let dia = data.getDate();
+  let sdia, smes, sano;
+  if( dia < 10 )
+    sdia = "0" + dia;
+  else
+    sdia = "" + dia;
+  
+  if( mes < 10 )
+    smes = "0" + mes;
+  else
+    smes = "" + mes;
+  sano = "" + ano;
+  switch( tipo )
+    {
+    case 1:
+      return `${sdia}/${smes}/${sano}`;
+      break;
+    case 2:
+      return `${sano}${smes}${sdia}`;
+      break;
+    default:
+      return `${sano}-${smes}-${sdia}`;
+      break;
+    }
+  }
 
 //  de DD/MM/YYYY => YYYYMMDD
  function toDateInv( data )
@@ -222,12 +256,30 @@ function com2Digs(number)
   return res;
   }
   
-// de DD/MM/YYYY => Date()
+// de DD/MM/YYYY => Date() ou
+// de YYYY-MM-DD => Date() ou
+// de YYYYMMDD   => Date()
 function toDate( data )
   {
-  var ano = data.substr( 6 );
-  var mes = data.substr( 3, 2 );
-  var dia = data.substr( 0, 2 );
+  let ano, mes, dia;
+  if( data.indexOf( "/" ) >= 0 )
+    {
+    ano = data.substr( 6 );
+    mes = data.substr( 3, 2 );
+    dia = data.substr( 0, 2 );
+    }
+  if( data.indexOf( "-" ) >= 0 )
+    {
+    ano = data.substr( 0, 4 );
+    mes = data.substr( 5, 2 );
+    dia = data.substr( 8, 2 );
+    }
+  if( data.indexOf( "-" ) < 0 && data.indexOf( "/" ) < 0 )
+    {
+    ano = data.substr( 0, 4 );
+    mes = data.substr( 4, 2 );
+    dia = data.substr( 6, 2 );
+    }
   return new Date( ano, mes-1, dia );
   }
   
@@ -298,7 +350,7 @@ function Deslogar()
  function Voltar()
   {
   window.history.back();
-  window.location = "index.php";
+  //window.location = "index.php";
   }
 
 function remoto( url, us, ps )

@@ -21,14 +21,15 @@
         "autFuncio.php",
         "autTodosFunc.php",
 	"autAlocaFunc.php",
+        "autAtribuir.php",
 	"autAdmApar.php",
+	"autFechamento.php",
         "bootstrap-3.3.1",
         "bootstrap-datepicker",
         "funAcesso.php",
         "imagens",
         "index.php",
         "padrao.php",
-        "partes",
-        "autAtribuir.php"
+        "partes"
     ]
 }

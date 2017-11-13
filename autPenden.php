@@ -783,19 +783,15 @@ include 'partes/Scripts.php';
 		$("#titwidget").html( "Análise de pendencias de " + nofunc );
 		
 		//	acha a data do último fechamento e acerta as datas iniciais
-		var parms = "&sshd=" + sshd;
+		var parms = "&sshd=" + sshdfunc;
 		var resu = Select( "dtfecha", parms );
 		if( resu == null )
 			throw new Error("Problemas de acesso ao banco de dados. Por favor, tente mais tarde.");
 		var dtfecha = resu.dados[0].DTFECHA;
-		var afecha = Number(dtfecha.substring( 0, 4 ));
-		var mfecha = Number(dtfecha.substring( 5, 7 ))-1;
-		var dfecha = Number(dtfecha.substring( 8 ));
-		
 		var hoje = new Date();
 		var dtfim = $.datepicker.formatDate("yymmdd", hoje );
 		$("#dtfim").val( $.datepicker.formatDate("dd/mm/yy", hoje ) );
-		var dtufech = new Date( afecha, mfecha, dfecha, 0, 0, 0 );
+		var dtufech = toDate( dtfecha );
 		$("#dtini").val( $.datepicker.formatDate("dd/mm/yy", dtufech ));
 		var dtini = $.datepicker.formatDate("yymmdd", dtufech );
 
@@ -811,7 +807,7 @@ include 'partes/Scripts.php';
 		//	prepara a definiçao das colunas
 		var colDefs	=	[];
 		var	col	=	-1;
-
+		/*
 		var aux	=
 			{
 			"tipo": "x",
@@ -824,7 +820,7 @@ include 'partes/Scripts.php';
 			"defaultContent": " "
 			};
 		colDefs.push( aux );
-		
+		*/
 		var aux	=
 			{
 			"tipo": null,
@@ -846,34 +842,44 @@ include 'partes/Scripts.php';
 			"editavel": false,
 			"vanovo": "",
 			"width": "10%",
+			"className": "centro",
 			"aTargets": [ ++col ],
 			"mData": "TSDT_ID",
 			"sTitle":"Situação",
 			"defaultContent": " ",
 			"render": function( data, type, full )
 				{
-				var res = "";
+				let txt, cor;
 				if( data == "" )
 					{
-					res = "<button type='button' class='btn btn-default  btn-md'>OK</button>";
+					txt	=	"OK";
+					cor = "WhiteSmoke ";
 					}
 				if( data == "1" )
 					{
-					res = "<button type='button' class='btn btn-primary  btn-md'>Pendente</button>";
+					txt	=	"PEN";
+					cor = "LightBlue ";
 					}
 				if( data == "2" )
 					{
-					res = "<button type='button' class='btn btn-success  btn-md'>Aceita</button>";
+					txt	=	"ACE";
+					cor = "LightGreen";
 					}
 				if( data == "3" )
 					{
-					res = "<button type='button' class='btn btn-danger  btn-md'>Negada</button>";
+					txt	=	"NEG";
+					cor = "OrangeRed ";
 					}
 				if( data == "4" )
 					{
-					res = "<button type='button' class='btn btn-warning  btn-md'>Análise</button>";
+					txt	=	"ANA";
+					cor = "yellow";
 					}
-				return res;
+				return `
+					<span align='center' style='vertical-align: middle; 
+								display:inline-block; background-color: ${cor}; border: 1px; 
+								border-style: solid; border-radius: 3px; padding:4px; '>
+								${txt}</span> `;
 				}
 			};
 		colDefs.push( aux );
@@ -1009,7 +1015,7 @@ include 'partes/Scripts.php';
 			"width": "35%",
 			"aTargets": [ ++col ],
 			"mData": "FDTM_DLMENS",
-			"sTitle":"Diálogo",
+			"sTitle":"Diálogo/Aprovar/Rejeitar",
 			"defaultContent": " ",
 			"render": function( data, type, full )
 				{

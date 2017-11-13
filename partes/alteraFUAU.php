@@ -10,17 +10,30 @@ if( !isset( $_GET["fuauid"] ) )
 	return;
 	}
 $fuauid = $_GET["fuauid"];
-if( isset( $_GET["dtini"] ) )
-	$dtini = $_GET["dtini"];
-else
-	$dtini = "";
-if( isset( $_GET["dtfim"] ) )
-	$dtfim = $_GET["dtfim"];
-else
-	$dtfim = "";
-if( $dtini == "" && $dtfim == "" )
+
+if( !isset( $_GET["dtini"] ) )
 	{
-	echo "{ \"status\": \"OK\" }";
+	echo	'{ "data": [{"erro": "parametro dtini obrigatório"}] }';
+	return;
+	}
+$dtini = $_GET["dtini"];
+
+if( !isset( $_GET["dtfim"] ) )
+	{
+	echo	'{ "data": [{"erro": "parametro dtfim obrigatório"}] }';
+	return;
+	}
+$dtfim = $_GET["dtfim"];
+
+if( $dtini == 'null' || $dtini == 'NULL' )
+	{
+	echo	'{ "data": [{"erro": "parametro dtini nao pode ser nulo"}] }';
+	return;
+	}
+	
+if( $dtini == '' || $dtfim == '' )
+	{
+	echo	'{ "data": [{"erro": "parametro dtini ou dtfim sem conteúdo"}] }';
 	return;
 	}
 
@@ -57,26 +70,29 @@ if( $dbg )
 	}
 	
 //	verifica duplicidade de autorização na UOR e no período
+$auxfim = $dtfim;
+if( $dtfim == 'NULL' || $dtfim == 'null' )
+	$auxfim = '30001201';
 $sql = "SELECT FUAU_ID 
 					FROM  BIOMETRIA.FUAU_FUNCIONARIOAUTORIZADOR 
-					WHERE FUAU_ID<>$fuauid AND
+					WHERE FUAU_ID <> $fuauid AND
 								FUNI_ID=(SELECT FUNI_ID 
 														FROM BIOMETRIA.FUAU_FUNCIONARIOAUTORIZADOR 
 														WHERE FUAU_ID=$fuauid) AND 
 								PMS_IDSAUUOR=(SELECT PMS_IDSAUUOR 
 																FROM BIOMETRIA.FUAU_FUNCIONARIOAUTORIZADOR 
-																WHERE FUAU_ID=$fuauid) AND ";
-if( $dtini != "" && $dtfim != "" )
-	$sql .= "(TO_DATE( '$dtini', 'YYYYMMDD' ) BETWEEN FUAU_DTINICIO AND 
-								NVL(FUAU_DTFIM, TO_DATE('30001231', 'YYYYMMDD') ) OR
-						TO_DATE( '$dtfim', 'YYYYMMDD' ) BETWEEN FUAU_DTINICIO AND 
-								NVL(FUAU_DTFIM, TO_DATE('30001231', 'YYYYMMDD')) )";
-if( $dtini != "" && $dtfim == "" )
-	$sql .= "TO_DATE( '$dtini', 'YYYYMMDD' ) BETWEEN FUAU_DTINICIO AND 
-						NVL(FUAU_DTFIM, TO_DATE('30001231', 'YYYYMMDD') )";
-if( $dtini == "" && $dtfim != "" )
-	$sql .= "TO_DATE( '$dtfim', 'YYYYMMDD' ) BETWEEN FUAU_DTINICIO AND 
-						NVL(FUAU_DTFIM, TO_DATE('30001231', 'YYYYMMDD'))";
+																WHERE FUAU_ID=$fuauid) AND (
+								( TO_DATE( '$dtini', 'YYYYMMDD' ) BETWEEN FUAU_DTINICIO AND 
+											NVL(FUAU_DTFIM, TO_DATE('30001231', 'YYYYMMDD') ) OR
+									TO_DATE( '$auxfim', 'YYYYMMDD' ) BETWEEN FUAU_DTINICIO AND 
+											NVL(FUAU_DTFIM, TO_DATE('30001231', 'YYYYMMDD')) ) OR
+								( FUAU_DTINICIO BETWEEN
+										TO_DATE( '$dtini', 'YYYYMMDD' ) AND
+										TO_DATE( '$auxfim', 'YYYYMMDD' ) OR
+									NVL(FUAU_DTFIM, TO_DATE('30001231', 'YYYYMMDD')) BETWEEN
+										TO_DATE( '$dtini', 'YYYYMMDD' ) AND
+										TO_DATE( '$auxfim', 'YYYYMMDD' ) )
+								)";
 
 $res = $ora->execSelect($sql);
 $jres = json_decode($res);
@@ -103,18 +119,15 @@ $ora->libStmt();
 $ora->beginTransaction();
 
 //	altera
-if( $dtini != "" && $dtfim != "" )
+if( $dtfim != "null" && $dtfim != "NULL" )
 	$sql = "UPDATE	BIOMETRIA.FUAU_FUNCIONARIOAUTORIZADOR 
 						SET		FUAU_DTINICIO=TO_DATE( '$dtini', 'YYYYMMDD' ), 
 									FUAU_DTFIM=TO_DATE( '$dtfim', 'YYYYMMDD' ) 
 						WHERE FUAU_ID=$fuauid";
-if( $dtini != "" && $dtfim == "" )
+else
 	$sql = "UPDATE	BIOMETRIA.FUAU_FUNCIONARIOAUTORIZADOR 
-						SET		FUAU_DTINICIO=TO_DATE( '$dtini', 'YYYYMMDD' )
-						WHERE FUAU_ID=$fuauid";
-if( $dtini == "" && $dtfim != "" )
-	$sql = "UPDATE	BIOMETRIA.FUAU_FUNCIONARIOAUTORIZADOR 
-						SET		FUAU_DTFIM=TO_DATE( '$dtfim', 'YYYYMMDD' ) 
+						SET		FUAU_DTINICIO=TO_DATE( '$dtini', 'YYYYMMDD' ), 
+									FUAU_DTFIM=NULL 
 						WHERE FUAU_ID=$fuauid";
 $res = $ora->execDelUpd( $sql );
 $jres = json_decode( $res );

@@ -381,6 +381,7 @@ include 'partes/Scripts.php';
 				return hh+":"+mm;
 			}
 			
+		/*
 		//	chama a página de pendências do funcionário
 		function pendencias( sshd )
 			{
@@ -412,7 +413,7 @@ include 'partes/Scripts.php';
 			criarCookie( "sshdfunc", sshd );
 			window.location = "autFuncio.php";
 			}
-			
+		*/
 		/////////////// PRINCIPAL ////////////////////////
 		var idapalant = 0;
 		var noapalant = "Escolha abaixo";
