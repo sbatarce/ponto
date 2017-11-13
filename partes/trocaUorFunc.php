@@ -256,12 +256,12 @@ if( $idfuorant >= 0 )
 			}
 		if( $dbg )
 			{
-			echo "{ \"status\": \"warn\", \"warn\": \"debug ativado=>rollback\", \"id\": \"$id\" }";
+			echo "{ \"status\": \"warn\", \"warn\": \"debug ativado=>rollback\", \"id\": \"$idfuorant\" }";
 			$ora->rollback();
 			}
 		else
 			{
-			echo "{ \"status\": \"OK\", \"id\": \"$id\" }";
+			echo "{ \"status\": \"OK\", \"id\": \"$idfuorant\" }";
 			$ora->commit();
 			}
 		$ora->disconnect();
