@@ -324,18 +324,7 @@ include 'partes/pagebody.php';
 						};
 					lin	+=	CampoTexto( aux );
 
-					if( resu.dados[ix].EHBASE == "1" )
-						{
-						lin	+=	"<a style='margin-left: 10px; ' " +
-										"href='javascript:trocaBase( " + 
-										original.IDFUNI + ", \"" + original.SSHD + "\", \"" + 
-										original.NOFUNC + "\", " + 
-										resu.dados[ix].IDAPAL + ", " + resu.dados[ix].IDFLTR +  " )' " +
-										"class='btn btn-circle btn-info btn-xs ' " +
-										"title=\"Troca o aparelho base do funcionário\" >" +
-										"<i class='glyphicon glyphicon-random'></i></a>";
-						}
-					else
+					if( resu.linhas > 1 )
 						{
 						lin	+=	"<a style='margin-left: 10px; ' " +
 										"href='javascript:removeApar( " + 
