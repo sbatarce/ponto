@@ -146,7 +146,7 @@ include 'partes/Scripts.php';
 												"\nNão pode ser adicionado ao aparelho";
 							aux = "Por favor, anote\nO Funcionário: " + row["NOME"] + 
 												"\nNão pode ser adicionado ao aparelho:\n";
-							//alert( aux );
+							alert( aux );
 							flerr = true;
 							}
 						}

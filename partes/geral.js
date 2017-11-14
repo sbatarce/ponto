@@ -6,6 +6,18 @@ var basicAuth = {};
 var flbasic = false;
 var tocoo = 10;
 
+$(document).ready(function()
+  {		
+  $(document).ajaxStart(function()
+    {
+    $("#wait").css("display", "block");
+    });
+  $(document).ajaxComplete(function()
+    {
+    $("#wait").css("display", "none");
+    });
+  });
+
 //  combina 2 objetos tipo { k1: v1, k2: v2,... }
 //  adiciona ou modifica obj2[kx] em obj1
 function combina( obj1, obj2 )
@@ -352,12 +364,11 @@ function Deslogar()
   window.history.back();
   //window.location = "index.php";
   }
-
+  
 function remoto( url, us, ps )
   {
-  if( $('#modwait').length ) 
-    $('#modwait').show();
-  var hea = { };
+  let resul = { };
+  let hea = { };
   if( us != undefined && ps != undefined )
     {
     if( us != null && ps != null )
@@ -366,7 +377,6 @@ function remoto( url, us, ps )
         hea["Authorization"] = "Basic " + btoa(us+":"+ps);
       }
     }
-  var resul = { };
   if( flbasic )
     combina( hea, basicAuth );
   $.ajax(
@@ -377,17 +387,15 @@ function remoto( url, us, ps )
     async: false,
     url: url,
     success: function( resp, textStatus, jqXHR )
-      {
-      resul = resp;
-      },
+              {
+              resul = resp;
+              },
     error: function( responseData, textStatus, errorThrown )
-      {
-      resul.status = textStatus + " - " + responseData.responseText;
-      resul.erro = errorThrown;
-      }
+            {
+            resul.status = textStatus + " - " + responseData.responseText;
+            resul.erro = errorThrown;
+            }
     });
-  if( $('#modwait').length ) 
-    $('#modwait').hide();
   return resul;
   }
 

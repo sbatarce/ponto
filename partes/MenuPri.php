@@ -1,3 +1,11 @@
+		<!--	div de wait -->											
+		<div id="wait" 
+				 style="display:none;width:69px;height:89px;
+				 position:absolute;top:30%;left:50%;padding:2px;z-index: 2147483647;">
+			<img src='imagens/espera.gif' width="128" height="128" /><br>
+			Aguarde...
+		</div>
+		
 		<!-- menu escamoteável -->
 		<div class="header">
 			<div class="container">

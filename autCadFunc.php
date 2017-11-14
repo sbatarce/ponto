@@ -357,7 +357,7 @@ include 'partes/pagebody.php';
 		function trocaSSHD( idfltr, sshd, nome, apal, apalnovo )
 			{
 			//	insere no aparelho novo
-			var body =	"[ { \"nome\": \"" + nome +
+			let body =	"[ { \"nome\": \"" + nome +
 									"\", \"verifica_biometria\": true, " +
 									"\"referencias\": [ " + sshd.substring(1) +  " ]}]";
 			let resu = repserviceB( "POST", "usuarios", apalnovo, "SISPONTO", null, body );
@@ -368,9 +368,9 @@ include 'partes/pagebody.php';
 				return;
 				}
 			//	remove do aparelho atual
-			var funcao = "usuarios/" + sshd.substring(1);
-			var resu = repserviceB( "DELETE", funcao, apal, "SISPONTO", null, null );
-			var aux = resu.erro;
+			let funcao = "usuarios/" + sshd.substring(1);
+			resu = repserviceB( "DELETE", funcao, apal, "SISPONTO", null, null );
+			aux = resu.erro;
 			//	000 -> OK
 			//	022 -> não há este usuário no aparelho
 			if( aux.indexOf("000") < 0 && aux.indexOf("022") < 0 )
@@ -379,9 +379,9 @@ include 'partes/pagebody.php';
 				return false;
 				}
 			//	troca no banco
-			var url = "partes/trocaFLTR.php?fltrid="+ idfltr + 
+			let url = "partes/trocaFLTR.php?fltrid="+ idfltr + 
 								"&apalid=" + apal;
-			var resu = remoto( url );
+			resu = remoto( url );
 			if( resu.status == "OK" )
 				{
 				alert( "OK: alterado" );

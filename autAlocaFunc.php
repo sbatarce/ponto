@@ -81,7 +81,6 @@ include 'partes/Scripts.php';
 	<script type="text/javascript" src="partes/geral.js" ></script>
 	<script type="text/javascript" src="partes/dteditavel.js" ></script>
 	<script type="text/javascript" >
-
 	$('#cktodos').bootstrapSwitch('state', false);
 
 		$("#cktodos").on( 'switchChange.bootstrapSwitch', function( evn, state )
@@ -391,6 +390,12 @@ include 'partes/Scripts.php';
 			{
 			if( idualo <= 0 )
 				return;
+//			$("#wait").dialog(
+	//			{
+				//dialogClass: "no-close",
+		//		modal: false
+			//	});
+			//$("#wait").dialog('show');
 			//
 			tableClear();
 			
@@ -399,7 +404,8 @@ include 'partes/Scripts.php';
 			var	resu	=	remoto( url );
 			if( resu == null )
 				{
-				alert( "Falha na obtenção dos dados. Por Favor, tente mais tarde")
+				alert( "Falha na obtenção dos dados. Por Favor, tente mais tarde");
+				//$("#wait").dialog( "hide" );
 				return;
 				}
 			var qt = resu.data.length;
@@ -436,6 +442,7 @@ include 'partes/Scripts.php';
 						}
 					}
 				Table.fnAddData( data, true );
+				//$("#wait").dialog( "hide" );
 				//atuatab();
 				}
 			}
