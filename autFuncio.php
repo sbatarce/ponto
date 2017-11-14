@@ -84,7 +84,6 @@ include 'partes/pagebody.php';
 	</div>
 			
 	<!-- modal de entrada de nova presença -->
-
 	<div id="novapres" class="modal fade bs-modal-sm" role="dialog"
 			aria-labelledby="mySmallModalLabel" aria-hidden="true"
 			style="width: 500px; max-width: 500px;" >
@@ -116,7 +115,6 @@ include 'partes/pagebody.php';
 	</div>
 			
 		<!-- modal de diálogo -->
-
 		<div id="moddialogo" class="modal fade bs-modal-sm" role="dialog"
 				aria-labelledby="mySmallModalLabel" aria-hidden="true"
 				style="width: 500px; max-width: 500px;" >
@@ -161,7 +159,6 @@ include 'partes/pagebody.php';
 	</div>
 
 	<!-- modal de entrada de diálogo -->
-
 	<div id="moddialog" class="modal fade bs-modal-sm" role="dialog"
 			aria-labelledby="mySmallModalLabel" aria-hidden="true"
 			style="width: 500px; max-width: 500px;" >

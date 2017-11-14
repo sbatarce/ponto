@@ -14,11 +14,7 @@ include 'partes/Head.php';
 		<link href="bootstrap-3.3.1/dist/css/bootstrap-switch.css" rel="stylesheet">
 	</head>
 	
-<<<<<<< HEAD
 	<body onload="javascript:titulo( '<h4>Alocação de funcionários na(s) UOR(s) do autorizador</h4>' );">
-=======
-	<body onload="javascript:titulo( '<h4>Lista de todos todos os usuários do Autorizador</h4>' );">
->>>>>>> cb91d5f8350789d33ae388c8cb548b0285236545
 <?php
 include 'partes/MenuPri.php';
 include 'partes/Cabec.php';
@@ -85,13 +81,8 @@ include 'partes/Scripts.php';
 	<script type="text/javascript" src="partes/geral.js" ></script>
 	<script type="text/javascript" src="partes/dteditavel.js" ></script>
 	<script type="text/javascript" >
-<<<<<<< HEAD
 
 	$('#cktodos').bootstrapSwitch('state', false);
-=======
-		
-		$('#cktodos').bootstrapSwitch('state', false);
->>>>>>> cb91d5f8350789d33ae388c8cb548b0285236545
 
 		$("#cktodos").on( 'switchChange.bootstrapSwitch', function( evn, state )
 			{
@@ -132,11 +123,7 @@ include 'partes/Scripts.php';
 				iduor	=	id;
 				nouor	= text;
 				}
-<<<<<<< HEAD
 			var url	=	"partes/tableData.php?query=funuorbio&iduor="+iduor;
-=======
-			var url	=	"partes/tableData.php?query=funuorbio&iduor=" + iduor;
->>>>>>> cb91d5f8350789d33ae388c8cb548b0285236545
 			var	resu	=	remoto( url );
 			if( resu == null )
 				{
@@ -155,17 +142,10 @@ include 'partes/Scripts.php';
 												"NOME": resu.data[ix].NOME,
 												"QTBIO": resu.data[ix].QTBIO,
 												"REGIME": "Escolha Abaixo",
-<<<<<<< HEAD
 												"PRESENTE": "não",
 												"MANTER": "sim",
 												"IDREG": "0",
 												"action": "" } );
-=======
-												"PRESENTE": "0",
-												"MANTER": "1",
-												"IDREG": "0",
-												"action": acsoalt} );
->>>>>>> cb91d5f8350789d33ae388c8cb548b0285236545
 						}
 					else
 						{
@@ -173,7 +153,6 @@ include 'partes/Scripts.php';
 												"NOME": resu.data[ix].NOME,
 												"QTBIO": resu.data[ix].QTBIO,
 												"REGIME": resu.data[ix].REGIME,
-<<<<<<< HEAD
 												"PRESENTE": "não",
 												"MANTER": "sim",
 												"IDREG": resu.data[ix].IDRETR,
@@ -190,15 +169,6 @@ include 'partes/Scripts.php';
 					Table.fnUpdate( fica, lis[ix], 5, fica, false );
 					}
 				Table.fnDraw( true );
-=======
-												"PRESENTE": "0",
-												"MANTER": "1",
-												"IDREG": resu.data[ix].IDRETR,
-												"action": acsoalt} );
-						}
-					}
-				Table.fnAddData( data, true );
->>>>>>> cb91d5f8350789d33ae388c8cb548b0285236545
 				}
 			$(".uors").select2('val', 0 );
 			}
@@ -224,7 +194,6 @@ include 'partes/Scripts.php';
 			for( var ix=0; ix<qtlin; ix++ )
 				{
 				row = Table.fnGetData( ix );
-<<<<<<< HEAD
 				noreg = row["REGIME"];
 				if( noreg != "" && noreg.indexOf("Escolha") < 0 )
 					continue;
@@ -264,19 +233,6 @@ include 'partes/Scripts.php';
 			*/
 			}
 			
-=======
-				if( row["action"] == "" )
-					continue;
-				if( row["IDREG"] == "0" )
-					{
-					row["REGIME"] = noregi;
-					row["IDREG"] = idregi;
-					Table.api().row(ix).data(row);
-					}
-				}
-			}
-			
->>>>>>> cb91d5f8350789d33ae388c8cb548b0285236545
 		function executar()
 			{
 			var qtlin = tableQtLins();
@@ -293,15 +249,9 @@ include 'partes/Scripts.php';
 			for( var ix=0; ix<qtlin; ix++ )
 				{
 				row = Table.fnGetData( ix );
-<<<<<<< HEAD
 				if( row["PRESENTE"] == "sim" )
 					continue;
 				if( row["MANTER"] != "sim" )
-=======
-				if( row["PRESENTE"] == "1" )
-					continue;
-				if( row["MANTER"] != "1" )
->>>>>>> cb91d5f8350789d33ae388c8cb548b0285236545
 					continue;
 				if( row["IDREG"] <= 0 )
 					{
@@ -316,15 +266,9 @@ include 'partes/Scripts.php';
 			for( var ix=0; ix<qtlin; ix++ )
 				{
 				row = Table.fnGetData( ix );
-<<<<<<< HEAD
 				if( row["PRESENTE"] == "sim" )
 					continue;
 				if( row["MANTER"] != "sim" )
-=======
-				if( row["PRESENTE"] == "1" )
-					continue;
-				if( row["MANTER"] != "1" )
->>>>>>> cb91d5f8350789d33ae388c8cb548b0285236545
 					continue;
 				var url = "partes/criaFuni.php?sshd=" + row["IUN"] +
 									"&idretr=" + row["IDREG"] +
@@ -334,16 +278,12 @@ include 'partes/Scripts.php';
 					{
 					var txt = "Erro:\n" + resul.erro + "\ncriando o funcionário:\n" +
 										row["NOME"];
-<<<<<<< HEAD
 					//alert( txt );
 					}
 				else
 					{
 					Table.fnUpdate( "sim", ix, 4, false );
 					Table.fnUpdate( "", ix, 5 );
-=======
-					alert( txt );
->>>>>>> cb91d5f8350789d33ae388c8cb548b0285236545
 					}
 				}
 			}
@@ -468,7 +408,6 @@ include 'partes/Scripts.php';
 				{
 				for( var ix=0; ix<qt; ix++ )
 					{
-<<<<<<< HEAD
 					if( resu.data[ix].FUNI_ID == "" )
 						{
 						var fica = "<a href='#' onClick='javascript:remove(" + ix + ")' " +
@@ -495,16 +434,6 @@ include 'partes/Scripts.php';
 												"IDREG": "",
 												"action": ""} );
 						}
-=======
-					data.push({	"IUN": resu.data[ix].IUN,
-											"NOME": resu.data[ix].NOME,
-											"QTBIO": resu.data[ix].QTBIO,
-											"REGIME": resu.data[ix].REGIME,
-											"PRESENTE": "1",
-											"MANTER": "1",
-											"IDREG": "",
-											"action": ""} );
->>>>>>> cb91d5f8350789d33ae388c8cb548b0285236545
 					}
 				Table.fnAddData( data, true );
 				//atuatab();
@@ -558,11 +487,7 @@ include 'partes/Scripts.php';
 						};
 
 		//	monta o datatables
-<<<<<<< HEAD
 		var	order	=	[4, 'asc'];											//	sem classificação 
-=======
-		var	order	=	[];											//	sem classificação 
->>>>>>> cb91d5f8350789d33ae388c8cb548b0285236545
 		//	prepara a definiçao das colunas
 		var colDefs	=	[];
 		var	col	=	-1;
@@ -634,38 +559,7 @@ include 'partes/Scripts.php';
 			"aTargets": [ ++col ],
 			"mData": "PRESENTE",
 			"sTitle":"Presente",
-<<<<<<< HEAD
 			"defaultContent": " "
-=======
-			"defaultContent": " ",
-			"render": function( data, type, full )
-					{
-					if( data == 0 )
-						return "<i class='glyphicon glyphicon-remove'></i></a>";
-					else
-						return "<i class='glyphicon glyphicon-ok'></i></a>";
-					}
-			};
-		colDefs.push( aux );
-		
-		aux	=
-			{
-			"tipo": "x",
-			"editavel": false,
-			"vanovo": "",
-			"width": "10%",
-			"aTargets": [ ++col ],
-			"mData": "MANTER",
-			"sTitle":"Manter",
-			"defaultContent": " ",
-			"render": function( data, type, full )
-					{
-					if( data == 0 )
-						return "<i class='glyphicon glyphicon-remove'></i></a>";
-					else
-						return "<i class='glyphicon glyphicon-ok'></i></a>";
-					}
->>>>>>> cb91d5f8350789d33ae388c8cb548b0285236545
 			};
 		colDefs.push( aux );
 		
@@ -674,22 +568,14 @@ include 'partes/Scripts.php';
 			"tipo": null,
 			"editavel": false,
 			"vanovo": "",
-<<<<<<< HEAD
 			"sTitle":"Adicionar",
-=======
->>>>>>> cb91d5f8350789d33ae388c8cb548b0285236545
 			"bSortable": false,
 			"searchable": false,
 			"aTargets": [ ++col ],
 			"orderable":false,
 			"mData": "action",
-<<<<<<< HEAD
 			"width": "10%",
 			"defaultContent": ""
-=======
-			"width": "5%",
-			"defaultContent": acsoalt
->>>>>>> cb91d5f8350789d33ae388c8cb548b0285236545
 			};
 		colDefs.push( aux );
 		
@@ -703,13 +589,8 @@ include 'partes/Scripts.php';
 									"NOME": "Escolha uma UOR de PONTO acima",
 									"QTBIO": "",
 									"REGIME": "",
-<<<<<<< HEAD
 									"PRESENTE": "",
 									"MANTER": "",
-=======
-									"PRESENTE": "0",
-									"MANTER": "0",
->>>>>>> cb91d5f8350789d33ae388c8cb548b0285236545
 									"IDREG": "",
 									"action": ""} );
 		Table.fnAddData( data, true );
