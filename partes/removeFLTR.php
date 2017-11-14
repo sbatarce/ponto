@@ -92,16 +92,15 @@ if( $jres->status != "OK" )
 	$ora->disconnect();
 	return;
 	}	
-$id = $jres->idnovo;
 //	commita e encerra
 if( $dbg )
 	{
-	echo "{ \"status\": \"warn\", \"warn\": \"debug ativado=>rollback\", \"id\": \"$id\" }";
+	echo "{ \"status\": \"warn\", \"warn\": \"debug ativado=>rollback\" }";
 	$ora->rollback();
 	}
 else
 	{
-	echo "{ \"status\": \"OK\", \"id\": \"$id\" }";
+	echo "{ \"status\": \"OK\" }";
 	$ora->commit();
 	}
 $ora->disconnect();
