@@ -10,11 +10,11 @@ $(document).ready(function()
   {		
   $(document).ajaxStart(function()
     {
-    $("#wait").css("display", "block");
+    $(".waitajax").css("display", "block");
     });
   $(document).ajaxComplete(function()
     {
-    $("#wait").css("display", "none");
+    $(".waitajax").css("display", "none");
     });
   });
 

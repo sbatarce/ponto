@@ -198,6 +198,7 @@ include 'partes/pagebody.php';
 		function editRow( oTable, nRow )
 			{
 			iduor = -1;
+			idnaosim = -1;
 			editRowG( oTable, nRow );
 			ixedt = nRow;
 			let aData = oTable.fnGetData(nRow);			
@@ -212,7 +213,7 @@ include 'partes/pagebody.php';
 			var aData = oTable.fnGetData(nRow);
 			if( iduor <= 0 && idreg <= 0 )
 				return;
-			
+			/*
 			if( iduor > 0 )
 				{
 				var url = "partes/trocaUorFunc.php?funiid="+ aData["IDFUNI"] + 
@@ -245,6 +246,9 @@ include 'partes/pagebody.php';
 					}
 				}
 			//saveRowG( oTable, nRow, idnovo );
+			*/
+			restoreRowG( oTable, nRow );
+			ixedt = -1;
 			return true;
 			}
 
@@ -484,6 +488,28 @@ include 'partes/pagebody.php';
 				Table.api().row(ixedt).data(row);
 				}
 			}
+			
+		function escnaosim( tipo, id, text )
+			{
+			idnaosim = id;
+			let aData = Table.fnGetData(ixedt);
+			
+			let url = "partes/updates.php?query=altmens&funiid="+ idfunc + 
+								"&manda=" + id;
+			let resu = remoto( url );
+			if( resu.status != "OK" )
+				{
+				alert( "Erro alterando opcao de mensagem: " + resu.erro );
+				return null;
+				}
+			let row = Table.fnGetData( ixedt );
+			row["STENVMENS"] = ""+id;
+			row["ENVMENS"] = text;
+			Table.api().row(ixedt).data(row);
+			
+			restoreRowG( Table, ixedt );
+			ixedt = -1;
+			}
 
 		function escUor( tipo, id, text )
 			{
@@ -621,13 +647,14 @@ include 'partes/pagebody.php';
 			}
 			
 /////////////// PRINCIPAL ////////////////////////
+		//	variáveis e rotinas de atualização
 		var idapar = -1;
 		var iduornov = -1;
 		var iduorant = -1;
+		var idnaosim = -1;
 		var nouorant = "";
 		var nouornov = "";
 		
-		//	variáveis e rotinas de atualização
 		var ixedt = -1;			//	row sendo editada
 		var idfunc = -1;		//	funiid do funcionario em edição
 		var iduor = -1;			//	última uor escolhida
@@ -702,6 +729,7 @@ include 'partes/pagebody.php';
 		var aux	=
 			{
 			"tipo": null,
+			"className": "centro",
 			"editavel": false,
 			"vanovo": "",
 			"bSortable": false,
@@ -715,19 +743,19 @@ include 'partes/pagebody.php';
 				{
 				return	acshow;
 				}
-
 			};
 		colDefs.push( aux );
 		
 		aux	=
 			{
 			"tipo": "t",
+			"className": "centro",
 			"editavel": false,
 			"vanovo": "",
 			"aTargets": [ ++col ],
 			"mData": "SSHD",
 			"sTitle":"SSHD",
-			"width": "15%",
+			"width": "10%",
 			"defaultContent": " "
 			};
 		colDefs.push( aux );
@@ -748,6 +776,7 @@ include 'partes/pagebody.php';
 		aux	=
 			{
 			"tipo": "t",
+			"className": "centro",
 			"editavel": false,
 			"vanovo": "",
 			"aTargets": [ ++col ],
@@ -758,6 +787,26 @@ include 'partes/pagebody.php';
 			};
 		colDefs.push( aux );
 
+		aux	=
+			{
+			"tipo": "l",
+			"className": "centro",
+			"editavel": true,
+			"vanovo": "",
+			"aTargets": [ ++col ],
+			"sTitle":"Envia Mensagens",
+			"mData": "ENVMENS",
+			"selID": "STENVMENS",
+			"selVal": "ENVMENS",
+			"classe": "cbnaosim",
+			"selminlen": 0,
+			"funcEscolha": escnaosim,
+			"selURL": "selectData.php?query=naosim",
+			"width": "10%",
+			"defaultContent": " "
+			};
+		colDefs.push( aux );
+		
 		aux	=
 			{
 			"tipo": "l",
@@ -806,7 +855,7 @@ include 'partes/pagebody.php';
 			"aTargets": [ ++col ],
 			"orderable":false,
 			"mData":null,
-			"width": "10%",
+			"width": "15%",
 			"defaultContent": acsoalt
 			};
 		colDefs.push( aux );

@@ -40,6 +40,31 @@ if( $qry == "upd" )
 	$sql	=	"update ".$_GET["tbl"]." set ".$_GET["alter"]." where ".$_GET["selec"];
 	}
 
+//	altmens( funiid, manda ) altera o estado da recepção de mensagens do funcionário
+if( $qry == "altmens" )
+	{
+	if( !isset( $_GET["funiid"] ) )
+		{
+		echo	'{ "status": "erro", "erro": "parametro funiid obrigatorio" }';
+		return;
+		}
+	if( !isset( $_GET["manda"] ) )
+		{
+		echo	'{ "status": "erro", "erro": "parametro manda obrigatorio" }';
+		return;
+		}
+	$funiid = $_GET["funiid"];
+	$manda = $_GET["manda"];
+	if( $manda != '0' && $manda != '1' )
+		{
+		echo	'{ "status": "erro", "erro": "parametro manda invalido" }';
+		return;
+		}
+		
+	$sql	=	"UPDATE BIOMETRIA.FUNI_FUNCIONARIO set FUNI_STMENS=$manda 
+							WHERE FUNI_ID=$funiid";
+	}
+
 //	delfuau	-	delete FUAU
 if( $qry == "delfuau" )
 	{

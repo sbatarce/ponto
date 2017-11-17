@@ -80,6 +80,14 @@ if( $qry == "xpto" )
 
 	$sql	=	"";
 	}
+	
+////////////////////////////////////////////////////////////////////////////////
+//	
+if( $qry == "naosim" )
+	{
+	echo '[ {"id":"0", "text":"nao"},{"id": "1", "text": "sim"} ]';
+	return;
+	}
 
 ////////////////////////////////////////////////////////////////////////////////
 //	candidauto	- candidatos a autorizador de uma fuor
@@ -150,11 +158,18 @@ if( $qry == "fuors" )
 		}
 	else
 		{
+		/*
 		$sql = "SELECT DISTINCT PUOR.UOR_IDUNIDADEORGANIZACIONAL, PUOR.UOR_DLSIGLAUNIDADE
 							FROM        BIOMETRIA.FUAU_FUNCIONARIOAUTORIZADOR FUAU
 							INNER JOIN  SAU.VWUORPUBLICA PUOR ON 
 													PUOR.UOR_IDUNIDADEORGANIZACIONAL=FUAU.PMS_IDSAUUOR
 							ORDER BY    PUOR.UOR_DLSIGLAUNIDADE";
+		 */
+		$sql = "SELECT DISTINCT UOR_IDUNIDADEORGANIZACIONAL, UOR_DLSIGLAUNIDADE
+							FROM	SAU.VWUORPUBLICA
+							WHERE	UOR_DTFINAL IS NULL AND
+										UOR_STATIVO=1							
+							ORDER BY	UOR_DLSIGLAUNIDADE";
 		}
 	}
 
