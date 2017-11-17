@@ -398,7 +398,7 @@ include 'partes/pagebody.php';
 				let resu = remoto( url );
 				if( resu.status == "OK" )
 					{
-					alert( "OK: UOR atualizada." );
+					alert( "OK: Funcionário adicionado." );
 					}
 				else
 					{

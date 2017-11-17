@@ -237,19 +237,19 @@ include 'partes/Scripts.php';
 				res = "";
 				res +=	"<a href='javascript:pendencias(\"" + full.SSHDFUNC +
 								"\", \""+ full.IDFUNC + "\", \"" + full.NOFUNC + 
-								"\", \""+ full.UORFUNC + "\" );' " +
+								"\", \""+ full.IDUORFUNC + "\" );' " +
 								"<button type='button' title='Verificar pendências do funcionário' " +
 								"class='btn btn-warning  btn-md'>ANA</button></a>";
 				
 				res +=	"<a href='javascript:ausencias( \"" + full.SSHDFUNC +
 								"\", \""+ full.IDFUNC + "\", \"" + full.NOFUNC + 
-								"\", \""+ full.UORFUNC + "\" );' " +
+								"\", \""+ full.IDUORFUNC + "\" );' " +
 								"<button type='button' title='Autorizar ausências' " +
 								"class='btn btn-success  btn-md'>AUS</button></a>";
 
 				res +=	"<a href='javascript:correcoes(\"" + full.SSHDFUNC+
 								"\", \""+ full.IDFUNC + "\", \"" + full.NOFUNC + 
-								"\", \""+ full.UORFUNC + "\" );' " +
+								"\", \""+ full.IDUORFUNC + "\" );' " +
 								"<button type='button' title='Corrigir saldo para mais ou para menos' " +
 								"class='btn btn-danger  btn-md'>COR</button></a>";
 
