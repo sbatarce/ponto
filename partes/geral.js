@@ -4,17 +4,33 @@
 var user;
 var basicAuth = {};
 var flbasic = false;
-var tocoo = 10;
+var bloq = false;
 
+function bloqueia( )
+  {
+  if( !bloq )
+    {
+    $(".waitajax").css("display", "block");
+    bloq = true;
+    }
+  }
+function libera( )
+  {
+  if( bloq )
+    {
+    $(".waitajax").css("display", "none");
+    bloq = false;
+    }
+  }
 $(document).ready(function()
   {		
   $(document).ajaxStart(function()
     {
-    $(".waitajax").css("display", "block");
+    bloqueia();
     });
   $(document).ajaxComplete(function()
     {
-    $(".waitajax").css("display", "none");
+    libera();
     });
   });
 

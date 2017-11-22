@@ -71,10 +71,6 @@ include 'partes/pagebody.php';
 			</div> <!-- /Page Container -->
 		</div> <!-- Main Container -->
 
-		<div id="wait" title="Basic dialog">
-			<p>Por favor, aguarde...</p>
-		</div>
-		
 <?php
 include 'partes/Scripts.php';
 ?>
@@ -277,11 +273,7 @@ include 'partes/Scripts.php';
 							"Por favor confirme...;"
 		if( !confirm( aux ) )
 			return;
-		$("#wait").dialog(
-			{
-			dialogClass: "no-close",
-			modal: true
-			});
+		bloqueia();
 		var qtlin = tableQtLins();
 		if( qtlin < 1 )
 			return;
@@ -305,7 +297,7 @@ include 'partes/Scripts.php';
 					qterro++;
 				}
 			}
-		$("#wait").dialog( "close" );
+		libera();
 		if( qterro > 0 )
 			{
 			if( qterro == 1 )
@@ -426,7 +418,7 @@ include 'partes/Scripts.php';
 			"tipo": "t",
 			"editavel": true,
 			"vanovo": "",
-			"width": "10%",
+			"width": "5%",
 			"aTargets": [ ++col ],
 			"mData": "SSHD",
 			"sTitle":"SSHD",
@@ -439,7 +431,7 @@ include 'partes/Scripts.php';
 			"tipo": "t",
 			"editavel": true,
 			"vanovo": "",
-			"width": "30%",
+			"width": "25%",
 			"aTargets": [ ++col ],
 			"mData": "NOME",
 			"sTitle":"Funcionário",
@@ -461,6 +453,20 @@ include 'partes/Scripts.php';
 			};
 		colDefs.push( aux );
 		
+		aux	=
+			{
+			"className": "centro",
+			"tipo": "l",
+			"editavel": true,
+			"vanovo": "",
+			"width": "10%",
+			"aTargets": [ ++col ],
+			"mData": "DTMAX",
+			"sTitle":"Maior Fechamento",
+			"defaultContent": " "
+			};
+		colDefs.push( aux );
+		
 		aux	=	
 			{
 			"tipo": null,
@@ -472,7 +478,7 @@ include 'partes/Scripts.php';
 			"aTargets": [ ++col ],
 			"orderable":false,
 			"mData": "FECHAR",
-			"width": "10%",
+			"width": "5%",
 			"render": function( data, type, row, meta )
 				{
 				if( data == "0" )
