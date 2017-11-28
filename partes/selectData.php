@@ -41,6 +41,11 @@ if( isset( $_GET["semzero"] ) )
 else
 	$sem0 = false;
 
+if( isset( $_GET["comtodos"] ) )
+	$comt = true;
+else
+	$cont = false;
+
 if( isset( $_GET["maisum"] ))
 	{
 	$maisum = $_GET["maisum"];
@@ -158,13 +163,6 @@ if( $qry == "fuors" )
 		}
 	else
 		{
-		/*
-		$sql = "SELECT DISTINCT PUOR.UOR_IDUNIDADEORGANIZACIONAL, PUOR.UOR_DLSIGLAUNIDADE
-							FROM        BIOMETRIA.FUAU_FUNCIONARIOAUTORIZADOR FUAU
-							INNER JOIN  SAU.VWUORPUBLICA PUOR ON 
-													PUOR.UOR_IDUNIDADEORGANIZACIONAL=FUAU.PMS_IDSAUUOR
-							ORDER BY    PUOR.UOR_DLSIGLAUNIDADE";
-		 */
 		$sql = "SELECT DISTINCT UOR_IDUNIDADEORGANIZACIONAL, UOR_DLSIGLAUNIDADE
 							FROM	SAU.VWUORPUBLICA
 							WHERE	UOR_DTFINAL IS NULL AND
