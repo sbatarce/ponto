@@ -261,7 +261,7 @@ include 'partes/Scripts.php';
 			alert( "Erro adicionando período de autorização: " + resul.erro );
 			return;
 			}
-		atuatab();
+		atuatab( false );
 		}
 		
 	function alterar()
@@ -285,7 +285,7 @@ include 'partes/Scripts.php';
 			alert( "Erro adicionando período de autorização: " + resul.erro );
 			return;
 			}
-		atuatab();
+		atuatab( false );
 		}
 		
 	function telaAlter( id, nome, iniinv, fiminv )
@@ -336,7 +336,7 @@ include 'partes/Scripts.php';
 		var url = "partes/updates.php?query=delfuau&fuauid="+ id;
 		var resul = remoto( url );
 		if( resul.status == "OK" )
-			atuatab();
+			atuatab( false );
 		else
 			alert( "Erro adicionando período de autorização: " + resul.erro );
 		}
