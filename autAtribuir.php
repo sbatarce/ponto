@@ -192,10 +192,20 @@ include 'partes/Scripts.php';
 		//	tratamento inicial das datas e inicialização do datatables
 		function setAjax(  )
 			{
-			if( uorid <= 0 )
-				return;
 			tableDestroy();
-			AjaxSource	=	"partes/tableData.php?query=uorautos&uorid=" + uorid;
+			if( tiuser < 4 )
+				{
+				if( uorid <= 0 )
+					return;
+				AjaxSource	=	"partes/tableData.php?query=uorautos&uorid=" + uorid;
+				}
+			else
+				{
+				if( uorid < 1 )
+					AjaxSource	=	"partes/tableData.php?query=uorautos";
+				else
+					AjaxSource	=	"partes/tableData.php?query=uorautos&uorid=" + uorid;
+				}
 			inicializa.init();
 			}
 
@@ -334,6 +344,11 @@ include 'partes/Scripts.php';
 	$('#eddt_new').click(function( e )
 		{
 		e.stopImmediatePropagation();
+		if( uorid < 1 )
+			{
+			alert( "Por favor, escolha uma UOR a qual adicionar autorizador." );
+			return;
+			}
 		$("#uorpto").val( nouor )
 		$("#dtinicria").val( $.datepicker.formatDate("dd/mm/yy", hoje ) );
 		let amanha = hoje;
@@ -343,12 +358,14 @@ include 'partes/Scripts.php';
 		$(".autors").select2('val', 0 );
 		$("#modcriaautor").modal('show');
 		} );
-			
+
+		/*
 	//	combo de tipo de ausências
 	url =	"selectData.php?query=funcfuni";
 	SelInit( "#tiaus", url, 0, "Escolha abaixo", escoautor );
 	taauid = 0;
-		
+		*/
+	 
 	function escocandid( tipo, id, text )
 		{
 		if( id > 0 )
@@ -360,11 +377,8 @@ include 'partes/Scripts.php';
 		
 	function escofuor( tipo, id, text	 )
 		{
-		if( id > 0 )
-			{
-			uorid	=	id;
-			nouor	= text;
-			}
+		uorid	=	id;
+		nouor	= text;
 		//	prepara a combo de candidatos
 		setBasicAuth( sshd, pass );
 		url =	"selectData.php?query=candidauto&fuorid="+id;
@@ -498,10 +512,18 @@ include 'partes/Scripts.php';
 
 		//	tratamento das datas 	
 		//	combo de UORS
-		url =	"selectData.php?query=fuors";
 		if( tiuser < "4" )
-			url += "&sshd="+sshd;
-		SelInit( "#fuors", url, 0, "Escolha abaixo", escofuor );
+			{
+			url =	"selectData.php?query=fuors&sshd="+sshd;
+			SelInit( "#fuors", url, 0, "Escolha abaixo", escofuor );
+			}
+		if( tiuser >= 4 )
+			{
+			url =	"selectData.php?query=fuors&semzero&maisum=todos&numais=0";
+			SelInit( "#fuors", url, 0, "todos", escofuor );
+			uorid	=	0;
+			nouor	= "todos";
+			}
 		
 		//	formatadores ligados ao datatables
 		var liNova			=
@@ -523,10 +545,23 @@ include 'partes/Scripts.php';
 			"tipo": "t",
 			"editavel": true,
 			"vanovo": "",
-			"width": "20%",
+			"width": "10%",
 			"aTargets": [ ++col ],
 			"mData": "SSHD",
 			"sTitle":"SSHD",
+			"defaultContent": " "
+			};
+		colDefs.push( aux );
+		
+		aux	=
+			{
+			"tipo": "t",
+			"editavel": true,
+			"vanovo": "",
+			"width": "15%",
+			"aTargets": [ ++col ],
+			"mData": "SIGLAUOR",
+			"sTitle":"UOR",
 			"defaultContent": " "
 			};
 		colDefs.push( aux );
@@ -550,7 +585,7 @@ include 'partes/Scripts.php';
 			"tipo": "l",
 			"editavel": true,
 			"vanovo": "",
-			"width": "15%",
+			"width": "10%",
 			"aTargets": [ ++col ],
 			"mData": "INICIO",
 			"sTitle":"Início",
@@ -564,7 +599,7 @@ include 'partes/Scripts.php';
 			"tipo": "t",
 			"editavel": true,
 			"vanovo": "",
-			"width": "15%",
+			"width": "10%",
 			"aTargets": [ ++col ],
 			"mData": "TERMINO",
 			"sTitle":"Término",
@@ -621,19 +656,24 @@ include 'partes/Scripts.php';
 		colDefs.push( aux );
 		///////////////////////////////////////////////////////////////////////
 
-		AjaxSource	=	"";
-		inicializa.init();
-		var data = [];
-		data.push( 
-						{
-						"FUAUID": -1,
-						"SSHD": "",
-						"NOME": "Escolha uma UOR acima",
-						"INICIO": "",
-						"TERMINO": "",
-						"action": ""
-						} );
-		Table.fnAddData( data, true );
+		if( tiuser < 4 )
+			{
+			AjaxSource	=	"";
+			inicializa.init();
+			var data = [];
+			data.push( 
+							{
+							"FUAUID": -1,
+							"SSHD": "",
+							"NOME": "Escolha uma UOR acima",
+							"INICIO": "",
+							"TERMINO": "",
+							"action": ""
+							} );
+			Table.fnAddData( data, true );
+			}
+		else
+			setAjax();
 				
 		</script>
 	</body>	

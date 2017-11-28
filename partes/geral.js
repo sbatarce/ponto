@@ -533,7 +533,7 @@ function SelOptions( url )
 //  id      - campo que será usado como id do Select2
 //  text    - campo que será mostrado no Select2
 //  func    - nome da função a chamar quando houver uma escolha
-//  minlen  - mínimo de caracteres a conter noi campo de pesquisa
+//  minlen  - mínimo de caracteres a conter no campo de pesquisa
 function SelInit( sel, url, id, text, func, minlen )
   {
   var min;
