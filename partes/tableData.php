@@ -261,7 +261,7 @@ if( $qry == "funcapar" )
 ////////////////////////////////////////////////////////////////////////////////
 //	funuorbio	tabela de pessoas em uma UOR do SAU (VWFUNCIONARIOATIVO) 
 //						com contagem de BIOMETRIA
-//						
+//	funuorbio( iduor, sguor, janauor )
 //	Parametros 
 //			iduor		-	id da UOR a selecionar pessoas
 //			todos		- traz ou não as pessoas ja alocadas em iduor
@@ -274,15 +274,15 @@ if( $qry == "funuorbio" )
 		}
 	$iduor = $_GET["iduor"];
 
-	if( !isset( $_GET["sguor"] ) )
-		{
-		echo	'{ "data": [{"erro": "parametro sguor obrigatorio"}] }';
-		return;
-		}
-	$sguor = $_GET["sguor"];
-
 	if( isset( $_GET["janafuor"] ) )
 		{
+		if( !isset( $_GET["sguor"] ) )
+			{
+			echo	'{ "data": [{"erro": "parametro sguor obrigatorio"}] }';
+			return;
+			}
+		$sguor = $_GET["sguor"];
+
 		$sql =	"SELECT	FUNI.FUNI_ID, IUN, NOME, IDUOR AS IDUORSAU, DCSIGLAUOR AS SIGLAUORSAU,
 										RETR.RETR_ID AS IDRETR, RETR.RETR_DLNOME AS REGIME,
 										FUOR.PMS_IDSAUUOR AS IDUORPONTO, SUOR.UOR_DLSIGLAUNIDADE AS SIGALUORPONTO,

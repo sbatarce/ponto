@@ -7,7 +7,7 @@
 		?>
   </head>
 
-  <body onload="javascript:Titulo( '<h4>Alocação de funcionários</h4>' );">
+  <body onload="javascript:Titulo( '<h4>Cadastro de funcionários</h4>' );">
 <?php
 include 'partes/MenuPri.php';
 include 'partes/Cabec.php';

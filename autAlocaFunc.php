@@ -46,16 +46,29 @@ include 'partes/pagebody.php';
 		</div>
 		<div class='row form-group' 
 				 style='margin-bottom: 5px; margin-left:4px;' data-toggle="buttons">
-			<div class="col-lg-6" style='width:50%;'>
-				<input class="btn btn-primary" type="button" value="Adicionar por SSHD"
+			<div class="col-lg-6" style='width:100%;'>
+				<input class="btn btn-primary" type="button" 
+							 value="Adicionar por SSHD"
 							 onclick="javascript:atribuir();"
+							 style="float: left; "
 							 title="Seleciona uma pessoa a partir do SSHD (do SAU).
 							 Adiciona a pessoa na lista abaixo.">
-				<input class="btn btn-primary" type="button" value="Alocar pessoas na UOR do PONTO"
+				<input class="btn btn-primary" type="button" 
+							 value="Alocar pessoas na UOR do PONTO"
 							 onclick="javascript:executar();"
-							 title="Coloca todas as pessoas da lista
-							 abaixo na UOR de PONTO selecionada
-							 que ainda não estão na UOR de PONTO.">
+							 style="margin-left: 10px; float: left; "
+							 title="Coloca todos os funcionários da lista abaixo 
+							 marcados para ser adicionado na UOR de 
+							 PONTO selecionada.">
+					
+				<input class="btn btn-primary" type="button" value="marcar todos para não adicionar"
+							 onclick="javascript:desmarcarTodos();"
+							 style="margin-left: 10px; float: right; "
+							 title="Marca todos para não adicionar à UOR">
+				<input class="btn btn-primary" type="button" value="marcar todos para adicionar"
+							 onclick="javascript:marcarTodos();"
+							 style="margin-left: 10px; float: right; "
+							 title="Marca todos para adicionar à UOR">
 			</div>
 		</div>
 		
@@ -81,12 +94,56 @@ include 'partes/Scripts.php';
 	<script type="text/javascript" src="partes/geral.js" ></script>
 	<script type="text/javascript" src="partes/dteditavel.js" ></script>
 	<script type="text/javascript" >
-	$('#cktodos').bootstrapSwitch('state', false);
+		$('#cktodos').bootstrapSwitch('state', false);
 
 		$("#cktodos").on( 'switchChange.bootstrapSwitch', function( evn, state )
 			{
 			fltodos = state;
 			});
+			
+		function marcarTodos()
+			{
+			var qtlin = tableQtLins();
+			if( qtlin < 1 )
+				return;
+			var row;
+			ixrow	=	0;
+			for( var ix=0; ix<qtlin; ix++ )
+				{
+				row = Table.fnGetData( ix );
+				if( row.action != "" )
+					{
+					row.action = "<a href='#' onClick='javascript:remove(" + ix + ")' " +
+										"class='btn btn-circle btn-info btn-xs remover' " +
+										"title=\"Este funcionário será adicionado à UOR.\n" +
+										"Clique para não adicioná-lo.\" >" +
+										"<i class='glyphicon glyphicon-ok'></i></a>";
+					Table.api().row(ix).data(row);
+					}
+				}
+			}
+
+		function desmarcarTodos()
+			{
+			var qtlin = tableQtLins();
+			if( qtlin < 1 )
+				return;
+			var row;
+			ixrow	=	0;
+			for( var ix=0; ix<qtlin; ix++ )
+				{
+				row = Table.fnGetData( ix );
+				if( row.action != "" )
+					{
+					row.action = "<a href='#' onClick='javascript:adiciona(" + ix + ")' " +
+									"class='btn btn-circle btn-info btn-xs adicionar' " +
+									"title=\"Este funcionário não será adicionado à UOR.\n" +
+									"Clique para adicioná-lo\" >" +
+									"   <i class='glyphicon glyphicon-remove'></i></a>";
+					Table.api().row(ix).data(row);
+					}
+				}
+			}
 
 		function logout()
 			{
@@ -163,7 +220,8 @@ include 'partes/Scripts.php';
 					{
 					var fica = "<a href='#' onClick='javascript:remove(" + lis[ix] + ")' " +
 										"class='btn btn-circle btn-info btn-xs remover' " +
-										"title=\"não colocar este funcionário na UOR de ponto\" >" +
+										"title=\"Este funcionário será adicionado à UOR.\n" +
+										"Clique para não adicioná-lo.\" >" +
 										"<i class='glyphicon glyphicon-ok'></i></a>";
 					Table.fnUpdate( fica, lis[ix], 5, fica, false );
 					}
@@ -206,7 +264,8 @@ include 'partes/Scripts.php';
 			{
 			var remo = "<a href='#' onClick='javascript:remove(" + ix + ")' " +
 									"class='btn btn-circle btn-info btn-xs adicionar' " +
-									"title=\"remover funcionário do aparelho\" >" +
+									"title=\"Este funcionário será adicionado à UOR.\n" +
+									"Clique para não adicioná-lo.\" >" +
 									"   <i class='glyphicon glyphicon-ok'></i></a>"
 			var row = Table.fnGetData( ix );
 			row["action"] = remo;
@@ -219,7 +278,8 @@ include 'partes/Scripts.php';
 			{
 			var tira =	"<a href='#' onClick='javascript:adiciona(" + ix + ")' " +
 									"class='btn btn-circle btn-info btn-xs adicionar' " +
-									"title=\"adicionar funcionário ao aparelho\" >" +
+									"title=\"Este funcionário não será adicionado à UOR.\n" +
+									"Clique para adicioná-lo\" >" +
 									"   <i class='glyphicon glyphicon-remove'></i></a>"
 			var row = Table.fnGetData( ix );
 			row["action"] = tira;
@@ -352,51 +412,12 @@ include 'partes/Scripts.php';
 				return hh+":"+mm;
 			}
 		
-		/*
-		//	chama a página de pendências do funcionário
-		function pendencias( sshd )
-			{
-			criarCookie( "sshdfunc", sshd );
-			window.location = "autPenden.php";
-			}
-			
-		function ausencias( sshd, id, nome )
-			{
-			criarCookie( "idfunc", id );
-			criarCookie( "nofunc", nome );
-			criarCookie( "sshdfunc", sshd );
-			window.location = "autAusencias.php";
-			}
-			
-		function correcoes( sshd )
-			{
-			criarCookie( "idfunc", id );
-			criarCookie( "nofunc", nome );
-			criarCookie( "sshdfunc", sshd );
-			window.location = "autCorrecao.php";
-			}
-			
-		//	chama o detalhe de um funcionário escolhido
-		function detfunc( id, nome, sshd )
-			{
-			criarCookie( "idfunc", id );
-			criarCookie( "nofunc", nome );
-			criarCookie( "sshdfunc", sshd );
-			window.location = "autFuncio.php";
-			}
-		*/
 		//	tratamento inicial das datas e inicialização do datatables
 		function setAjax(  )
 			{
 			if( idualo <= 0 )
 				return;
-//			$("#wait").dialog(
-	//			{
-				//dialogClass: "no-close",
-		//		modal: false
-			//	});
-			//$("#wait").dialog('show');
-			//
+
 			tableClear();
 			
 			var url	=	"partes/tableData.php?query=funuorbio&janafuor&iduor=" + idualo +
@@ -418,7 +439,7 @@ include 'partes/Scripts.php';
 						{
 						var fica = "<a href='#' onClick='javascript:remove(" + ix + ")' " +
 											"class='btn btn-circle btn-info btn-xs remover' " +
-											"title=\"não colocar este funcionário na UOR de ponto\" >" +
+											"title=\"clique para não colocar este funcionário na UOR de ponto\" >" +
 											"<i class='glyphicon glyphicon-ok'></i></a>";
 						data.push({	"IUN": resu.data[ix].IUN,
 												"NOME": resu.data[ix].NOME,
@@ -517,7 +538,7 @@ include 'partes/Scripts.php';
 			"tipo": "t",
 			"editavel": false,
 			"vanovo": "",
-			"width": "15%",
+			"width": "20%",
 			"aTargets": [ ++col ],
 			"mData": "NOME",
 			"sTitle":"Funcionário",
@@ -530,7 +551,7 @@ include 'partes/Scripts.php';
 			"tipo": "t",
 			"editavel": false,
 			"vanovo": "",
-			"width": "10%",
+			"width": "5%",
 			"aTargets": [ ++col ],
 			"mData": "QTBIO",
 			"sTitle":"Biometrias",

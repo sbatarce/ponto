@@ -11,7 +11,7 @@
 //	saldoant( funiid, dtinic ) - obter saldo anterior do FUNI_ID em uma data
 //	funiid( sshd ) - obter FUNI_ID do SSHD
 //	sshd( funiid ) - obter SSHD do FUNI_ID
-//	fuauid( funiid, uorid ) - obtem o FUAU_ID do autorizador da UOR
+//	fuauid( sshd, uorid ) - obtem FUAU_ID, FUAU_DTINICIO e FUAU_DTFIM
 //	medioperio( funiid, dtini, dtfim )
 //	mediofecha( funiid )
 //	obtregimefunc( funiid )
@@ -362,7 +362,9 @@ if( $qry == "sshd" )
 	}
 	
 ////////////////////////////////////////////////////////////////////////////////
-//	fuauid( funiid, uorid ) - obtem o FUAU_ID do autorizador da UOR
+//	fuauid( sshd, uorid ) - obtem FUAU_ID, FUAU_DTINICIO e FUAU_DTFIM
+//			sshd		autorizador 
+//			uorid		UOR uor de autorização
 if( $qry == "fuauid" )
 	{
 	if( !isset( $_GET["sshd"] ) )
@@ -377,8 +379,9 @@ if( $qry == "fuauid" )
 		}
 	$sshd	=	$_GET["sshd"];
 	$uorid	=	$_GET["uorid"];
-	$sql = "SELECT FUAU_ID AS FUAUID 
-						FROM BIOMETRIA.FUAU_FUNCIONARIOAUTORIZADOR FUAU
+	$sql = "SELECT	FUAU_ID AS FUAUID, TO_CHAR( FUAU_DTINICIO, 'YYYYMMDD' ) AS INI, 
+									TO_CHAR( FUAU.FUAU_DTFIM, 'YYYYMMDD' ) AS FIM
+						FROM				BIOMETRIA.FUAU_FUNCIONARIOAUTORIZADOR FUAU
 						INNER JOIN  BIOMETRIA.FUNI_FUNCIONARIO FUNI ON
 												FUNI.FUNI_ID = FUAU.FUNI_ID
 						where FUAU.PMS_IDSAUUOR=$uorid and FUNI.PMS_IDPMSPESSOA='$sshd'";

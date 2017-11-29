@@ -188,6 +188,25 @@ include 'partes/Scripts.php';
 		function FormataChild( original )
 			{
 			}
+			
+		//	verifica jurisdição de autorizador na UOR
+		function jurisdUOR( sshdauto, uorauto )
+			{
+			var url	=	"partes/queries.php?query=fuauid" + 
+								"&sshd=" + sshdauto + 
+								"&uorid=" + uorauto;
+			var	resu	=	remoto( url );
+			if( resu.status != "OK" )
+				{
+				alert( "Erro obtendo dados do autorizador: " + resu.erro );
+				return false;
+				}
+			if( resu.linhas < 1 )
+				return false;
+			if( resu.dados[0].FIM != "" )
+				return false;
+			return true;
+			}
 		
 		//	tratamento inicial das datas e inicialização do datatables
 		function setAjax(  )
@@ -251,6 +270,9 @@ include 'partes/Scripts.php';
 
 	function encerra( id, ini, fim )
 		{
+		if( !jurisdUOR( sshd, uorid ) )
+			return;
+		//
 		dtfim = $.datepicker.formatDate("yymmdd", dtuprc )
 		var url = "partes/alteraFUAU.php?fuauid="+ id;
 		url += "&dtini=" + ini;
@@ -271,6 +293,7 @@ include 'partes/Scripts.php';
 			$('#modaltautor').modal('hide');
 			return;
 			}
+		//
 		dtini = $(".dtinialt").datepicker("getDate");
 		//
 		var url = "partes/alteraFUAU.php?fuauid="+ fuauid;
@@ -290,6 +313,9 @@ include 'partes/Scripts.php';
 		
 	function telaAlter( id, nome, iniinv, fiminv )
 		{
+		if( !jurisdUOR( sshd, uorid ) )
+			return;
+		//
 		fuauid = id;
 		var inidir = "";
 		var fimdir = "";
@@ -333,6 +359,8 @@ include 'partes/Scripts.php';
 		
 	function remove( id )
 		{
+		if( !jurisdUOR( sshd, uorid ) )
+			return;
 		var url = "partes/updates.php?query=delfuau&fuauid="+ id;
 		var resul = remoto( url );
 		if( resul.status == "OK" )
@@ -349,6 +377,9 @@ include 'partes/Scripts.php';
 			alert( "Por favor, escolha uma UOR a qual adicionar autorizador." );
 			return;
 			}
+		if( !jurisdUOR( sshd, uorid ) )
+			return;
+		//
 		$("#uorpto").val( nouor )
 		$("#dtinicria").val( $.datepicker.formatDate("dd/mm/yy", hoje ) );
 		let amanha = hoje;
@@ -396,284 +427,283 @@ include 'partes/Scripts.php';
 				}
 			}
 
-		/////////////// PRINCIPAL ////////////////////////
-		//	obtem dados do autorizador
-		/////////////////////////////////////////
-		var dtini = null;
-		var dtfim = null;
-		var fuauid = -1;
-		var parms, resu;
-		var sshd = obterCookie( "user" );
-		if( sshd == null )
-			{
-			Deslogar();
-			}
-			
-		var pass = obterCookie( "pass" );
-		if( pass == null )
-			{
-			Deslogar();
-			}
-			
-		var tiuser = obterCookie( "tiuser" );
-		if( tiuser == null || tiuser < 4 )
-			{
-			Deslogar();
-			}
-		//	obtenção de datas 
-		var hoje = new Date();
-		parms = "";
-		resu = Select( "parametros", parms );
-		if( resu == null )
-			throw new Error("Problemas de acesso ao banco de dados. Por favor, tente mais tarde.");
-		var dtuinv = resu.dados[0].DTUPROC;
-		var dtudir = toDateDir( dtuinv );
-		var dtuprc = toDate( dtudir );
-		
-		$('#dtuprc').val( dtudir );
+	/////////////// PRINCIPAL ////////////////////////
+	//	obtem dados do autorizador
+	/////////////////////////////////////////
+	var dtini = null;
+	var dtfim = null;
+	var fuauid = -1;
+	var parms, resu;
+	var sshd = obterCookie( "user" );
+	if( sshd == null )
+		{
+		Deslogar();
+		}
 
-		//	datepickers
-		$( ".dtinicria" ).datepicker(
-			{
-			dateFormat: "dd/mm/yy",
-			altFormat: "yymmdd",
-			startView: 2,
-			todayBtn: true,
-			daysOfWeekHighlighted: "0,6",
-			autoclose: true,
-			minDate: dtuprc,
-			todayHighlight: true			
-			}).on('change.dp', function(e)
-				{ 
-				var dt = $(".dtinicria").datepicker("getDate");
-				dtini = $.datepicker.formatDate("yymmdd", dt );
-				$("#dtfimcria").datepicker( "option", "minDate", dt.getDate()+1 );
-				$("#dtfimcria").val( "" );
-				});
-				
-		$( ".dtfimcria" ).datepicker(
-			{
-			dateFormat: "dd/mm/yy",
-			altFormat: "yymmdd",
-			startView: 2,
-			todayBtn: true,
-			daysOfWeekHighlighted: "0,6",
-			autoclose: true,
-			todayHighlight: true			
-			}).on('change.dp', function(e)
-				{ 
-				var dt = $(".dtfimcria").datepicker("getDate");
-				dtfim = $.datepicker.formatDate("yymmdd", dt );
-				});
+	var pass = obterCookie( "pass" );
+	if( pass == null )
+		{
+		Deslogar();
+		}
 
-		$( ".dtinialt" ).datepicker(
-			{
-			dateFormat: "dd/mm/yy",
-			altFormat: "yymmdd",
-			startView: 2,
-			todayBtn: true,
-			daysOfWeekHighlighted: "0,6",
-			autoclose: true,
-			minDate: dtuprc,
-			todayHighlight: true			
-			}).on('change.dp', function(e)
-				{ 
-				let dt = $(".dtinialt").datepicker("getDate");
-				dtini = $.datepicker.formatDate("yymmdd", dt );
-				dt.setDate(dt.getDate()+1);
-				$("#dtfimalt").datepicker( "option", "minDate", dt );
-				$(".dtfimalt").val( "" );
-				});
-				
-		$( ".dtfimalt" ).datepicker(
-			{
-			dateFormat: "dd/mm/yy",
-			altFormat: "yymmdd",
-			startView: 2,
-			todayBtn: true,
-			daysOfWeekHighlighted: "0,6",
-			autoclose: true,
-			todayHighlight: true			
-			}).on('change.dp', function(e)
-				{ 
-				var dt = $(".dtfimalt").datepicker("getDate");
-				dtfim = $.datepicker.formatDate("yymmdd", dt );
-				});
+	var tiuser = obterCookie( "tiuser" );
+	
+	//	verifica se o logado é um autorizador perene
 
-					
-		//	obtem FUNI_ID do autorizador
-		parms = "&sshd=" + sshd;
-		resu = Select( "funiid", parms );
-		if( resu == null )
-			throw new Error("Problemas de acesso ao banco de dados. Por favor, tente mais tarde.");
-		var autorid = resu.dados[0].FUNI_ID;
+	//	obtenção de datas 
+	var hoje = new Date();
+	parms = "";
+	resu = Select( "parametros", parms );
+	if( resu == null )
+		throw new Error("Problemas de acesso ao banco de dados. Por favor, tente mais tarde.");
+	var dtuinv = resu.dados[0].DTUPROC;
+	var dtudir = toDateDir( dtuinv );
+	var dtuprc = toDate( dtudir );
 
-		$("#titwidget").html( "" );
+	$('#dtuprc').val( dtudir );
 
-		//	tratamento das datas 	
-		//	combo de UORS
-		if( tiuser < "4" )
-			{
-			url =	"selectData.php?query=fuors&sshd="+sshd;
-			SelInit( "#fuors", url, 0, "Escolha abaixo", escofuor );
-			}
-		if( tiuser >= 4 )
-			{
-			url =	"selectData.php?query=fuors&semzero&maisum=todos&numais=0";
-			SelInit( "#fuors", url, 0, "todos", escofuor );
-			uorid	=	0;
-			nouor	= "todos";
-			}
-		
-		//	formatadores ligados ao datatables
-		var liNova			=
-						{
-						"SSHD": "",
-						"NOME": "",
-						"INICIO": "",
-						"TERMINO": ""
-						};
+	//	datepickers
+	$( ".dtinicria" ).datepicker(
+		{
+		dateFormat: "dd/mm/yy",
+		altFormat: "yymmdd",
+		startView: 2,
+		todayBtn: true,
+		daysOfWeekHighlighted: "0,6",
+		autoclose: true,
+		minDate: dtuprc,
+		todayHighlight: true			
+		}).on('change.dp', function(e)
+			{ 
+			var dt = $(".dtinicria").datepicker("getDate");
+			dtini = $.datepicker.formatDate("yymmdd", dt );
+			$("#dtfimcria").datepicker( "option", "minDate", dt.getDate()+1 );
+			$("#dtfimcria").val( "" );
+			});
 
-		//	monta o datatables
-		var	order	=	[];											//	sem classificação 
-		//	prepara a definiçao das colunas
-		var colDefs	=	[];
-		var	col	=	-1;
+	$( ".dtfimcria" ).datepicker(
+		{
+		dateFormat: "dd/mm/yy",
+		altFormat: "yymmdd",
+		startView: 2,
+		todayBtn: true,
+		daysOfWeekHighlighted: "0,6",
+		autoclose: true,
+		todayHighlight: true			
+		}).on('change.dp', function(e)
+			{ 
+			var dt = $(".dtfimcria").datepicker("getDate");
+			dtfim = $.datepicker.formatDate("yymmdd", dt );
+			});
 
-		var aux	=
-			{
-			"tipo": "t",
-			"editavel": true,
-			"vanovo": "",
-			"width": "10%",
-			"aTargets": [ ++col ],
-			"mData": "SSHD",
-			"sTitle":"SSHD",
-			"defaultContent": " "
-			};
-		colDefs.push( aux );
-		
-		aux	=
-			{
-			"tipo": "t",
-			"editavel": true,
-			"vanovo": "",
-			"width": "15%",
-			"aTargets": [ ++col ],
-			"mData": "SIGLAUOR",
-			"sTitle":"UOR",
-			"defaultContent": " "
-			};
-		colDefs.push( aux );
-		
-		aux	=
-			{
-			"tipo": "t",
-			"editavel": true,
-			"vanovo": "",
-			"width": "40%",
-			"aTargets": [ ++col ],
-			"mData": "NOME",
-			"sTitle":"Autorizador",
-			"defaultContent": " "
-			};
-		colDefs.push( aux );
-		
-		aux	=
-			{
-			"className": "centro",
-			"tipo": "l",
-			"editavel": true,
-			"vanovo": "",
-			"width": "10%",
-			"aTargets": [ ++col ],
-			"mData": "INICIO",
-			"sTitle":"Início",
-			"defaultContent": " "
-			};
-		colDefs.push( aux );
-		
-		aux	=
-			{
-			"className": "centro",
-			"tipo": "t",
-			"editavel": true,
-			"vanovo": "",
-			"width": "10%",
-			"aTargets": [ ++col ],
-			"mData": "TERMINO",
-			"sTitle":"Término",
-			"defaultContent": " "
-			};
-		colDefs.push( aux );
-		
-		aux	=	
-			{
-			"tipo": null,
-			"editavel": false,
-			"vanovo": "",
-			"sTitle":"",
-			"bSortable": false,
-			"searchable": false,
-			"aTargets": [ ++col ],
-			"orderable":false,
-			"mData": "action",
-			"width": "10%",
-			"render": function( data, type, row )
-				{
-				var stnow = toStDate( new Date(), 2 );
-				var stini = toDateInv( row.INICIO );
-				var stter = toDateInv( row.TERMINO );
-				
-				var acalt = "<a href='#' onClick='javascript:telaAlter(" + row.FUAUID + 
-										",\"" + row.NOME + "\"," + stini + "," + stter + ");' " +
-										"class='btn btn-circle btn-info btn-xs' " +
-										"title=\"Modifica as datas do período de autorização\" >" +
-										"<i class='glyphicon glyphicon-edit'></i></a>";
-				var acrem = "<a href='#' onClick='javascript:remove(" + row.FUAUID + ");' " +
-										"class='btn btn-circle btn-info btn-xs' " +
-										"title=\"Remove este período de autorização\" >" +
-										"<i class='glyphicon glyphicon-remove'></i></a>";
-				var acenc = "<a href='#' onClick='javascript:encerra(" + row.FUAUID + 
-										"," + stini + "," + stter + ");' " +
-										"class='btn btn-circle btn-info btn-xs' " +
-										"title=\"Encerra o período de autorização\" >" +
-										"<i class='glyphicon glyphicon-log-in'></i></a>";
-				
-				if( stini == "" )
-					return "";
-				if( stnow <= stini )
-					return acalt+acrem;
+	$( ".dtinialt" ).datepicker(
+		{
+		dateFormat: "dd/mm/yy",
+		altFormat: "yymmdd",
+		startView: 2,
+		todayBtn: true,
+		daysOfWeekHighlighted: "0,6",
+		autoclose: true,
+		minDate: dtuprc,
+		todayHighlight: true			
+		}).on('change.dp', function(e)
+			{ 
+			let dt = $(".dtinialt").datepicker("getDate");
+			dtini = $.datepicker.formatDate("yymmdd", dt );
+			dt.setDate(dt.getDate()+1);
+			$("#dtfimalt").datepicker( "option", "minDate", dt );
+			$(".dtfimalt").val( "" );
+			});
 
-				if( stter == "" )
-					return acalt+acenc;
-					
-				if( stnow <= stter )
-					return acalt;
+	$( ".dtfimalt" ).datepicker(
+		{
+		dateFormat: "dd/mm/yy",
+		altFormat: "yymmdd",
+		startView: 2,
+		todayBtn: true,
+		daysOfWeekHighlighted: "0,6",
+		autoclose: true,
+		todayHighlight: true			
+		}).on('change.dp', function(e)
+			{ 
+			var dt = $(".dtfimalt").datepicker("getDate");
+			dtfim = $.datepicker.formatDate("yymmdd", dt );
+			});
+
+
+	//	obtem FUNI_ID do autorizador
+	parms = "&sshd=" + sshd;
+	resu = Select( "funiid", parms );
+	if( resu == null )
+		throw new Error("Problemas de acesso ao banco de dados. Por favor, tente mais tarde.");
+	var autorid = resu.dados[0].FUNI_ID;
+
+	$("#titwidget").html( "" );
+
+	//	tratamento das datas 	
+	//	combo de UORS
+	if( tiuser < "4" )
+		{
+		url =	"selectData.php?query=fuors&sshd="+sshd;
+		SelInit( "#fuors", url, 0, "Escolha abaixo", escofuor );
+		}
+	if( tiuser >= 4 )
+		{
+		url =	"selectData.php?query=fuors&semzero&maisum=todos&numais=0";
+		SelInit( "#fuors", url, 0, "todos", escofuor );
+		uorid	=	0;
+		nouor	= "todos";
+		}
+
+	//	formatadores ligados ao datatables
+	var liNova			=
+		{
+		"SSHD": "",
+		"NOME": "",
+		"INICIO": "",
+		"TERMINO": ""
+		};
+
+	//	monta o datatables
+	var	order	=	[];											//	sem classificação 
+	//	prepara a definiçao das colunas
+	var colDefs	=	[];
+	var	col	=	-1;
+
+	var aux	=
+		{
+		"tipo": "t",
+		"editavel": true,
+		"vanovo": "",
+		"width": "10%",
+		"aTargets": [ ++col ],
+		"mData": "SSHD",
+		"sTitle":"SSHD",
+		"defaultContent": " "
+		};
+	colDefs.push( aux );
+
+	aux	=
+		{
+		"tipo": "t",
+		"editavel": true,
+		"vanovo": "",
+		"width": "15%",
+		"aTargets": [ ++col ],
+		"mData": "SIGLAUOR",
+		"sTitle":"UOR",
+		"defaultContent": " "
+		};
+	colDefs.push( aux );
+
+	aux	=
+		{
+		"tipo": "t",
+		"editavel": true,
+		"vanovo": "",
+		"width": "40%",
+		"aTargets": [ ++col ],
+		"mData": "NOME",
+		"sTitle":"Autorizador",
+		"defaultContent": " "
+		};
+	colDefs.push( aux );
+
+	aux	=
+		{
+		"className": "centro",
+		"tipo": "l",
+		"editavel": true,
+		"vanovo": "",
+		"width": "10%",
+		"aTargets": [ ++col ],
+		"mData": "INICIO",
+		"sTitle":"Início",
+		"defaultContent": " "
+		};
+	colDefs.push( aux );
+
+	aux	=
+		{
+		"className": "centro",
+		"tipo": "t",
+		"editavel": true,
+		"vanovo": "",
+		"width": "10%",
+		"aTargets": [ ++col ],
+		"mData": "TERMINO",
+		"sTitle":"Término",
+		"defaultContent": " "
+		};
+	colDefs.push( aux );
+
+	aux	=	
+		{
+		"tipo": null,
+		"editavel": false,
+		"vanovo": "",
+		"sTitle":"",
+		"bSortable": false,
+		"searchable": false,
+		"aTargets": [ ++col ],
+		"orderable":false,
+		"mData": "action",
+		"width": "10%",
+		"render": function( data, type, row )
+			{
+			var stnow = toStDate( new Date(), 2 );
+			var stini = toDateInv( row.INICIO );
+			var stter = toDateInv( row.TERMINO );
+
+			var acalt = "<a href='#' onClick='javascript:telaAlter(" + row.FUAUID + 
+									",\"" + row.NOME + "\"," + stini + "," + stter + ");' " +
+									"class='btn btn-circle btn-info btn-xs' " +
+									"title=\"Modifica as datas do período de autorização\" >" +
+									"<i class='glyphicon glyphicon-edit'></i></a>";
+			var acrem = "<a href='#' onClick='javascript:remove(" + row.FUAUID + ");' " +
+									"class='btn btn-circle btn-info btn-xs' " +
+									"title=\"Remove este período de autorização\" >" +
+									"<i class='glyphicon glyphicon-remove'></i></a>";
+			var acenc = "<a href='#' onClick='javascript:encerra(" + row.FUAUID + 
+									"," + stini + "," + stter + ");' " +
+									"class='btn btn-circle btn-info btn-xs' " +
+									"title=\"Encerra o período de autorização\" >" +
+									"<i class='glyphicon glyphicon-log-in'></i></a>";
+
+			if( stini == "" )
 				return "";
-				}
-			};
-		colDefs.push( aux );
-		///////////////////////////////////////////////////////////////////////
+			if( stnow <= stini )
+				return acalt+acrem;
 
-		if( tiuser < 4 )
-			{
-			AjaxSource	=	"";
-			inicializa.init();
-			var data = [];
-			data.push( 
-							{
-							"FUAUID": -1,
-							"SSHD": "",
-							"NOME": "Escolha uma UOR acima",
-							"INICIO": "",
-							"TERMINO": "",
-							"action": ""
-							} );
-			Table.fnAddData( data, true );
+			if( stter == "" )
+				return acalt+acenc;
+
+			if( stnow <= stter )
+				return acalt;
+			return "";
 			}
-		else
-			setAjax();
+		};
+	colDefs.push( aux );
+	///////////////////////////////////////////////////////////////////////
+
+	if( tiuser < 4 )
+		{
+		AjaxSource	=	"";
+		inicializa.init();
+		var data = [];
+		data.push( 
+			{
+			"FUAUID": -1,
+			"SSHD": "",
+			"NOME": "Escolha uma UOR acima",
+			"INICIO": "",
+			"TERMINO": "",
+			"action": ""
+			} );
+		Table.fnAddData( data, true );
+		}
+	else
+		setAjax();
 				
 		</script>
 	</body>	

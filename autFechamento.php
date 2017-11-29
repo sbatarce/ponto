@@ -347,11 +347,8 @@ include 'partes/Scripts.php';
 			}
 			
 		var tiuser = obterCookie( "tiuser" );
-		if( tiuser == null || tiuser < 4 )
-			{
-			Deslogar();
-			}
-		//	obtenção de datas 
+
+//	obtenção de datas 
 		var hoje = new Date();
 		parms = "";
 		resu = Select( "parametros", parms );
