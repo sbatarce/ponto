@@ -525,7 +525,7 @@ include 'partes/Scripts.php';
 			"tipo": "t",
 			"editavel": false,
 			"vanovo": "",
-			"width": "5%",
+			"width": "10%",
 			"aTargets": [ ++col ],
 			"mData": "IUN",
 			"sTitle":"SSHD",
@@ -538,7 +538,7 @@ include 'partes/Scripts.php';
 			"tipo": "t",
 			"editavel": false,
 			"vanovo": "",
-			"width": "20%",
+			"width": "25%",
 			"aTargets": [ ++col ],
 			"mData": "NOME",
 			"sTitle":"Funcionário",
@@ -549,6 +549,7 @@ include 'partes/Scripts.php';
 		aux	=
 			{
 			"tipo": "t",
+			"className": "centro",
 			"editavel": false,
 			"vanovo": "",
 			"width": "5%",
@@ -564,7 +565,7 @@ include 'partes/Scripts.php';
 			"tipo": "l",
 			"editavel": false,
 			"vanovo": "",
-			"width": "10%",
+			"width": "15%",
 			"aTargets": [ ++col ],
 			"mData": "REGIME",
 			"sTitle":"Regime",
@@ -581,6 +582,7 @@ include 'partes/Scripts.php';
 		aux	=
 			{
 			"tipo": "x",
+			"className": "centro",
 			"editavel": false,
 			"vanovo": "",
 			"width": "10%",
@@ -594,6 +596,7 @@ include 'partes/Scripts.php';
 		aux	=	
 			{
 			"tipo": null,
+			"className": "centro",
 			"editavel": false,
 			"vanovo": "",
 			"sTitle":"Adicionar",
@@ -602,7 +605,7 @@ include 'partes/Scripts.php';
 			"aTargets": [ ++col ],
 			"orderable":false,
 			"mData": "action",
-			"width": "10%",
+			"width": "5%",
 			"defaultContent": ""
 			};
 		colDefs.push( aux );

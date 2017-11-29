@@ -45,12 +45,21 @@ include 'partes/pagebody.php';
 
 		<div class='row form-group' 
 				 style='margin-bottom: 5px; margin-left:4px;' data-toggle="buttons">
-			<div class="col-lg-6" style='width:50%;'>
+			<div class="col-lg-6" style='width:100%;'>
 				<input class="btn btn-primary" type="button" value="Efetuar modificações"
 							 onclick="javascript:executar();"
 							 title="Efetua todas as modificações marcadas 
 							 no banco de dados, adiciona e remove as pessoas 
 							 no aparelho selecionado em Aparelho.">
+					
+				<input class="btn btn-primary" type="button" value="marcar todos para não adicionar"
+							 onclick="javascript:desmarcarTodos();"
+							 style="margin-left: 10px; float: right; "
+							 title="Marca todos para não adicionar à UOR">
+				<input class="btn btn-primary" type="button" value="marcar todos para adicionar"
+							 onclick="javascript:marcarTodos();"
+							 style="margin-left: 10px; float: right; "
+							 title="Marca todos para adicionar à UOR">
 			</div>
 		</div>
 		
@@ -79,7 +88,8 @@ include 'partes/Scripts.php';
 
 		var acadic =	"<a href='#' onClick='javascript:adiciona(" + "ix" + ")' " +
 									"class='btn btn-circle btn-info btn-xs adicionar' " +
-									"title=\"adicionar ao aparelho\" >" +
+									"title=\"Funcionário não será adicionado ao aparelho\n" +
+									"Clique para marcá-lo para ser adicionado.\" >" +
 									"   <i class='glyphicon glyphicon-remove'></i></a>";
 
 		$('#cktodos').bootstrapSwitch('state', false);
@@ -88,6 +98,46 @@ include 'partes/Scripts.php';
 			{
 			fltodos = state;
 			});
+
+		function marcarTodos()
+			{
+			var qtlin = tableQtLins();
+			if( qtlin < 1 )
+				return;
+			var row;
+			ixrow	=	0;
+			for( var ix=0; ix<qtlin; ix++ )
+				{
+				row = Table.fnGetData( ix );
+				if( row.action != "" )
+					adiciona( ix );
+				}
+			}
+
+		function desmarcarTodos()
+			{
+			var qtlin = tableQtLins();
+			if( qtlin < 1 )
+				return;
+			var row;
+			ixrow	=	0;
+			for( var ix=0; ix<qtlin; ix++ )
+				{
+				row = Table.fnGetData( ix );
+				if( row.action != "" )
+					{
+					remove(ix);
+					/*
+					row.action = "<a href='#' onClick='javascript:adiciona(" + ix + ")' " +
+									"class='btn btn-circle btn-info btn-xs adicionar' " +
+									"title=\"Funcionário não será adicionado ao aparelho\n" +
+									"Clique para marcá-lo para ser adicionado.\" >" +
+									"   <i class='glyphicon glyphicon-remove'></i></a>";
+					Table.api().row(ix).data(row);
+					*/
+					}
+				}
+			}
 
 		function logout()
 			{
@@ -163,20 +213,22 @@ include 'partes/Scripts.php';
 			{
 			var act = "<a href='#' onClick='javascript:remove(" + ix + ")' " +
 									"class='btn btn-circle btn-info btn-xs adicionar' " +
-									"title=\"remover funcionário do aparelho\" >" +
-									"   <i class='glyphicon glyphicon-remove'></i></a>"
+									"title=\"Funcionário será adicionado ao aparelho\n" +
+									"Clique para marca-lo para não adicionar\" >" +
+									"   <i class='glyphicon glyphicon-ok'></i></a>";
 			Table.fnUpdate( "sim", ix, 5, false );
 			Table.fnUpdate( act, ix, 6 );
 			flalt = true;
 			}
 		
-			
+		//	marca o funcionário como a remover
 		function remove( ix )
 			{
 			var act = "<a href='#' onClick='javascript:adiciona(" + ix + ")' " +
 									"class='btn btn-circle btn-info btn-xs adicionar' " +
-									"title=\"adicionar funcionário ao aparelho\" >" +
-									"   <i class='glyphicon glyphicon-ok'></i></a>"
+									"title=\"Funcionário não será adicionado ao aparelho\n" +
+									"Clique para marcá-lo para ser adicionado.\" >" +
+									"   <i class='glyphicon glyphicon-remove'></i></a>";
 			Table.fnUpdate( "nao", ix, 5, false );
 			Table.fnUpdate( act, ix, 6 );
 			flalt = true;
@@ -221,10 +273,6 @@ include 'partes/Scripts.php';
 				{
 				for( var ix=0; ix<qt; ix++ )
 					{
-					var act = "<a href='#' onClick='javascript:remove(" + ix + ")' " +
-									"class='btn btn-circle btn-info btn-xs remover' " +
-										"title=\"remover do aparelho\" >" +
-										"   <i class='glyphicon glyphicon-remove'></i></a>";
 					data.push({	
 										"FUNIID": resu.data[ix].FUNI_ID,
 										"SSHD": resu.data[ix].SSHD,
@@ -284,8 +332,9 @@ include 'partes/Scripts.php';
 					{
 					var act = "<a href='#' onClick='javascript:remove(" + ix + ")' " +
 									"class='btn btn-circle btn-info btn-xs remover' " +
-										"title=\"remover do aparelho\" >" +
-										"   <i class='glyphicon glyphicon-remove'></i></a>";
+									"title=\"Funcionário será adicionado ao aparelho\n" +
+									"Clique para marca-lo para não adicionar\" >" +
+										"   <i class='glyphicon glyphicon-ok'></i></a>";
 					data.push({	
 										"FUNIID": resu.data[ix].FUNI_ID,
 										"SSHD": resu.data[ix].SSHD,
@@ -302,8 +351,9 @@ include 'partes/Scripts.php';
 					{
 					var act = "<a href='#' onClick='javascript:remove(" + lis[ix] + ")' " +
 									"class='btn btn-circle btn-info btn-xs remover' " +
-										"title=\"remover do aparelho\" >" +
-										"   <i class='glyphicon glyphicon-remove'></i></a>";
+									"title=\"Funcionário será adicionado ao aparelho\n" +
+									"Clique para marca-lo para não adicionar\" >" +
+										"   <i class='glyphicon glyphicon-ok'></i></a>";
 					Table.fnUpdate( act, lis[ix], 6, act, false );
 					}
 				Table.fnDraw( true );
@@ -491,6 +541,7 @@ include 'partes/Scripts.php';
 		aux	=
 			{
 			"tipo": "t",
+			"className": "centro",
 			"editavel": false,
 			"vanovo": "",
 			"width": "10%",
@@ -517,6 +568,7 @@ include 'partes/Scripts.php';
 		aux	=
 			{
 			"tipo": "t",
+			"className": "centro",
 			"editavel": false,
 			"vanovo": "",
 			"width": "10%",
@@ -530,6 +582,7 @@ include 'partes/Scripts.php';
 		aux	=
 			{
 			"tipo": "t",
+			"className": "centro",
 			"editavel": false,
 			"visible": false,
 			"vanovo": "",
@@ -544,6 +597,7 @@ include 'partes/Scripts.php';
 		aux	=	
 			{
 			"tipo": null,
+			"className": "centro",
 			"editavel": false,
 			"vanovo": "",
 			"bSortable": false,
@@ -551,6 +605,7 @@ include 'partes/Scripts.php';
 			"aTargets": [ ++col ],
 			"orderable":false,
 			"mData": "action",
+			"sTitle": "Adicionar",
 			"width": "5%",
 			"defaultContent": " "
 			};
