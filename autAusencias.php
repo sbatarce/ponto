@@ -187,7 +187,8 @@ include 'partes/Scripts.php';
 				alert( "Por favor, a data final deve ser maior ou igual à inicial.")
 				return;
 				}
-				
+			dtini = toStDate( ini, 2 );
+			dtfim = toStDate( fim, 2 );
 			//	insere a ausência autorizada
 			url = "partes/ausAut.php?funiid=" + idfunc +
 						"&autid=" + autorid +
