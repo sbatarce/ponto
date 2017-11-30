@@ -13,11 +13,14 @@
 				<div class="navigation" id="menupri" >
 					<div class="row">
 						<!-- Menus por tipo de usuário   -->
-						<!-- Menu dos super usuários     -->
+						<!-- Menu dos super usuários     
 						<div class="col-md-2 col-sm-5 col-xs-7 adm">
 							<div class="menu adm">
-								<span class="br-green"><i class="glyphicon glyphicon-adjust"></i> &nbsp; Administradores</span>
-								<div class="menu-list">
+								<span class="br-green" class="admmenu">
+									<i class="glyphicon glyphicon-adjust"></i> 
+									&nbsp; Administradores
+								</span>
+								<div class="menu-list adm">
 									<ul>
 										<li>
 											<a href="autAtribuir.php" ttip="ttip" data-placement="bottom" 
@@ -55,11 +58,13 @@
 								</div>
 							</div>
 						</div>
+			-->
 						<!-- Menu dos autorizadores     -->
 						<div class="col-md-2 col-sm-4 col-xs-6 aut">
 							<div class="menu aut" >
 								<span class="br-lblue" class="admmenu">
-									<i class="glyphicon glyphicon-eye-open"></i> &nbsp; Autorizadores
+									<i class="glyphicon glyphicon-eye-open"></i> 
+									&nbsp; Autorizadores
 								</span>
 								<div class="menu-list">
 									<ul>
@@ -118,7 +123,9 @@
 						<!-- Menu dos funcionários     -->
 						<div class="col-md-3 col-sm-5 col-xs-7 fun">
 							<div class="menu fun">
-								<span class="br-pastel"><i class="glyphicon glyphicon-file"></i> &nbsp; Funcionários</span>
+								<span class="br-pastel"><i class="glyphicon glyphicon-file"></i> 
+									&nbsp; Funcionários
+								</span>
 								<div class="menu-list">
 									<ul>
 										<li><a href="funAcesso.php" ttip="ttip" data-placement="bottom" 

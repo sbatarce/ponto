@@ -37,9 +37,9 @@ if( !$conn )
   }
 
 //	verifica na biometria
-$sql	=	"SELECT FUNI.FUNI_ID, FUAU.PMS_IDSAUUOR, USUA.PERF_ID
-						FROM BIOMETRIA.FUNI_FUNCIONARIO FUNI
-						LEFT JOIN BIOMETRIA.FUAU_FUNCIONARIOAUTORIZADOR FUAU ON
+$sql	=	"SELECT FUNI.FUNI_ID, FUAU.PMS_IDSAUUOR, USUA.PERF_ID, USUA.USUA_STATIVO
+						FROM			BIOMETRIA.FUNI_FUNCIONARIO FUNI
+						LEFT JOIN	BIOMETRIA.FUAU_FUNCIONARIOAUTORIZADOR FUAU ON
 											FUAU.FUNI_ID=FUNI.FUNI_ID AND
 											FUAU.FUAU_DTFIM IS NULL 
 						LEFT JOIN BIOMETRIA.USUA_USUARIO USUA ON
@@ -74,17 +74,15 @@ if( !$row )
 $funiid	=	$row['FUNI_ID'];
 $puorid = $row['PMS_IDSAUUOR'];
 $perfid = $row['PERF_ID'];
+$uativo = $row['USUA_STATIVO'];
 oci_free_statement( $stid );
 oci_close( $conn );
-if( isset( $_GET["dbg"] ) )
+if( $uativo != "1" )
 	echo "{ 
 				\"status\": \"OK\", 
 				\"FUNI_ID\": \"$funiid\", 
-				\"UOR_ID\": \"$puorid\",
-				\"PERF_ID\": \"$perfid\",
-				\"loguser\": \"$loguser\",
-				\"logpass\": \"$logpass\",
-				\"amb\": \"$amb\"
+				\"UOR_ID\": \"\",
+				\"PERF_ID\": \"0\"
 				}";
 else
 	echo "{ 

@@ -134,7 +134,7 @@
 					criarCookie("tiuser", resul.PERF_ID, 1);
 					
 						
-					if( resul.PERF_ID == "4" || resul.PERF_ID == 5 )
+					if( resul.PERF_ID == "4" || resul.PERF_ID == "5" )
 						{
 						if( resul.UOR_ID != "" )
 							criarCookie("uoraut", resul.UOR_ID, 0, 10 );
