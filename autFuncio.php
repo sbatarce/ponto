@@ -782,34 +782,24 @@ include 'partes/Scripts.php';
 
 	var sshd = obterCookie( "user" );
 	if( sshd == null )
-		{
 		Deslogar();
-		window.history.back();
-		window.location = "index.php";
-		}
 
 	var idfunc = obterCookie( "idfunc" );
-	if( idfunc == null )
+	if( idfunc == null || idfunc == "" )
 		{
-		Deslogar();
-		window.history.back();
-		window.location = "index.php";
+		window.location = "autTodosFunc.php";
 		}
 
 	var nofunc = obterCookie( "nofunc" );
-	if( nofunc == null )
+	if( nofunc == null || nofunc == "" )
 		{
-		Deslogar();
-		window.history.back();
-		window.location = "index.php";
+		window.location = "autTodosFunc.php";
 		}
 
 	var sshdfunc = obterCookie( "sshdfunc" );
 	if( sshdfunc == null || sshdfunc == "" )
 		{
-		Deslogar();
-		window.history.back();
-		window.location = "index.php";
+		window.location = "autTodosFunc.php";
 		}
 
 	//	obtem data do fechamento
@@ -823,6 +813,8 @@ include 'partes/Scripts.php';
 
 	$("#titwidget").html( "Ponto de " + nofunc );
 	matarCookie( "sshdfunc" );
+	matarCookie( "nofunc" );
+	matarCookie( "idfunc" );
 			
 		//	formatadores ligados ao datatables
 		//		ticamp:		tipo de campo t/n/l = texto, numérico ou legenda

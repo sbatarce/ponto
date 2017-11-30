@@ -268,9 +268,38 @@ include 'partes/Scripts.php';
 		//	obtem dados do autorizador
 		var sshd = obterCookie( "user" );
 		if( sshd == null )
-			{
 			Deslogar();
+
+		//	obtem dados do funcionário escolhido
+		var idfunc = obterCookie( "idfunc" );
+		if( idfunc == null || idfunc == "" )
+			{
+			window.location = "autTodosFunc.php";
 			}
+
+		var nofunc = obterCookie( "nofunc" );
+		if( nofunc == null || nofunc == "" )
+			{
+			window.location = "autTodosFunc.php";
+			}
+
+		var sshdfunc = obterCookie( "sshdfunc" );
+		if( sshdfunc == null || sshdfunc == "" )
+			{
+			window.location = "autTodosFunc.php";
+			}
+
+		var iduorfunc = obterCookie( "iduorfunc" );
+		if( iduorfunc == null )
+			{
+			window.location = "autTodosFunc.php";
+			}
+
+		matarCookie( "sshdfunc" );
+		matarCookie( "nofunc" );
+		matarCookie( "idfunc" );
+		matarCookie( "iduorfunc" );
+
 		//	obtem FUNI_ID do autorizador
 		var parms = "&sshd=" + sshd;
 		var resu = Select( "funiid", parms );
@@ -278,35 +307,6 @@ include 'partes/Scripts.php';
 			throw new Error("Problemas de acesso ao banco de dados. Por favor, tente mais tarde.");
 		var autorid = resu.dados[0].FUNI_ID;
 
-		//	obtem dados do funcionário escolhido
-		var idfunc = obterCookie( "idfunc" );
-		if( idfunc == null )
-			{
-			window.history.back();
-			window.location = "index.php";
-			}
-
-		var nofunc = obterCookie( "nofunc" );
-		if( nofunc == null )
-			{
-			window.history.back();
-			window.location = "index.php";
-			}
-
-		var sshdfunc = obterCookie( "sshdfunc" );
-		if( sshdfunc == null )
-			{
-			window.history.back();
-			window.location = "index.php";
-			}
-
-		var iduorfunc = obterCookie( "iduorfunc" );
-		if( iduorfunc == null )
-			{
-			console.log("passou 3")
-			window.history.back();
-			window.location = "index.php";
-			}
 			
 		$("#titwidget").html( "Ausências autorizadas de " + nofunc );
 		matarCookie( "sshdfunc" );

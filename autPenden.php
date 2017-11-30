@@ -722,63 +722,40 @@ include 'partes/Scripts.php';
 				setAjax();
 				});
 	
-	/////////////// PRINCIPAL ////////////////////////
-	var flanali = true;
-	var flpenden = false;
-	var flok = false;
-	var flaceita = false;
-	var flnegada = false;
-	var fltable = false;
-	//	tabelas de definição da tabela de presenças
-	var funiid = null;
-	var flmod = 0;				//	indica se há alterações não salvas
-	var flstt = 0;				//	indica se há alterações de status
-	var status = 4;
-	var dataatual;
-	var fdtrid;
-	var fdtmid;
-	var stts = [];				//	status e-existente, n-novo, d-deletado
-	var mensgs = [];			//	lista de mensagens
-	var salvos = [];			//	s-salvo
-		//	formatadores ligados ao datatables
-		//		ticamp:		tipo de campo t/n/l = texto, numérico ou legenda
-		//		inputs:		nomes dos campos no banco relativamente aos inputs
-		//		origem:		índice da coluna do Datatables que atualiza o campo no banco
-		//		editael:	indica se a coluna do datatable é editável
-		var notabel			=	"";								//	nome da tabela base
-		var	nocmpid			=	"";															//	nome do campo ID da tabela base
-		var sequence		= "";
-		var liNova			=
-					{
-					"DATA": "",
-					"Registros": "",
-					"Mensagens": "",
-					"Totais": ""
-					};
+		/////////////// PRINCIPAL ////////////////////////
+		var flanali = true;
+		var flpenden = false;
+		var flok = false;
+		var flaceita = false;
+		var flnegada = false;
+		var fltable = false;
+		//	tabelas de definição da tabela de presenças
+		var funiid = null;
+		var flmod = 0;				//	indica se há alterações não salvas
+		var flstt = 0;				//	indica se há alterações de status
+		var status = 4;
+		var dataatual;
+		var fdtrid;
+		var fdtmid;
+		var stts = [];				//	status e-existente, n-novo, d-deletado
+		var mensgs = [];			//	lista de mensagens
+		var salvos = [];			//	s-salvo
+
 		var sshd = obterCookie( "user" );
 		if( sshd == null )
-			{
 			Deslogar();
-			window.history.back();
-			window.location = "index.php";			
-			}
 			
 		var sshdfunc = obterCookie( "sshdfunc" );
-		if( sshdfunc == null )
-			{
-			Deslogar();
-			window.history.back();
-			window.location = "index.php";			
-			}
+		if( sshdfunc == null || sshdfunc == "" )
+			window.location = "autTodosFunc.php";
+
 		var nofunc = obterCookie( "nofunc" );
-		if( nofunc == null )
-			{
-			Deslogar();
-			window.history.back();
-			window.location = "index.php";
-			}
+		if( nofunc == null || nofunc == "" )
+			window.location = "autTodosFunc.php";
 
 		matarCookie( "sshdfunc" );
+		matarCookie( "nofunc" );
+		matarCookie( "idfunc" );
 
 		$("#titwidget").html( "Análise de pendencias de " + nofunc );
 		
@@ -795,32 +772,28 @@ include 'partes/Scripts.php';
 		$("#dtini").val( $.datepicker.formatDate("dd/mm/yy", dtufech ));
 		var dtini = $.datepicker.formatDate("yymmdd", dtufech );
 
-		//	obtem FUNI_ID
+		//	obtem FUNI_ID do usuário (autorizador)
 		var parms = "&sshd=" + sshd;
 		var resu = Select( "funiid", parms );
 		if( resu == null )
 			throw new Error("Problemas de acesso ao banco de dados. Por favor, tente mais tarde.");
 		funiid = resu.dados[0].FUNI_ID;
 
-		//	monta o datatables
-		var	order	=	[[0,'asc'],[3, 'asc']];											//	sem classificação 
+		//	formatadores ligados ao datatables
+		var notabel			=	"";								//	nome da tabela base
+		var	nocmpid			=	"";								//	nome do campo ID da tabela base
+		var sequence		= "";
+		var liNova			=
+					{
+					"DATA": "",
+					"Registros": "",
+					"Mensagens": "",
+					"Totais": ""
+					};
+		var	order	=	[[0,'asc'],[3, 'asc']];			//	classificação 
 		//	prepara a definiçao das colunas
 		var colDefs	=	[];
 		var	col	=	-1;
-		/*
-		var aux	=
-			{
-			"tipo": "x",
-			"editavel": false,
-			"vanovo": "",
-			"aTargets": [ ++col ],
-			"visible": false,
-			"mData": "ISODATE",
-			"sTitle":"",
-			"defaultContent": " "
-			};
-		colDefs.push( aux );
-		*/
 		var aux	=
 			{
 			"tipo": null,

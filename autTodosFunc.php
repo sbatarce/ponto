@@ -134,11 +134,10 @@ include 'partes/Scripts.php';
 			}
 
 		//	tratamento inicial das datas e inicialização do datatables
-		function setAjax( del )
+		function setAjax(  )
 			{
 			//
-			if( del != 0 )
-				tableDestroy();
+			tableDestroy();
 			AjaxSource	=	"partes/tableData.php?query=funcindex&autsshd=" + sshd;
 			inicializa.init();
 			}
@@ -157,7 +156,7 @@ include 'partes/Scripts.php';
 				{ 
 				var dt = $("#dtini").datepicker("getDate");
 				dtini = $.datepicker.formatDate("yymmdd", dt );
-				setAjax(1);
+				setAjax();
 				});
 		
     $( "#dtfim" ).datepicker(
@@ -173,14 +172,12 @@ include 'partes/Scripts.php';
 				{ 
 				var dt = $("#dtfim").datepicker("getDate");
 				dtfim = $.datepicker.formatDate("yymmdd", dt );
-				setAjax(1);
+				setAjax();
 				});
 		/////////////// PRINCIPAL ////////////////////////
 		var sshd = obterCookie( "user" );
 		if( sshd == null )
-			{
 			Deslogar();
-			}
 		$("#eddt_new").hide();
 		//	tabelas de definição da tabela de presenças
 		var dataatual;
@@ -373,7 +370,7 @@ include 'partes/Scripts.php';
 		
 		///////////////////////////////////////////////////////////////////////
 
-		setAjax( 0 );
+		setAjax();
 				
 		</script>
 	</body>	
