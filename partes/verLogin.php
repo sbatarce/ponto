@@ -81,7 +81,7 @@ if( $uativo != "1" )
 	echo "{ 
 				\"status\": \"OK\", 
 				\"FUNI_ID\": \"$funiid\", 
-				\"UOR_ID\": \"\",
+				\"UOR_ID\": \"$puorid\",
 				\"PERF_ID\": \"0\"
 				}";
 else

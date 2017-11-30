@@ -864,14 +864,6 @@ include 'partes/pagebody.php';
 
 		$("#eddt_new").hide();
 		setAjax();
-		/*
-		var handler = function() 
-			{
-				alert( "passou aqui" );
-			};
-		$('#eddt_new').unbind( "click" );
-		$('#eddt_new').bind( "click", handler );
-		*/
 		</script>
 	</body>	
 </html>

@@ -189,6 +189,21 @@ include 'partes/Scripts.php';
 			{
 			}
 			
+		function tabVazia()
+			{
+			var data = [];
+			data.push( 
+				{
+				"FUAUID": -1,
+				"SSHD": "",
+				"NOME": "Escolha uma UOR acima",
+				"INICIO": "",
+				"TERMINO": "",
+				"action": ""
+				} );
+			Table.fnAddData( data, true );
+			}
+			
 		//	verifica jurisdição de autorizador na UOR
 		function jurisdUOR( sshdauto, uorauto )
 			{
@@ -211,15 +226,20 @@ include 'partes/Scripts.php';
 		//	tratamento inicial das datas e inicialização do datatables
 		function setAjax(  )
 			{
-			tableDestroy();
 			if( tiuser < 4 )
 				{
-				if( uorid <= 0 )
+				if( uorid <	1 )
+					{
+					tableClear();
+					tabVazia();
 					return;
+					}
+				tableDestroy();
 				AjaxSource	=	"partes/tableData.php?query=uorautos&uorid=" + uorid;
 				}
 			else
 				{
+				tableDestroy();
 				if( uorid < 1 )
 					AjaxSource	=	"partes/tableData.php?query=uorautos";
 				else
@@ -690,17 +710,7 @@ include 'partes/Scripts.php';
 		{
 		AjaxSource	=	"";
 		inicializa.init();
-		var data = [];
-		data.push( 
-			{
-			"FUAUID": -1,
-			"SSHD": "",
-			"NOME": "Escolha uma UOR acima",
-			"INICIO": "",
-			"TERMINO": "",
-			"action": ""
-			} );
-		Table.fnAddData( data, true );
+		tabVazia();
 		}
 	else
 		setAjax();

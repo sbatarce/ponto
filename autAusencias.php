@@ -207,6 +207,23 @@ include 'partes/Scripts.php';
 			limpaDados()
 			atuatab();
 			}
+			
+		function remove( faauid )
+			{
+			if( confirm( "Remover a ausẽncia autorizada selecionada?" )  )
+				{
+				//	remove
+				let url = "partes/ausAutRem.php?faauid=" + faauid;
+				var resu = remoto( url );
+				if( resu.status != "OK" )
+					{
+					var err = resu.erro;
+					alert( "Falha <" + err + "> ao remover ausencia autorizada." );
+					return;
+					}
+				atuatab();
+				}
+			}
 
 		//	tratamento inicial das datas e inicialização do datatables
 		function setAjax(  )
@@ -491,6 +508,12 @@ include 'partes/Scripts.php';
 			"width": "10%",
 			"render": function( data, type, row )
 				{
+				return	"<a href='#' onClick='javascript:remove(" + row.FAAU_ID + ");' " +
+								"class='btn btn-circle btn-info btn-xs' " +
+								"title=\"Remove este período de autorização\" >" +
+								"<i class='glyphicon glyphicon-remove'></i></a>"
+				}
+				/*
 				var ago = new Date();
 				var stnow = ago.getFullYear() +
 										com2Digs( ago.getMonth()+1 ) +
@@ -503,6 +526,7 @@ include 'partes/Scripts.php';
 				else
 					return acremo;
 				}
+				*/
 			};
 		colDefs.push( aux );
 		///////////////////////////////////////////////////////////////////////
