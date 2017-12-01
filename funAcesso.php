@@ -768,13 +768,14 @@ include 'partes/Scripts.php';
 	if( resu.linhas < 1 )
 		throw new Error("Problemas de acesso ao banco de dados. Por favor, tente mais tarde.");
 	var dtfecha = toDate( resu.dados[0].DTFECHA );
+	var dtproxf = new Date( dtfecha.getYear()+1900, dtfecha.getMonth(), dtfecha.getDate()+1 );
 
 	//	acerta as datas
 	var hoje = new Date();
 	var dtfim = $.datepicker.formatDate("yymmdd", hoje );
 	$("#dtfim").val( $.datepicker.formatDate("dd/mm/yy", hoje ) );
 	hoje.setDate(1);
-	$("#dtini").val( $.datepicker.formatDate("dd/mm/yy", dtfecha ));
+	$("#dtini").val( $.datepicker.formatDate("dd/mm/yy", dtproxf ));
 	var dtini = $.datepicker.formatDate("yymmdd", hoje );
 
 		//	formatadores ligados ao datatables
