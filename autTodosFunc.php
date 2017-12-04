@@ -138,7 +138,10 @@ include 'partes/Scripts.php';
 			{
 			//
 			tableDestroy();
-			AjaxSource	=	"partes/tableData.php?query=funcindex&autsshd=" + sshd;
+			if( tiuser <= 3 )
+				AjaxSource	=	"partes/tableData.php?query=funcindex&autsshd=" + sshd;
+			else
+				AjaxSource	=	"partes/tableData.php?query=funcindex&super&autsshd=" + sshd;
 			inicializa.init();
 			}
 			
@@ -178,6 +181,10 @@ include 'partes/Scripts.php';
 		var sshd = obterCookie( "user" );
 		if( sshd == null )
 			Deslogar();
+		
+		var tiuser = obterCookie( "tiuser" );
+
+		
 		$("#eddt_new").hide();
 		//	tabelas de definição da tabela de presenças
 		var dataatual;
