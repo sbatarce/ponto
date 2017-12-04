@@ -207,6 +207,8 @@ include 'partes/Scripts.php';
 		//	verifica jurisdição de autorizador na UOR
 		function jurisdUOR( sshdauto, uorauto )
 			{
+			if( tiuser > 3 )
+				return true;
 			var url	=	"partes/queries.php?query=fuauid" + 
 								"&sshd=" + sshdauto + 
 								"&uorid=" + uorauto;
