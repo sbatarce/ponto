@@ -642,7 +642,10 @@ include 'partes/pagebody.php';
 		function setAjax()
 			{
 			tableDestroy();
-			AjaxSource	=	"partes/tableData.php?query=autcadas&sshd=" + sshd;
+			if( tiuser < 4 )
+				AjaxSource	=	"partes/tableData.php?query=autcadas&sshd=" + sshd;
+			else
+				AjaxSource	=	"partes/tableData.php?query=autcadas";
 			inicializa.init();
 			}
 			
@@ -681,6 +684,8 @@ include 'partes/pagebody.php';
 			}
 			
 		var pass = obterCookie( "pass" );
+		
+		var tiuser = obterCookie( "tiuser" );
 
 		$( "#xuordata" ).datepicker(
 			{

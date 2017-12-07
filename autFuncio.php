@@ -810,6 +810,31 @@ include 'partes/Scripts.php';
 	if( resu.linhas < 1 )
 		throw new Error("Problemas de acesso ao banco de dados. Por favor, tente mais tarde.");
 	var dtfecha = toDate( resu.dados[0].DTFECHA );
+	var dtiper = new Date(dtfecha.getTime());
+	dtiper.setDate( dtiper.getDate()+1 );
+
+	//	acerta as datas
+	var hoje = new Date();
+	var dtfim = $.datepicker.formatDate("yymmdd", hoje );
+	$("#dtfim").val( $.datepicker.formatDate("dd/mm/yy", hoje ) );
+	hoje.setDate(1);
+	if( dtiper > hoje )
+		{
+		$("#dtini").val( $.datepicker.formatDate("dd/mm/yy", dtiper ));
+		var dtini = $.datepicker.formatDate("yymmdd", dtiper );
+		}
+	else
+		{
+		$("#dtini").val( $.datepicker.formatDate("dd/mm/yy", hoje ));
+		var dtini = $.datepicker.formatDate("yymmdd", hoje );
+		}
+
+	//	obtem FUNI_ID
+	var parms = "&sshd=" + sshdfunc;
+	var resu = Select( "funiid", parms );
+	if( resu == null )
+		throw new Error("Problemas de acesso ao banco de dados. Por favor, tente mais tarde.");
+	funiid = resu.dados[0].FUNI_ID;
 
 	$("#titwidget").html( "Ponto de " + nofunc );
 	matarCookie( "sshdfunc" );
@@ -832,21 +857,6 @@ include 'partes/Scripts.php';
 						"Mensagens": "",
 						"Totais": ""
 						};
-		//	acerta as datas
-		var hoje = new Date();
-		var dtfim = $.datepicker.formatDate("yymmdd", hoje );
-		$("#dtfim").val( $.datepicker.formatDate("dd/mm/yy", hoje ) );
-		hoje.setDate(1);
-		$("#dtini").val( $.datepicker.formatDate("dd/mm/yy", dtfecha ));
-		var dtini = $.datepicker.formatDate("yymmdd", dtfecha );
-
-		//	obtem FUNI_ID
-		var parms = "&sshd=" + sshdfunc;
-		var resu = Select( "funiid", parms );
-		if( resu == null )
-			throw new Error("Problemas de acesso ao banco de dados. Por favor, tente mais tarde.");
-		funiid = resu.dados[0].FUNI_ID;
-
 		//	monta o datatables
 		var	order	=	[];											//	sem classificação 
 		//	prepara a definiçao das colunas

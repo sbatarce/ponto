@@ -253,11 +253,11 @@ if( $qry == "dtfecha" )
 		return;
 		}
 	$sshd	=	$_GET["sshd"];
-	$sql = "select TO_CHAR( MAX(FSHM.FSHM_DTREFERENCIA), 'YYYY-MM-DD' ) AS DTFECHA
-    FROM BIOMETRIA.FSHM_FUNCSALDOHORAMENSAL FSHM
-    INNER JOIN BIOMETRIA.FUNI_FUNCIONARIO FUNI ON
-                FUNI.FUNI_ID=FSHM.FUNI_ID
-    WHERE FUNI.PMS_IDPMSPESSOA='$sshd'";
+	$sql = "SELECT TO_CHAR( MAX(FSHM.FSHM_DTREFERENCIA), 'YYYY-MM-DD' ) AS DTFECHA
+						FROM BIOMETRIA.FSHM_FUNCSALDOHORAMENSAL FSHM
+						INNER JOIN BIOMETRIA.FUNI_FUNCIONARIO FUNI ON
+												FUNI.FUNI_ID=FSHM.FUNI_ID
+						WHERE FUNI.PMS_IDPMSPESSOA='$sshd'";
 	}
 
 ////////////////////////////////////////////////////////////////////////////////

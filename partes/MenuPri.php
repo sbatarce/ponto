@@ -135,6 +135,14 @@
 												Acesso ao Ponto
 											</a>
 										</li>
+										<li><a href="partes/Manual_Sistema_de_Ponto.pdf" ttip="ttip" 
+													 data-placement="bottom" 
+													 data-original-title="ajuda do ponto" 
+													 class="fun" >
+												<i class="glyphicon glyphicon-question-sign green"></i> 
+												Ajuda
+											</a>
+										</li>
 									</ul>
 								</div>
 							</div>

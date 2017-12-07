@@ -24,7 +24,10 @@ include 'partes/pagebody.php';
 ?>
 		<div class='row input-append date linha' style='margin-bottom: 10px; margin-left:4px'>
 			Início<input type="text" size="10" id="dtfrom" 
-											 style="margin-left: 20px; margin-right: 20px; "/>
+									 style="margin-left: 20px; margin-right: 20px; "/>
+			<input type="text" size="10" id="dtfecha" 
+						 style="margin-left: 10px; margin-right: 20px; float: right;"/>
+			<label style="float: right;">Fechamento em</label>
 		</div>
 										<table class="table table-striped table-hover table-bordered" id="eddt">
 											<thead><tr role="row"></tr></thead>
@@ -154,7 +157,7 @@ include 'partes/Scripts.php';
 			$("#modausen").modal('hide');
 			}
 
-		//	cria a nova ausêwncia autorizada
+		//	cria a nova ausência autorizada
 		function autorizar()
 			{
 			//	verifica e insere novas atualizações
@@ -209,12 +212,28 @@ include 'partes/Scripts.php';
 			atuatab();
 			}
 			
-		function remove( faauid )
+		function altera( ix )
+			{
+			let row = Table.fnGetData( ix );
+			let stini = toDateInv( row.INICIO );
+			let stter = toDateInv( row.TERMINO );
+				$('#dtini').datepicker( "option", "ninDate", dtproxf );
+			/*
+			if( stini <= dtfecha )
+				{
+				$('#dtini').datepicker( "option", "ninDate", "10/10/2017" );
+				}
+				*/
+			return;
+			}
+			
+		function remove( ix )
 			{
 			if( confirm( "Remover a ausẽncia autorizada selecionada?" )  )
 				{
 				//	remove
-				let url = "partes/ausAutRem.php?faauid=" + faauid;
+				let row = Table.fnGetData( ix );
+				let url = "partes/ausAutRem.php?faauid=" + row.FAAU_ID;
 				var resu = remoto( url );
 				if( resu.status != "OK" )
 					{
@@ -231,6 +250,7 @@ include 'partes/Scripts.php';
 			{
 			//
 			tableDestroy();
+			ixtab = -1;
 			AjaxSource	=	"partes/tableData.php?query=ausaut" + 
 					"&sshd=" + sshdfunc +
 					"&inicio=" + dtfrom;
@@ -275,6 +295,7 @@ include 'partes/Scripts.php';
 			$("#modausen").modal('show');
 			} );
 		/////////////// PRINCIPAL ////////////////////////
+		var ixtab = -1;
 		var hoje = new Date();
 		var dtini = $.datepicker.formatDate("yymmdd", hoje );
 		var dtfim = $.datepicker.formatDate("yymmdd", hoje );
@@ -340,8 +361,10 @@ include 'partes/Scripts.php';
 		var dfecha = Number(dtfecha.substring( 8 ));
 		var dtufech = toDate( dtfecha );
 		dtfecha = $.datepicker.formatDate("yymmdd", dtufech );
-		$("#dtfrom").val( $.datepicker.formatDate("dd/mm/yy", dtufech ));
+		var dtproxf = new Date( dtufech.getYear()+1900, dtufech.getMonth(), dtufech.getDate()+1 );
+		$("#dtfrom").val( $.datepicker.formatDate("dd/mm/yy", dtproxf ));
 		var dtfrom = $.datepicker.formatDate("yymmdd", dtufech );
+		$("#dtfecha").val( $.datepicker.formatDate("dd/mm/yy", dtufech ) );
 
 		//	tratamento das datas 	
 		$( "#dtfrom" ).datepicker(					//	data inicial de pesquisa
@@ -352,7 +375,7 @@ include 'partes/Scripts.php';
 			todayBtn: true,
 			daysOfWeekHighlighted: "0,6",
 			autoclose: true,
-			minDate: dtufech,
+			//minDate: dtufech,
 			todayHighlight: true			
 			}).on('change.dp', function(e)
 				{ 
@@ -420,7 +443,7 @@ include 'partes/Scripts.php';
 			"tipo": "t",
 			"editavel": true,
 			"vanovo": "",
-			"width": "20%",
+			"width": "15%",
 			"aTargets": [ ++col ],
 			"mData": "TIPO",
 			"sTitle":"Tipo",
@@ -483,7 +506,7 @@ include 'partes/Scripts.php';
 			"tipo": "t",
 			"editavel": true,
 			"vanovo": "",
-			"width": "20%",
+			"width": "10%",
 			"aTargets": [ ++col ],
 			"mData": "TMPDIARIO",
 			"sTitle":"Tempo diário",
@@ -509,9 +532,25 @@ include 'partes/Scripts.php';
 			"width": "10%",
 			"render": function( data, type, row )
 				{
-				return	"<a href='#' onClick='javascript:remove(" + row.FAAU_ID + ");' " +
+				let stini = toDateInv( row.INICIO );
+				let stter = toDateInv( row.TERMINO );
+				
+				ixtab++;
+				if( dtfecha >= stter )
+					return "";
+				if( dtfecha >= stini )
+					return	"<a href='#' onClick='javascript:altera(" + ixtab + ");' " +
+									"class='btn btn-circle btn-info btn-xs' " +
+									"title=\"Clique para alterar este período de autorização\" >" +
+									"<i class='glyphicon glyphicon-edit'></i></a>"
+				
+				return	"<a href='#' onClick='javascript:altera(" + ixtab + ");' " +
 								"class='btn btn-circle btn-info btn-xs' " +
-								"title=\"Remove este período de autorização\" >" +
+								"title=\"Clique para alterar este período de autorização\" >" +
+								"<i class='glyphicon glyphicon-edit'></i></a>" +
+								"<a href='#' onClick='javascript:remove(" + ixtab + ");' " +
+								"class='btn btn-circle btn-info btn-xs' " +
+								"title=\"Clique para remover este período de autorização\" >" +
 								"<i class='glyphicon glyphicon-remove'></i></a>"
 				}
 				/*
@@ -519,8 +558,6 @@ include 'partes/Scripts.php';
 				var stnow = ago.getFullYear() +
 										com2Digs( ago.getMonth()+1 ) +
 										com2Digs( ago.getDate() );
-				var stini = toDateInv( row.INICIO );
-				var stter = toDateInv( row.TERMINO );
 				
 				if( stnow > stini || stnow > stter )
 					return "";

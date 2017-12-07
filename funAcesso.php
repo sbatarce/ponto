@@ -18,13 +18,17 @@ include 'partes/pagebody.php';
 ?>
 		<div class='row input-append date linha' style='margin-bottom: 10px; margin-left:4px'>
 			Período de<input type="text" size="10" id="dtini" 
-											 style="margin-left: 20px; margin-right: 20px; "/>
+											 style="margin-left: 20px; margin-right: 10px; "/>
 			a <input type="text" size="10" id="dtfim" 
-							 style="margin-left: 20px; margin-right: 20px; "/>
-			Saldo <input type="text" size="10" id="sldant" 
-							 style="margin-left: 20px; margin-right: 20px; "/>
-			Registros do dia<input type="text" size="25" id="reghoje" 
-														 style="margin-left: 20px; margin-right: 20px; "/>
+							 style="margin-left: 10px; margin-right: 10px; "/>
+			Saldo <input type="text" size="10" id="sldant" readonly
+									 style="margin-left: 10px; margin-right: 10px; "/>
+			<input type="text" size="10" id="dtfecha" readonly
+											 style="margin-left: 5px; margin-right: 20px; float: right;"/>
+			<label for="dtfecha" style="float: right;">Fechado em</label>
+			<input type="text" size="20" id="reghoje" 
+														 style="margin-left: 5px; margin-right: 20px; float: right;"/>
+			<label for="dtfecha" style="float: right;">Registros do dia</label>
 		</div>
 										<table class="table table-striped table-hover table-bordered" id="eddt">
 											<thead><tr role="row"></tr></thead>
@@ -769,13 +773,14 @@ include 'partes/Scripts.php';
 		throw new Error("Problemas de acesso ao banco de dados. Por favor, tente mais tarde.");
 	var dtfecha = toDate( resu.dados[0].DTFECHA );
 	var dtproxf = new Date( dtfecha.getYear()+1900, dtfecha.getMonth(), dtfecha.getDate()+1 );
+	$("#dtfecha").val( $.datepicker.formatDate("dd/mm/yy", dtfecha ) );
 
 	//	acerta as datas
 	var hoje = new Date();
 	var dtfim = $.datepicker.formatDate("yymmdd", hoje );
 	$("#dtfim").val( $.datepicker.formatDate("dd/mm/yy", hoje ) );
 	hoje.setDate(1);
-	$("#dtini").val( $.datepicker.formatDate("dd/mm/yy", dtproxf ));
+	$("#dtini").val( $.datepicker.formatDate("dd/mm/yy", dtproxf ) );
 	var dtini = $.datepicker.formatDate("yymmdd", hoje );
 
 		//	formatadores ligados ao datatables
