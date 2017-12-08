@@ -327,7 +327,7 @@ if( $qry == "saldoant" )
 		}
 	$funiid	=	$_GET["funiid"];
 	$dtinic	=	$_GET["dtinic"];
-	$sql = "SELECT BIOMETRIA.SF_CALCULASALDOINICIAL( $funiid, TO_DATE('$dtinic','YYYYMMDD')-1 ) 
+	$sql = "SELECT BIOMETRIA.SF_CALCULASALDOINICIAL( $funiid, TO_DATE('$dtinic','YYYYMMDD') ) 
 						AS MINUTOS FROM DUAL";
 	}
 
