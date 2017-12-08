@@ -122,8 +122,8 @@ if( $qtpend > 0 )
 	return;
 	}
 	
-//	obtem saldo e médias no dia do novo fechamento para compor o novo FSHM
-$sql = "SELECT  BIOMETRIA.SF_CALCULASALDOINICIAL( $funiid, TO_DATE('$data','YYYYMMDD')) AS SALDO,
+//	obtem saldo e médias no final do dia do novo fechamento para compor o novo FSHM
+$sql = "SELECT  BIOMETRIA.SF_CALCULASALDOINICIAL( $funiid, TO_DATE('$data','YYYYMMDD')+1) AS SALDO,
 								NIQUANTIDADEHORARIO1 AS QTDENTRA, NISOMAHORARIO1 AS MEDENTRA, 
 								NIQUANTIDADEHORARIO2 AS QTDINTER, NISOMAHORARIO2 AS MEDINTER, 
 								NIQUANTIDADEHORARIO3 AS QTDVOLTA, NISOMAHORARIO3 AS MEDVOLTA, 
