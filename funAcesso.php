@@ -9,7 +9,7 @@ include 'partes/Head.php';
 		<link rel="shortcut icon" href="/imagens/PMSICO.png">
 	</head>
 	
-	<body onload="javascript:titulo( '<h4>Ponto do funcionário logado</h4>' );">
+	<body onload="javascript:titulo( '<h4>Ponto do funcionário</h4>' );">
 <?php
 include 'partes/MenuPri.php';
 include 'partes/Cabec.php';
@@ -668,7 +668,7 @@ include 'partes/Scripts.php';
 
 			tableDestroy();
 			AjaxSource	=	"partes/tableData.php?query=funaces&sshd=" + sshd.toUpperCase() + 
-												"&dtini="+dtini+"&dtfim="+dtfim;
+												"&dtini=" + dtini + "&dtfim=" + dtfim;
 			inicializa.init();
 			}
 			

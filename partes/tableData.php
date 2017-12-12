@@ -793,9 +793,9 @@ if( $qry == "funaces" )
 													AND TO_DATE('$dtfim', 'YYYYMMDD') ";
 	if( $sshd != "" )
 		$sql .= "AND FUNI.PMS_IDPMSPESSOA='$sshd' 
-						ORDER BY FUNI.FUNI_ID, FDTR.FDTR_DTREFERENCIA";
+						ORDER BY FUNI.FUNI_ID, FDTR.FDTR_DTREFERENCIA ";
 	else
-		$sql .= "ORDER BY FDTR.FDTR_DTREFERENCIA";
+		$sql .= "ORDER BY FDTR.FDTR_DTREFERENCIA ";
 	}
 ////////////////////////////////////////////////////////////////////////////////	
 ////////////////////////////////////////////////////////////////////////////////
