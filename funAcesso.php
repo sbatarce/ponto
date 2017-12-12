@@ -646,7 +646,7 @@ include 'partes/Scripts.php';
 			dtfim = $.datepicker.formatDate("yymmdd", dt );
 			
 			var pessoa = sshd.substr( 1 );
-			parms = "&pessoa="+pessoa+"&dtinic="+dtfim+"&dtterm="+dtfim;
+			parms = "&pessoa="+pessoa+"&dtinic="+dthoje+"&dtterm="+dthoje;
 			var resu = Select( "reprpmspessoa", parms );
 			if( resu == null )
 				throw new Error("Problemas de acesso ao banco de dados. Por favor, tente mais tarde.");
@@ -777,6 +777,7 @@ include 'partes/Scripts.php';
 
 	//	acerta as datas
 	var hoje = new Date();
+	var dthoje = $.datepicker.formatDate("yymmdd", hoje );
 	var dtfim = $.datepicker.formatDate("yymmdd", hoje );
 	$("#dtfim").val( $.datepicker.formatDate("dd/mm/yy", hoje ) );
 	hoje.setDate(1);

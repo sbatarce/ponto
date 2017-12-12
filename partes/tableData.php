@@ -790,7 +790,7 @@ if( $qry == "funaces" )
 													FUCO.FUNI_ID=FUNI.FUNI_ID AND
 													FUCO.FUCO_DTREFERENCIA=FDTR.FDTR_DTREFERENCIA
 							WHERE       FDTR.FDTR_DTREFERENCIA BETWEEN TO_DATE('$dtini', 'YYYYMMDD') 
-													AND TO_DATE('$dtfim', 'YYYYMMDD') + 1 ";
+													AND TO_DATE('$dtfim', 'YYYYMMDD') ";
 	if( $sshd != "" )
 		$sql .= "AND FUNI.PMS_IDPMSPESSOA='$sshd' 
 						ORDER BY FUNI.FUNI_ID, FDTR.FDTR_DTREFERENCIA";
