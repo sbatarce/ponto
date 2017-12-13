@@ -8,6 +8,7 @@
 //		dtini		data inicial da sequencia de ausências
 //		dtfim		data final
 //		mins		minutos de ausência autorizada a cada dia
+//		lib4b		libera a exigencia de 4 batidas (opcional)
 
 include '../partes/fmtErro.php';
 include 'ambiente.php';
@@ -54,7 +55,11 @@ if( isset( $_GET["mins"] ) )
 	$mins = $_GET["mins"];
 else
 	$mins = 0;
-	
+
+if( isset( $_GET["lib4b"] ) )
+	$lib4b = "1";
+else
+	$lib4b = "0";	
 //	obtem parametros
 $funiid = $_GET["funiid"];
 $autid = $_GET["autid"];
@@ -284,7 +289,7 @@ $ora->beginTransaction();
 $sql	=	"insert into BIOMETRIA.FAAU_FUNCAUSENCIAAUTORIZADA VALUES( 
 					BIOMETRIA.SQ_FAAU.NEXTVAL, $funiid, $taauid, $fuauid, 
 					TO_DATE( '$dtini', 'YYYYMMDD' ), 
-					TO_DATE( '$dtfim', 'YYYYMMDD' ), $mins )";
+					TO_DATE( '$dtfim', 'YYYYMMDD' ), $mins, $lib4b )";
 $res = $ora->execInsert( $sql, "BIOMETRIA.SQ_FAAU" );
 $jres	= json_decode($res);
 if( $jres->status != "OK" )
