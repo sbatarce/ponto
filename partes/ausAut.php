@@ -85,6 +85,33 @@ if( $res != "OK" )
 	echo $res;
 	return;
 	}
+
+//	obtem a data do ultimo processamento
+$sql = "SELECT TO_CHAR( PAGL_DTPROCESSADA, 'YYYYMMDD') AS DTUPROC 
+					FROM BIOMETRIA.PAGL_PARAMETROSGLOBAIS";
+$res = $ora->execSelect($sql);
+$jres = json_decode($res);
+if( $dbg )
+	{
+	echo "Obtend DTUPRC sql=$sql/resultado:";
+	var_dump($jres);
+	}
+if( $jres->status != "OK" )
+	{
+	fmtErro( "erro", "Obtend DTUPRC: $jres->erro" );
+	$ora->disconnect();
+	return;
+	}
+if( $jres->linhas < 1 )
+	{
+	fmtErro( "erro", "Registro PAGL nao existe" );
+	$ora->disconnect();
+	return;
+	}
+$dtate = $jres->dados[0]->DTUPROC;
+if( $dbg )
+	echo "Data do ultimo processamento: $dtate <br>";
+
 //	verifica a validade da sequencia de ausências
 //	obtem a quantidade de horas normais do funcionário
 $sql = "SELECT MAX(RTAT.RTAT_NITMPDIARIO) AS TMP
@@ -358,6 +385,8 @@ else
 		}	
 	}
 //	insere as eventuais FDTFs necessárias
+if( $dtate > $dtfim )
+	$dtate = $dtfim;
 $sql = "INSERT INTO BIOMETRIA.FDTF_FUNCDIATRABALHO_FAAU
 					SELECT BIOMETRIA.SQ_FDTF.NEXTVAL, $faauid, FDTR.FDTR_ID, $fuauid, $mins
 						FROM BIOMETRIA.FDTR_FUNCIONARIODIATRABALHO FDTR
@@ -367,7 +396,7 @@ $sql = "INSERT INTO BIOMETRIA.FDTF_FUNCDIATRABALHO_FAAU
 												FUNI.FUNI_ID=FRTR.FUNI_ID
 						WHERE FUNI.FUNI_ID=$funiid AND FDTR.FDTR_DTREFERENCIA 
 										BETWEEN TO_DATE( '$dtini', 'YYYYMMDD' ) 
-												AND TO_DATE( '$dtfim', 'YYYYMMDD' )";
+												AND TO_DATE( '$dtate', 'YYYYMMDD' )";
 $res = $ora->execInsert( $sql, "" );
 $jres	= json_decode($res);
 if( $dbg )
