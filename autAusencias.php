@@ -67,6 +67,12 @@ include 'partes/pagebody.php';
 						<input style='width:50%; ' class='input-small inp' 
 									 id="tiaus" title="Escolha o tipo de ausencia"/></label>
 						<br/>
+						<label for="lib4b" class='lab sim' style='width:100%; '>Libera exigência de 4 batidas diárias: 
+						<input style='width:20%; ' class='input-small inp' 
+									 id="lib4b" title="Indica haverá liberação da obrigação de 4 batidas
+																			nos dias em que esta ausência estiver em vigor"/>
+						</label>
+						<br/>
 						<label for="qtaus" class='lab sim' style='width:100%; ' >Horas de ausência:
 						<input style='width:20%; ' class='input-small inp' 
 									 id="qtaus" title="quantidade de horas de ausência a autorizar no formato HH:MM"/>
@@ -153,6 +159,7 @@ include 'partes/Scripts.php';
 			$("#dtini").val( $.datepicker.formatDate("dd/mm/yy", hoje ));
 			$("#dtfim").val( $.datepicker.formatDate("dd/mm/yy", hoje ) );
 			$('#tiaus').select2('val', '0');
+			$('#lib4b').select2('val', '1');
 			$('#qtaus').val('00:00');
 			$("#modausen").modal('hide');
 			}
@@ -200,6 +207,11 @@ include 'partes/Scripts.php';
 						"&dtini=" + dtini +
 						"&dtfim=" + dtfim +
 						"&mins=" + qtaus;
+			if( faauid >= 0 )
+				url += "&faauid=" + faauid;
+			if( idlib4b == 1 )
+				url += '&lib4b';
+				
 			var resu = remoto( url );
 			if( resu.status != "OK" )
 				{
@@ -209,27 +221,36 @@ include 'partes/Scripts.php';
 				}
 			//	limpa e encerra
 			limpaDados()
-			atuatab();
+			setAjax();
 			}
 			
 		function altera( ix )
 			{
 			let row = Table.fnGetData( ix );
-			let stini = toDateInv( row.INICIO );
-			let stter = toDateInv( row.TERMINO );
-				$('#dtini').datepicker( "option", "ninDate", dtproxf );
-			/*
-			if( stini <= dtfecha )
-				{
-				$('#dtini').datepicker( "option", "ninDate", "10/10/2017" );
-				}
-				*/
+			$('#dtini').datepicker( "option", "ninDate", dtproxf );
+			$('#dtini').val(row.INICIO);
+			$('#dtfim').val(row.TERMINO);
+			let url =	"selectData.php?query=naosim";
+			if( row.LIB4B == 0 )
+				SelInit( "#lib4b", url, 0, "nao", escolib4b );
+			else
+				SelInit( "#lib4b", url, 1, "sim", escolib4b );
+			
+			url =	"selectData.php?query=tiaus";
+			SelInit( "#tiaus", url, row.IDTIPO, row.TIPO, escoTiaus );
+			taauid = row.IDTIPO;
+			escoTiaus( 'change', row.IDTIPO );
+			
+			$('#qtaus').val(minToHHMM(row.TMPDIARIO));
+			
+			faauid = row.FAAU_ID;
+			$("#modausen").modal('show');
 			return;
 			}
 			
 		function remove( ix )
 			{
-			if( confirm( "Remover a ausẽncia autorizada selecionada?" )  )
+			if( confirm( "Remover a ausência autorizada selecionada?" )  )
 				{
 				//	remove
 				let row = Table.fnGetData( ix );
@@ -241,7 +262,7 @@ include 'partes/Scripts.php';
 					alert( "Falha <" + err + "> ao remover ausencia autorizada." );
 					return;
 					}
-				atuatab();
+				setAjax();
 				}
 			}
 
@@ -255,6 +276,11 @@ include 'partes/Scripts.php';
 					"&sshd=" + sshdfunc +
 					"&inicio=" + dtfrom;
 			inicializa.init();
+			}
+			
+		function escolib4b( tipo, id, text )
+			{
+			idlib4b = id;
 			}
 			
 		function escoTiaus( tipo, id )
@@ -277,14 +303,18 @@ include 'partes/Scripts.php';
 				document.getElementById('qtaus').setAttribute("readonly", true);
 				var mins = resu.dados[0].TAAU_NIVARHORAS * 60;
 				document.getElementById('qtaus').value = minToHHMM(mins);
+				document.getElementById('lib4b').setAttribute("readonly", true);
 				}
 			else
 				{
 				document.getElementById('qtaus').removeAttribute("readonly");
 				document.getElementById('qtaus').value = "";
+				document.getElementById('lib4b').removeAttribute("readonly");
 				}
 			//
+			idlib4b = 1;
 			taauid = id;
+			$('#lib4b').val('sim').trigger('change');
 			}
 
     $('#eddt_new').click(function( e )
@@ -292,6 +322,7 @@ include 'partes/Scripts.php';
 			e.stopImmediatePropagation();
 			$("#dtini").val( $.datepicker.formatDate("dd/mm/yy", hoje ));
 			$("#dtfim").val( $.datepicker.formatDate("dd/mm/yy", hoje ) );
+			faauid = -1;
 			$("#modausen").modal('show');
 			} );
 		/////////////// PRINCIPAL ////////////////////////
@@ -303,6 +334,9 @@ include 'partes/Scripts.php';
 		var idaus = -1;
 		var noaus = "";
 		var taauid = -1;				//	id do tipo de ausência autorizada
+		var faauid = -1;				//	id de uma ausencia preexistente
+		
+		var idlib4b = 0;
 		
 		//	obtem dados do autorizador
 		var sshd = obterCookie( "user" );
@@ -421,6 +455,10 @@ include 'partes/Scripts.php';
 		SelInit( "#tiaus", url, 0, "Escolha abaixo", escoTiaus );
 		taauid = 0;
 		
+		//	combo de tipo de ausências
+		url =	"selectData.php?query=naosim";
+		SelInit( "#lib4b", url, 1, "sim", escolib4b );
+		
 		//	formatadores ligados ao datatables
 		var liNova			=
 						{
@@ -443,7 +481,7 @@ include 'partes/Scripts.php';
 			"tipo": "t",
 			"editavel": true,
 			"vanovo": "",
-			"width": "15%",
+			"width": "20%",
 			"aTargets": [ ++col ],
 			"mData": "TIPO",
 			"sTitle":"Tipo",
@@ -457,7 +495,7 @@ include 'partes/Scripts.php';
 			"tipo": "t",
 			"editavel": true,
 			"vanovo": "",
-			"width": "15%",
+			"width": "10%",
 			"aTargets": [ ++col ],
 			"mData": "PODE",
 			"sTitle":"Marcação",
@@ -475,10 +513,33 @@ include 'partes/Scripts.php';
 		aux	=
 			{
 			"className": "centro",
+			"tipo": "t",
+			"editavel": true,
+			"vanovo": "",
+			"width": "10%",
+			"aTargets": [ ++col ],
+			"mData": "LIB4B",
+			"sTitle":"Libera 4 Batidas",
+			"defaultContent": " ",
+			"render": function( data, type, full )
+				{
+				if( full.PODE == '0' )
+					return "sim";
+				if( data == '0' )
+					return "nao";
+				else
+					return "sim";
+				}
+			};
+		colDefs.push( aux );
+		
+		aux	=
+			{
+			"className": "centro",
 			"tipo": "l",
 			"editavel": true,
 			"vanovo": "",
-			"width": "20%",
+			"width": "10%",
 			"aTargets": [ ++col ],
 			"mData": "INICIO",
 			"sTitle":"Início",
@@ -492,7 +553,7 @@ include 'partes/Scripts.php';
 			"tipo": "t",
 			"editavel": true,
 			"vanovo": "",
-			"width": "20%",
+			"width": "10%",
 			"aTargets": [ ++col ],
 			"mData": "TERMINO",
 			"sTitle":"Término",
@@ -553,24 +614,10 @@ include 'partes/Scripts.php';
 								"title=\"Clique para remover este período de autorização\" >" +
 								"<i class='glyphicon glyphicon-remove'></i></a>"
 				}
-				/*
-				var ago = new Date();
-				var stnow = ago.getFullYear() +
-										com2Digs( ago.getMonth()+1 ) +
-										com2Digs( ago.getDate() );
-				
-				if( stnow > stini || stnow > stter )
-					return "";
-				else
-					return acremo;
-				}
-				*/
 			};
 		colDefs.push( aux );
 		///////////////////////////////////////////////////////////////////////
-
 		setAjax();
-				
 		</script>
 	</body>	
 </html>

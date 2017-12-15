@@ -530,7 +530,7 @@ function SelOptions( url )
     type: 'GET',
     async: false,
     crossDomain: true,
-    url: url,
+    url: 'partes/'+url,
     success: function( resp, textStatus, jqXHR )
       {
       resul = resp;
@@ -580,7 +580,7 @@ function SelInit( sel, url, id, text, func, minlen )
         })
       .on( "change", function( e )
         {
-        if( func != undefined && func != null )
+        if( func != undefined && func != null && e.val != undefined && e.added != undefined )
           func( "change", e.val, e.added.text );
         } );
       },

@@ -59,7 +59,13 @@ else
 if( isset( $_GET["lib4b"] ) )
 	$lib4b = "1";
 else
-	$lib4b = "0";	
+	$lib4b = "0";
+
+if( isset( $_GET["faauid"] ) )
+	$faauid = $_GET["faauid"];
+else
+	$faauid = "-";
+
 //	obtem parametros
 $funiid = $_GET["funiid"];
 $autid = $_GET["autid"];
@@ -206,8 +212,8 @@ if( !$pode )
 												FDTE.FDTR_ID=FDTR.FDTR_ID
 						WHERE FRTR.FUNI_ID=$funiid AND       
 									FDTR.FDTR_DTREFERENCIA BETWEEN 
-									TO_DATE( '20170801', 'YYYYMMDD' ) AND
-									TO_DATE( '20170813', 'YYYYMMDD' )";
+									TO_DATE( '$dtini', 'YYYYMMDD' ) AND
+									TO_DATE( '$dtfim', 'YYYYMMDD' )";
 	$res = $ora->execSelect($sql);
 	$jres = json_decode($res);
 	if( $dbg )
@@ -251,7 +257,9 @@ while( $refdt <= $fimdt )
 						FROM BIOMETRIA.FAAU_FUNCAUSENCIAAUTORIZADA FAAU
 						WHERE TO_DATE( '$dt', 'YYYYMMDD' ) BETWEEN
 									FAAU.FAAU_DTINI AND FAAU.FAAU_DTFIM AND
-									FAAU.FUNI_ID=$funiid";
+									FAAU.FUNI_ID=$funiid ";
+	if( $faauid != '-' )
+		$sql .= "AND FAAU.FAAU_ID <> $faauid ";
 	$res = $ora->execSelect($sql);
 	$jres = json_decode($res);
 	if( $dbg )
@@ -286,21 +294,69 @@ while( $refdt <= $fimdt )
 $ora->beginTransaction();
 
 //	insere FAAU
-$sql	=	"insert into BIOMETRIA.FAAU_FUNCAUSENCIAAUTORIZADA VALUES( 
-					BIOMETRIA.SQ_FAAU.NEXTVAL, $funiid, $taauid, $fuauid, 
-					TO_DATE( '$dtini', 'YYYYMMDD' ), 
-					TO_DATE( '$dtfim', 'YYYYMMDD' ), $mins, $lib4b )";
-$res = $ora->execInsert( $sql, "BIOMETRIA.SQ_FAAU" );
-$jres	= json_decode($res);
-if( $jres->status != "OK" )
+if( $faauid == "-" )
 	{
-	echo $res;
-	$ora->rollback();
-	$ora->disconnect();
-	return;
+	$sql	=	"INSERT INTO BIOMETRIA.FAAU_FUNCAUSENCIAAUTORIZADA VALUES( 
+						BIOMETRIA.SQ_FAAU.NEXTVAL, $funiid, $taauid, $fuauid, 
+						TO_DATE( '$dtini', 'YYYYMMDD' ), 
+						TO_DATE( '$dtfim', 'YYYYMMDD' ), $mins, $lib4b )";
+	$res = $ora->execInsert( $sql, "BIOMETRIA.SQ_FAAU" );
+	$jres	= json_decode($res);
+	if( $dbg )
+		{
+		echo "Inserindo FAAU sql=$sql/resultado:";
+		var_dump($jres);
+		}
+	if( $jres->status != "OK" )
+		{
+		echo $res;
+		$ora->rollback();
+		$ora->disconnect();
+		return;
+		}
+	$faauid = $jres->idnovo;
+	$ora->libStmt();
 	}
-$faauid = $jres->idnovo;
-$ora->libStmt();
+else
+	{
+	$sql = "UPDATE BIOMETRIA.FAAU_FUNCAUSENCIAAUTORIZADA SET
+						TAAU_ID=$taauid, FUAU_ID=$fuauid,
+						FAAU_DTINI=TO_DATE( '$dtini', 'YYYYMMDD' ), 
+						FAAU_DTFIM=TO_DATE( '$dtfim', 'YYYYMMDD' ), 
+						FAAU_NITMPDIARIO=$mins, FAAU_STLIB4BATIDAS= $lib4b
+						WHERE FAAU_ID=$faauid";
+	$res = $ora->execDelUpd( $sql );
+	$jres = json_decode( $res );
+	if( $dbg )
+		{
+		echo "update FAAU SQL=$sql/resultado:";
+		var_dump($jres);
+		}
+	if( $jres->status != "OK" )
+		{
+		fmtErro( "erro", "alterando FAAU: $jres->erro" );
+		$ora->rollback();
+		$ora->disconnect();
+		return;
+		}	
+	//	remove todos os FDTF's
+	$sql = "DELETE FROM BIOMETRIA.FDTF_FUNCDIATRABALHO_FAAU
+						WHERE FAAU_ID=$faauid";
+	$res = $ora->execDelUpd( $sql );
+	$jres = json_decode( $res );
+	if( $dbg )
+		{
+		echo "removendo FDTF SQL=$sql/resultado:";
+		var_dump($jres);
+		}
+	if( $jres->status != "OK" )
+		{
+		fmtErro( "erro", "removendo FDTF: $jres->erro" );
+		$ora->rollback();
+		$ora->disconnect();
+		return;
+		}	
+	}
 //	insere as eventuais FDTFs necessárias
 $sql = "INSERT INTO BIOMETRIA.FDTF_FUNCDIATRABALHO_FAAU
 					SELECT BIOMETRIA.SQ_FDTF.NEXTVAL, $faauid, FDTR.FDTR_ID, $fuauid, $mins
@@ -314,6 +370,11 @@ $sql = "INSERT INTO BIOMETRIA.FDTF_FUNCDIATRABALHO_FAAU
 												AND TO_DATE( '$dtfim', 'YYYYMMDD' )";
 $res = $ora->execInsert( $sql, "" );
 $jres	= json_decode($res);
+if( $dbg )
+	{
+	echo "Inserindo FDTF SQL=$sql/resultado:";
+	var_dump($jres);
+	}
 if( $jres->status != "OK" )
 	{
 	echo $res;
