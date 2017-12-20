@@ -804,7 +804,7 @@ include 'partes/Scripts.php';
 			"aTargets": [ ++col ],
 			"orderable":false,
 			"mData":null,
-			"width": "5%",
+			"width": "3%",
 			"defaultContent": acshow
 			};
 		colDefs.push( aux );
@@ -814,7 +814,7 @@ include 'partes/Scripts.php';
 			"tipo": "x",
 			"editavel": false,
 			"vanovo": "",
-			"width": "10%",
+			"width": "7%",
 			"className": "centro",
 			"aTargets": [ ++col ],
 			"mData": "TSDT_ID",
@@ -875,7 +875,7 @@ include 'partes/Scripts.php';
 			"tipo": "x",
 			"editavel": false,
 			"vanovo": "",
-			"width": "25%",
+			"width": "23%",
 			"aTargets": [ ++col ],
 			"mData": "NOME",
 			"sTitle":"Funcionario",
@@ -888,7 +888,7 @@ include 'partes/Scripts.php';
 			"tipo": "x",
 			"editavel": false,
 			"vanovo": "",
-			"width": "18%",
+			"width": "22%",
 			"aTargets": [ ++col ],
 			"mData": "HORARIOS",
 			"sTitle":"Registros",
@@ -914,21 +914,27 @@ include 'partes/Scripts.php';
 						aux	+= "red";
 					if( orgs[i] == "3" )
 						aux	+= "yellow";
+					
+					let ho;
+					if( full.DATA == hors[i].substr(0,10) )
+						ho = hors[i].substr(11);
+					else
+						ho = "("+hors[i].substr(11)+")";
 
 					if( opes[i] == "2" )
 						{
 						if( lin2 != "" )
-							aux += "'>-" + hors[i] + "</font>";
+							aux += "'>-" + ho + "</font>";
 						else
-							aux += "'>" + hors[i] + "</font>";
+							aux += "'>" + ho + "</font>";
 						lin2 += aux;
 						}
 					else
 						{
 						if( lin1 != "" )
-							aux += "'>-" + hors[i] + "</font>";
+							aux += "'>-" + ho + "</font>";
 						else
-							aux += "'>" + hors[i] + "</font>";
+							aux += "'>" + ho + "</font>";
 						lin1 += aux;
 						}
 					}
@@ -985,7 +991,7 @@ include 'partes/Scripts.php';
 			"tipo": "x",
 			"editavel": true,
 			"vanovo": "",
-			"width": "35%",
+			"width": "30%",
 			"aTargets": [ ++col ],
 			"mData": "FDTM_DLMENS",
 			"sTitle":"Diálogo/Aprovar/Rejeitar",

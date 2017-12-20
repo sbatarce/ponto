@@ -90,8 +90,8 @@ include 'partes/pagebody.php';
 	<!-- modal de entrada de novo horário -->
 	<div id="novapres" class="modal fade bs-modal-sm" role="dialog"
 			aria-labelledby="mySmallModalLabel" aria-hidden="true"
-			style="width: 500px; max-width: 500px;" >
-		<div class="modal-dialog modal-sm" style="width: 500px; max-width: 500px;">
+			style="width: 300px; max-width: 500px;" >
+		<div class="modal-dialog modal-sm" style="width: 300px; max-width: 500px;">
 			<div class="modal-content">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
@@ -100,14 +100,21 @@ include 'partes/pagebody.php';
 					<h4 class="modal-title">Entrada de presença pelo funcionário</h4>
 				</div>
 				<div class="modal-body" id="bdymodal">
+
 					<div class='row linha' style='margin-top: 10px; margin-left:30px;'>
-						<input	style='width:90%;' class='input-small' autofocus
+						<input type="button" class="btn btn-primary"
+									 id="dareg"
+									 onclick="javascript:trocaData()"
+									 value="" >
+					</div>
+					<div class='row linha' style='margin-top: 10px; margin-left:30px;'>
+						<input	style='width:50%; margin-top: 10px; ' class='input-small' autofocus
 										id="novohor" title="introduza um horário a adicionar à data"/>
 					</div>
 				</div>
 				<div class="modal-footer">
 				<center>
-					<button type="button" class="btn btn-primary"
+					<button type="button" class="btn btn-success"
 									onclick="javascript:novapresOK()">
 									OK
 					</button>
@@ -247,10 +254,10 @@ include 'partes/Scripts.php';
 						case "e":										//	existente
 							if( opes[ix] == "0" )
 								parms	=	"&fdteid=" + fids[ix] + "&operid=NULL" + 
-												"&origid=" + orgs[ix]+ "&hora=" + dataatual + " " + hors[ix];
+												"&origid=" + orgs[ix]+ "&hora=" + hors[ix];
 							else
 								parms	=	"&fdteid=" + fids[ix] + "&operid=" + opes[ix] + 
-												"&origid=" + orgs[ix]+ "&hora=" + dataatual + " " + hors[ix];
+												"&origid=" + orgs[ix]+ "&hora=" + hors[ix];
 								
 							if( !Update( "upfdte", parms ))
 								{
@@ -262,7 +269,7 @@ include 'partes/Scripts.php';
 							
 						case "n":										//	novo
 							parms	=	"&fdtrid=" + fdtrid + "&operid=" + opes[ix] + 
-											"&origid=" + orgs[ix]+ "&hora=" + dataatual + " " + hors[ix];
+											"&origid=" + orgs[ix]+ "&hora=" + hors[ix];
 							if( !Insert( "infdte", parms ))
 								{
 								alert( "falha ao atualizar horarios" );
@@ -278,7 +285,7 @@ include 'partes/Scripts.php';
 									{
 									opes[ix] = "2";
 									parms	=	"&fdteid=" + fids[ix] + "&operid=2" + 
-													"&origid=" + orgs[ix]+ "&hora=" + dataatual + " " + hors[ix];
+													"&origid=" + orgs[ix]+ "&hora=" + hors[ix];
 									if( !Update( "upfdte", parms ) )
 										{
 										alert( "falha ao atualizar horarios" );
@@ -319,23 +326,61 @@ include 'partes/Scripts.php';
 			flmod = 0;
 			$("#modpresen").modal("hide");
 			}
+			
+		function addHor()
+			{
+			$('#dareg').removeClass('btn-danger');
+			$('#dareg').addClass('btn-success');
+			$('#dareg').val(dataatual);
+			$("#novohor").val("");
+			$("#novapres").modal("show");
+			}
+
+		//
+		function trocaData()
+			{
+			if( $('#dareg').hasClass('btn-success') )
+				{
+				$('#dareg').removeClass('btn-success');
+				$('#dareg').addClass('btn-danger');
+				$('#dareg').val(dataproxi);
+				}
+			else
+				{
+				$('#dareg').removeClass('btn-danger');
+				$('#dareg').addClass('btn-success');
+				$('#dareg').val(dataatual);
+				}
+			}
 		
 		//	saiu do diálogo de digitação de nova presença pelo OK
 		function novapresOK()
 			{
-			var hora = $("#novohor").val();
-			if( hora.length != 5)
+			let hora = $("#novohor").val();
+			let dia = $('#dareg').val().substr( 0, 5 );
+			let hh;
+			let mm;
+			if( hora.length != 5 && hora.length != 4 )
 				{
-				alert( "Horário inválido. Deve ser no formato hh:mm" );
+				alert( "Horário inválido. Deve ser no formato hh:mm ou h:mm" );
 				return;
 				}
-			if( hora.substring( 2, 3 ) != ":" )
+			if( hora.substring( 2, 3 ) != ":" && hora.substring( 1, 2 ) != ":" )
 				{
-				alert( "Horário inválido. Deve ser no formato hh:mm" );
+				alert( "Horário inválido. Deve ser no formato hh:mm ou h:mm" );
 				return;
 				}
-			var hh = hora.substring( 0, 2 );
-			var mm = hora.substring( 3, 5);
+			if( hora.substring( 2, 3 ) == ":" )
+				{
+				hh = hora.substring( 0, 2 );
+				mm = hora.substring( 3, 5);
+				}
+			if( hora.substring( 1, 2 ) == ":" )
+				{
+				hh = hora.substring( 0, 1 );
+				mm = hora.substring( 2, 4 );
+				hora = '0'+hora;
+				}
 			if( Number(hh) < 0 || Number(hh) > 23 )
 				{
 				alert( "Horário inválido" );
@@ -349,7 +394,8 @@ include 'partes/Scripts.php';
 			
 			for( var ix=0; ix<hors.length; ix++ )
 				{
-				if( hora == hors[ix] )
+				if( hora == hors[ix].substr( 11 ) && 
+						dia == hors[ix].substr( 0, 5 ) )
 					{
 					if( opes[ix] == "2" )
 						{
@@ -372,7 +418,7 @@ include 'partes/Scripts.php';
 					}
 				}
 			fids.push("");
-			hors.push(hora);
+			hors.push($('#dareg').val()+" "+hora);
 			opes.push("1");
 			orgs.push("2");
 			salvos.push("n");
@@ -415,6 +461,7 @@ include 'partes/Scripts.php';
 		function montaPresTab()
 			{
 			var vhtml =	"<thead><tr>" +
+									"<th align='center'><b>  Data     </b></th>" +
 									"<th align='center'><b>  Horário  </b></th>" +
 									"<th align='center'><b>  Orígem   </b></th>" +
 									"<th align='center'><b>  Tipo     </b></th>" +
@@ -422,42 +469,64 @@ include 'partes/Scripts.php';
 									"</tr></thead>";
 
 			$("#idhorarios tbody tr").remove();
-			var aux = "<tbody>";
+			let aux = "<tbody>";
+			let dia = dataatual.substr( 0, 2 );
 			for( var ix=0; ix<hors.length; ix++ )
 				{
 				var acao = "";
-				aux	+=	"<tr><th>" + hors[ix] + "</th><th>";
+				aux	+=	"<tr><th>" + hors[ix].substr( 0, 5 ) + "</th>";
+				aux	+=	"<th>"+hors[ix].substr( 11 ) + "</th>";
+				aux +=	"<th>";
 				switch( orgs[ix] )
 					{
 					case "1":
-						aux += "biometria</th><th>";
+						aux += "biometria</th>";
 						break;
 					case "2":
-						aux += "funcionário</th><th>";
+						aux += "funcionário</th>";
 						break;
 					case "3":
-						aux += "automática</th><th>";
+						aux += "automática</th>";
 						break;
 					}
+				aux +=	"<th>";
 				switch( opes[ix] )
 					{
 					case "0":
 						aux += "</th>";
-						acao +=	"<a href='javascript:exclPres("+ix+");' class='btn btn-circle btn-warning btn-xs detalhes'>" +
+						acao +=	"<th><a href='javascript:exclPres("+ix+");' " +
+										"class='btn btn-circle btn-warning btn-xs detalhes'>" +
 										"<i class='typcn typcn-minus-outline'></i></a>";
 						break;
 					case "1":
 						aux += "incluida</th>";
-						acao +=	"<a href='javascript:exclPres("+ix+");' class='btn btn-circle btn-warning btn-xs detalhes'>" +
+						acao +=	"<th><a href='javascript:exclPres("+ix+");' " +
+										"class='btn btn-circle btn-warning btn-xs detalhes'>" +
 										"<i class='typcn typcn-minus-outline'></i></a>";
 						break;
 					case "2":
 						aux += "excluida</th>";
-						acao +=	"<a href='javascript:inclPres("+ix+");' class='btn btn-circle btn-primary btn-xs detalhes'>" +
+						acao +=	"<th><a href='javascript:inclPres("+ix+");' " +
+										"class='btn btn-circle btn-primary btn-xs detalhes'>" +
 										"<i class='typcn typcn-plus-outline'></i></a>";
 						break;
 					}
-				aux += "<th>" + acao + "</th></tr>";
+				/*
+				//	este trecho comentado cria um icone que possibilita transferir 
+				//	uma batida para o dia anterior, tipo uma batida registrana na 
+				//	madrugada que na realidade é a saída do dia anterior.
+				if( hors[ix].substr( 0, 2 ) == dia )
+					acao +=	"<a href='javascript:anterDia("+ix+");' " +
+									"title='Passa esta batida para o dia anterior' " +
+									"class='btn btn-circle btn-warning btn-xs '>" +
+									"<i class='typcn typcn-document-delete'></i></a>";
+				else
+					acao +=	"<a href='javascript:proxDia("+ix+");' " +
+									"title='Recoloca esta batida no dia seguinte'" +
+									"class='btn btn-circle btn-warning btn-xs '>" +
+									"<i class='typcn typcn-document-add'></i></a>";
+				*/
+				aux += acao + "</th></tr>";
 				}
 			aux += "</tbody>";
 			vhtml += aux;
@@ -594,6 +663,10 @@ include 'partes/Scripts.php';
 			flmod	=	0;
 			fdtrid = idfdtr;
 			dataatual = data;
+			let dtdia = toDate(dataatual);
+			dtdia.setDate( dtdia.getDate()+1 );
+			dataproxi =	toStDate( dtdia, 1 );
+			
 			if( horarios == "" )
 				{
 				hors = [];
@@ -621,12 +694,6 @@ include 'partes/Scripts.php';
 			$("#modpresen").modal('show');
 			}
 			
-		function addHor()
-			{
-			$("#novohor").val("");
-			$("#novapres").modal("show");
-			}
-
 		//	tratamento inicial das datas e inicialização do datatables
 		function setAjax( del )
 			{
@@ -740,6 +807,7 @@ include 'partes/Scripts.php';
 	var funiid = null;
 	var flmod = 0;
 	var dataatual;
+	var dataproxi;
 	var fdtrid;
 	var fdtmid;
 	var hors = [];				//	horários
@@ -861,7 +929,7 @@ include 'partes/Scripts.php';
 			"tipo": "x",
 			"editavel": false,
 			"vanovo": "",
-			"width": "15%",
+			"width": "25%",
 			"aTargets": [ ++col ],
 			"mData": "HORARIOS",
 			"sTitle":"Registros",
@@ -881,12 +949,12 @@ include 'partes/Scripts.php';
 					act += "<b>sem registros</b></a>";
 					return act;
 					}
-				var lin1 = "";
-				var lin2 = "";
-				var orgs = full.ORIGENS.split(";");
-				var opes = full.OPERACOES.split(";");
-				var hors = full.HORARIOS.split(";");
-				for( var i=0; i<hors.length; i++ )
+				let lin1 = "";
+				let lin2 = "";
+				let orgs = full.ORIGENS.split(";");
+				let opes = full.OPERACOES.split(";");
+				let hors = full.HORARIOS.split(";");
+				for( let i=0; i<hors.length; i++ )
 					{
 					var aux = "<font color='";
 					if( orgs[i] == "1" )
@@ -896,20 +964,22 @@ include 'partes/Scripts.php';
 					if( orgs[i] == "3" )
 						aux	+= "yellow";
 
+					let ho = hors[i].substr( 11 );
+
 					if( opes[i] == "2" )
 						{
 						if( lin2 != "" )
-							aux += "'>-" + hors[i] + "</font>";
+							aux += "'>-" + ho + "</font>";
 						else
-							aux += "'>" + hors[i] + "</font>";
+							aux += "'>" + ho + "</font>";
 						lin2 += aux;
 						}
 					else
 						{
 						if( lin1 != "" )
-							aux += "'>-" + hors[i] + "</font>";
+							aux += "'>-" + ho + "</font>";
 						else
-							aux += "'>" + hors[i] + "</font>";
+							aux += "'>" + ho + "</font>";
 						lin1 += aux;
 						}
 					}
@@ -938,7 +1008,7 @@ include 'partes/Scripts.php';
 			"tipo": "x",
 			"editavel": true,
 			"vanovo": "",
-			"width": "13%",
+			"width": "10%",
 			"aTargets": [ ++col ],
 			"mData": "TIPOMENSAGEM",
 			"sTitle":"Mensagens",
@@ -968,7 +1038,7 @@ include 'partes/Scripts.php';
 			"tipo": "x",
 			"editavel": true,
 			"vanovo": "",
-			"width": "27%",
+			"width": "20%",
 			"aTargets": [ ++col ],
 			"mData": "FDTM_DLMENS",
 			"sTitle":"Diálogo",

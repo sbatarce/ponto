@@ -919,7 +919,7 @@ include 'partes/Scripts.php';
 			"tipo": "x",
 			"editavel": false,
 			"vanovo": "",
-			"width": "15%",
+			"width": "25%",
 			"aTargets": [ ++col ],
 			"mData": "HORARIOS",
 			"sTitle":"Registros",
@@ -946,21 +946,27 @@ include 'partes/Scripts.php';
 						aux	+= "red";
 					if( orgs[i] == "3" )
 						aux	+= "yellow";
+					
+					let ho;
+					if( full.DATA == hors[i].substr( 0, 10 ) )
+						ho = hors[i].substr(11);
+					else
+						ho = "("+hors[i].substr(11)+")";
 
 					if( opes[i] == "2" )
 						{
 						if( lin2 != "" )
-							aux += "'>-" + hors[i] + "</font>";
+							aux += "'>-" + ho + "</font>";
 						else
-							aux += "'>" + hors[i] + "</font>";
+							aux += "'>" + ho + "</font>";
 						lin2 += aux;
 						}
 					else
 						{
 						if( lin1 != "" )
-							aux += "'>-" + hors[i] + "</font>";
+							aux += "'>-" + ho + "</font>";
 						else
-							aux += "'>" + hors[i] + "</font>";
+							aux += "'>" + ho + "</font>";
 						lin1 += aux;
 						}
 					}
@@ -989,7 +995,7 @@ include 'partes/Scripts.php';
 			"tipo": "x",
 			"editavel": true,
 			"vanovo": "",
-			"width": "13%",
+			"width": "10%",
 			"aTargets": [ ++col ],
 			"mData": "TIPOMENSAGEM",
 			"sTitle":"Mensagens",
@@ -1019,7 +1025,7 @@ include 'partes/Scripts.php';
 			"tipo": "x",
 			"editavel": true,
 			"vanovo": "",
-			"width": "27%",
+			"width": "20%",
 			"aTargets": [ ++col ],
 			"mData": "FDTM_DLMENS",
 			"sTitle":"Diálogo",
@@ -1053,7 +1059,7 @@ include 'partes/Scripts.php';
 			"tipo": "x",
 			"editavel": true,
 			"vanovo": "",
-			"width": "25%",
+			"width": "20%",
 			"aTargets": [ ++col ],
 			"mData": "AUTORIZADAS",
 			"sTitle":"Autorizações e correções",
