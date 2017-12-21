@@ -269,61 +269,65 @@ include 'partes/Scripts.php';
 		
 	function executar()
 		{
-		var aux = "Fechar todos os funcionários marcados?\n" +
+		let aux = "Fechar todos os funcionários marcados?\n" +
 							"Por favor confirme...;"
 		if( !confirm( aux ) )
 			return;
 		bloqueia();
-		var qtlin = tableQtLins();
+		let qtlin = tableQtLins();
 		if( qtlin < 1 )
 			return;
-		var row;
+		let row;
 		ixrow	=	0;
-		var qtmarc = 0;						//	quantidade de funcionarios marcados
-		var qterro = 0;						//	quantidade de erros
+		let qtmarc = 0;						//	quantidade de funcionarios marcados
+		let qterro = 0;						//	quantidade de erros
+		let qtjafx = 0;
 		for( var ix=0; ix<qtlin; ix++ )
 			{
 			row = Table.fnGetData( ix );
-			if( row.FECHAR == "1" )
+			if( row.FECHAR != "1" )
+				continue;
+			qtmarc++;
+			if( toDateInv(row.FECHAMENTO) >= dtfecha )
 				{
-				qtmarc++;
-				if( fechaFunc( row.SSHD, dtfecha ) )
-					{
-					row.FECHAR = "0";
-					row.FECHAMENTO = dtudir;
-					Table.api().row(ix).data(row);
-					}
-				else
-					qterro++;
+				qtjafx++;
+				continue;
 				}
-			}
-		libera();
-		if( qterro > 0 )
-			{
-			if( qterro == 1 )
+			if( toDateInv(row.DTMAX) < dtfecha )
 				{
-				aux = "" + qterro + " funcionário de ";
-				if( qtmarc == 1 )
-					aux += qtmarc + " marcado ";
-				else
-					aux += qtmarc + " marcados ";
-				aux += "não pode ser fechado.\n" +
-							"Provavelmente por ter pendencias anteriores\n" +
-							"à data de fechamento estabelecida.";
+				qterro++;
+				continue;
+				}
+			//	efetua o fechamento
+			if( fechaFunc( row.SSHD, dtfecha ) )
+				{
+				row.FECHAR = "0";
+				row.FECHAMENTO = dtudir;
+				Table.api().row(ix).data(row);
 				}
 			else
-				{
-				aux = "" + qterro + " funcionários de ";
-				if( qtmarc == 1 )
-					aux += qtmarc + " marcado ";
-				else
-					aux += qtmarc + " marcados ";
-				aux += "não puderam ser fechados.\n" +
-							"Provavelmente por terem pendencias anteriores\n" +
-							"à data de fechamento estabelecida.";
-				}
-			alert( aux );
+				qterro++;
 			}
+		libera();
+		aux = "";
+		if( qtmarc == 0 )
+			aux += "Nenhum funcionário foi marcado para fechamento.\n";
+		if( qtmarc == 1 )
+			aux += "1 funcionário marcado para fechamento.\n";
+		if( qtmarc > 1 )
+			aux += "" + qtmarc + " funcionários marcados para fechamento.\n";
+		if( qterro > 0 || qtjafx > 0 )
+			{
+			if( qtjafx > 1 )
+				aux += "" + qtjafx + " funcionários já estavam fechados nesta data\n";
+			if( qtjafx == 1 )
+				aux += "1 funcionário já estava fechado nesta data\n";
+			if( qterro > 1 )
+				aux += "" + qterro + " funcionários apresentaram problemas no fechamento\n";
+			if( qterro == 1 )
+				aux += "1 funcionário apresentou problema no fechamento\n";
+			}
+		alert( aux );
 		}
 
 		/////////////// PRINCIPAL ////////////////////////

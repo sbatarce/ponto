@@ -236,6 +236,7 @@ include 'partes/Scripts.php';
 			else
 				SelInit( "#lib4b", url, 1, "sim", escolib4b );
 			
+			SelInit( "#lib4b", url, 1, "sim", escolib4b );
 			url =	"selectData.php?query=tiaus";
 			SelInit( "#tiaus", url, row.IDTIPO, row.TIPO, escoTiaus );
 			taauid = row.IDTIPO;
@@ -322,6 +323,17 @@ include 'partes/Scripts.php';
 			e.stopImmediatePropagation();
 			$("#dtini").val( $.datepicker.formatDate("dd/mm/yy", hoje ));
 			$("#dtfim").val( $.datepicker.formatDate("dd/mm/yy", hoje ) );
+			
+			
+			let url =	"selectData.php?query=naosim";
+			SelInit( "#lib4b", url, 1, "sim", escolib4b );
+			url =	"selectData.php?query=tiaus";
+			SelInit( "#tiaus", url, 0, "Escolha abaixo", escoTiaus );
+			taauid = 0;
+
+
+
+
 			faauid = -1;
 			$("#modausen").modal('show');
 			} );
