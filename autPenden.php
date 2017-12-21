@@ -518,7 +518,7 @@ include 'partes/Scripts.php';
 					}
 				}
 			aux = "Atenção! Esta opreração não poderá ser desfeita ou modificada.\n " + 
-						"Todas os eventuais registros incluídos pelo funcionário derão removidos.\n" +
+						"Todos os eventuais registros incluídos pelo funcionário serão removidos.\n" +
 						"Prosseguir mesmo assim?";
 			if( !confirm( aux ) )
 				return;
@@ -757,7 +757,7 @@ include 'partes/Scripts.php';
 		matarCookie( "nofunc" );
 		matarCookie( "idfunc" );
 
-		$("#titwidget").html( "Análise de pendencias de " + nofunc );
+		$("#titwidget").html( "Análise de pendências de " + nofunc );
 		
 		//	acha a data do último fechamento e acerta as datas iniciais
 		var parms = "&sshd=" + sshdfunc;
