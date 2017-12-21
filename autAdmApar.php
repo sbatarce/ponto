@@ -273,31 +273,33 @@ include 'partes/Scripts.php';
 				{
 				for( var ix=0; ix<qt; ix++ )
 					{
-					data.push({	
-										"FUNIID": resu.data[ix].FUNI_ID,
-										"SSHD": resu.data[ix].SSHD,
-										"NOME": resu.data[ix].NOME,
-										"BIOS": resu.data[ix].BIOS,
-										"UORPONTO": resu.data[ix].SIGLAUORPONTO,
-										"PRESENTE": "sim",
-										"MANTER": "sim",
-										"action": " "
-										} );
+					data.push(
+						{	
+						"FUNIID": resu.data[ix].FUNI_ID,
+						"SSHD": resu.data[ix].SSHD,
+						"NOME": resu.data[ix].NOME,
+						"BIOS": resu.data[ix].BIOS,
+						"UORPONTO": resu.data[ix].SIGLAUORPONTO,
+						"PRESENTE": "sim",
+						"MANTER": "sim",
+						"action": " "
+						} );
 					}
 				Table.fnAddData( data, true );
 				}
 			else
 				{
-				data.push(	{	
-										"FUNIID": "",
-										"SSHD": "",
-										"NOME": "Não há dados a exibir",
-										"BIOS": "",
-										"UORPONTO": "",
-										"PRESENTE": "",
-										"MANTER": "",
-										"action": " "
-										} );
+				data.push(	
+					{	
+					"FUNIID": "",
+					"SSHD": "",
+					"NOME": "Não há dados a exibir",
+					"BIOS": "",
+					"UORPONTO": "",
+					"PRESENTE": "",
+					"MANTER": "",
+					"action": " "
+					} );
 
 				Table.fnAddData( data, true );
 				}
