@@ -23,6 +23,7 @@
 	"autAlocaFunc.php",
         "autAtribuir.php",
 	"autAdmApar.php",
+	"autCorrecao.php",
 	"autFechamento.php",
         "bootstrap-3.3.1",
         "bootstrap-datepicker",
