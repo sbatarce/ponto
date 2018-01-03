@@ -95,6 +95,14 @@ if( $qry == "naosim" )
 	}
 
 ////////////////////////////////////////////////////////////////////////////////
+//	
+if( $qry == "dbcr" )
+	{
+	echo '[ {"id":"0", "text":"Escolha abaixo:"},{"id": "1", "text": "DB"},{"id": "2", "text": "CR"} ]';
+	return;
+	}
+
+////////////////////////////////////////////////////////////////////////////////
 //	candidauto	- candidatos a autorizador de uma fuor
 //	
 if( $qry == "candidauto" )

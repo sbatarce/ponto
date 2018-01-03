@@ -6,6 +6,8 @@
 //	seta FDTR em analise
 //	update FDTE
 //	update diálogo
+//	delfuco - remove FUCO
+//	updfuco - altera FUCO
 if( !isset( $_GET["query"] ) )
 	{
 	echo	'{ "data": [{"erro": "parametro query obrigatório"}] }';
@@ -38,6 +40,65 @@ if( $qry == "upd" )
 		return;
 		}	
 	$sql	=	"update ".$_GET["tbl"]." set ".$_GET["alter"]." where ".$_GET["selec"];
+	}
+	
+//	delfuco - remove fuco
+if( $qry == "delfuco" )
+	{
+	if( !isset( $_GET["fucoid"] ) )
+		{
+		echo	'{ "status": "erro", "erro": "parametro fucoid obrigatorio" }';
+		return;
+		}
+	$fucoid = $_GET["fucoid"];
+
+	$sql	=	"DELETE FROM BIOMETRIA.FUCO_FUNCCORRECAOHORAS WHERE FUCO_ID=$fucoid";
+	}
+
+//	updfuco - altera um fuco
+if( $qry == "updfuco" )
+	{
+	if( !isset( $_GET["fucoid"] ) )
+		{
+		echo	'{ "status": "erro", "erro": "parametro fucoid obrigatorio" }';
+		return;
+		}
+	if( !isset( $_GET["fuauid"] ) )
+		{
+		echo	'{ "status": "erro", "erro": "parametro fuauid obrigatorio" }';
+		return;
+		}
+	if( !isset( $_GET["dtref"] ) )
+		{
+		echo	'{ "status": "erro", "erro": "parametro dtref obrigatorio" }';
+		return;
+		}
+	if( !isset( $_GET["dbcr"] ) )
+		{
+		echo	'{ "status": "erro", "erro": "parametro dbcr obrigatorio" }';
+		return;
+		}
+	if( !isset( $_GET["mins"] ) )
+		{
+		echo	'{ "status": "erro", "erro": "parametro mins obrigatorio" }';
+		return;
+		}
+	if( isset( $_GET["obs"] ) )
+		$obs = $_GET["obs"];
+	else
+		$obs = "";
+
+	$fucoid = $_GET["fucoid"];
+	$fuauid = $_GET["fuauid"];
+	$dtref = $_GET["dtref"];
+	$dbcr = $_GET["dbcr"];
+	$mins = $_GET["mins"];
+						
+	$sql	=	"UPDATE  BIOMETRIA.FUCO_FUNCCORRECAOHORAS
+						SET FUAU_ID=$fuauid, FUCO_DTREFERENCIA=TO_DATE( '$dtref', 'YYYYMMDD' ), 
+								FUCO_DCDBCR='$dbcr', FUCO_NITMP=$mins,
+								FUCO_DLOBS='$obs' 
+						WHERE FUCO_ID=$fucoid";
 	}
 
 //	altmens( funiid, manda ) altera o estado da recepção de mensagens do funcionário
@@ -203,7 +264,6 @@ if( $qry == "updial" )
 									FDTM_TPFUNCAUT='F', FDTM_STEMAIL=0
 							WHERE FDTM_ID=$fdtmid";
 	}
-//
 //	executa o SQL
 include 'ambiente.php';
 include 'ORAConn.php';

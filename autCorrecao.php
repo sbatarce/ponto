@@ -9,7 +9,7 @@ include 'partes/Head.php';
 		<link rel="shortcut icon" href="/imagens/PMSICO.png">
 	</head>
 	
-	<body onload="javascript:titulo( '<h4>Administração de usuários da Biometria</h4>' );">
+	<body onload="javascript:titulo( '<h4>Correção de Horas</h4>' );">
 		
 <?php
 include 'partes/MenuPri.php';
@@ -18,6 +18,11 @@ include 'partes/pageheader.php';
 include 'partes/pagebody.php';
 ?>
 		<div class='row input-append date linha' style='margin-bottom: 10px; margin-left:4px'>
+			Início<input type="text" size="10" id="dtfrom" 
+									 style="margin-left: 20px; margin-right: 20px; "/>
+			<input type="text" size="10" id="dtfecha" 
+						 style="margin-left: 10px; margin-right: 20px; float: right;"/>
+			<label style="float: right;">Fechamento em</label>
 		</div>
 										<table class="table table-striped table-hover table-bordered" id="eddt">
 											<thead><tr role="row"></tr></thead>
@@ -33,121 +38,52 @@ include 'partes/pagebody.php';
 			</div> <!-- /Page Container -->
 		</div> <!-- Main Container -->
 		
-		<!-- modal de retificação de horários: adiciona e exclui horários do dia -->
-		<div id="modpresen" class="modal fade bs-modal-sm" role="dialog"
-				aria-labelledby="mySmallModalLabel" aria-hidden="true"
-				style="width: 500px; max-width: 500px;" >
-			<div class="modal-dialog modal-sm" style="width: 500px; max-width: 500px;">
-				<div class="modal-content">
-					<div class="modal-header">
-						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-										&times;
-						</button>
-						<h4 class="modal-title">Horários do dia</h4>
-					</div>
-					<div class="modal-body" id="bdymodal" style="width: 80%;">
-						<div class='row linha' style='margin-top: 10px; margin-left:30px;'>
-							<h5>
-								<a href='javascript:addHor();' style='margin-left: 10px'
-									title="adicionar um novo horário"
-									class='btn btn-palegreen btn-circle btn-xs'>
-									<i class='typcn typcn-plus-outline'></i>
-								</a>
-							</h5>
-							<table id="tbhorarios" cellspacing="50" border="2">
-							</table>
-						</div>
-					</div>
-					<div class="modal-footer">
-					<center>
-						<button type="button" class="btn btn-primary"
-										onclick="javascript:presenOK()"
-										title="Persiste as eventuais modificações">
-										OK
-						</button>
-						<button type="button" class="btn btn-default"
-										onclick="javascript:presSairOK()"
-										title="Encerra alterações sem salvar eventuais alterações">
-										Cancelar
-						</button>
-					</center>
-					</div>
-				</div>
-		</div>
-	</div>
-			
-	<!-- modal de entrada de novo horário -->
-	<div id="novapres" class="modal fade bs-modal-sm" role="dialog"
-			aria-labelledby="mySmallModalLabel" aria-hidden="true"
-			style="width: 500px; max-width: 500px;" >
+	<!-- modal de criação ou alteração de correção de horas -->
+	<div id="modcorrec" class="modal fade bs-modal-sm" role="dialog"
+			 aria-labelledby="mySmallModalLabel" aria-hidden="true"
+			 style="width: 500px; max-width: 500px;" >
 		<div class="modal-dialog modal-sm" style="width: 500px; max-width: 500px;">
 			<div class="modal-content">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
 									&times;
 					</button>
-					<h4 class="modal-title">Entrada de presença pelo funcionário</h4>
+					<h4 class="modal-title">Correção de horas</h4>
 				</div>
-				<div class="modal-body" id="bdymodal">
-					<div class='row linha' style='margin-top: 10px; margin-left:30px;'>
-						<input	style='width:90%;' class='input-small' autofocus
-										id="novohor" title="introduza um horário a adicionar à data"/>
-					</div>
+				<div class="modal-body" id="bdymodal" style="width: 80%;">
+					<label for="dtcor" class='lab' style='width: 40%; '>Data da correção
+					<input id="dtcor" class='dtcor input-small inp' 
+								 style='width: 50%; ' readonly /></label>
+					<br/>
+					<label for="dbcr" class='lab' style='width:100%; '>Creditar ou debitar: 
+					<input style='width:50%; ' class='input-small inp' 
+								 id="dbcr" title="Escolha se crédito ou débito de horas"/></label>
+					<br/>
+					<br/>
+					<label for="obs" class='lab' style='width:100%; '>Observações (opcional): 
+						<textarea style='width:100%; height: 50px; ' class='input-small inp' 
+											id="obs" title="Observações opcionais do Autorizador">
+						</textarea></label>
+					<br/>
+					<label for="tmp" class='lab sim' style='width:100%; ' >Correção em horas:
+					<input style='width:20%; ' class='input-small' 
+								 id="tmp" title="quantidade de horas de a corrigir para mais ou para menos"/>
+					</label>
 				</div>
 				<div class="modal-footer">
 				<center>
 					<button type="button" class="btn btn-primary"
-									onclick="javascript:novapresOK()">
-									OK
+									onclick="javascript:corrigir()"
+									title="Persiste as eventuais modificações">
+									Corrigir
 					</button>
-					<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+					<button type="button" class="btn btn-warning" data-dismiss="modal"
+									title="Encerra alterações sem salvar eventuais alterações">
+									Cancelar
+					</button>
 				</center>
 				</div>
 			</div>
-		</div>
-	</div>
-			
-		<!-- modal de entrada de diálogo: adiciona uma ou mais mensagens de diálogo -->
-		<div id="moddialogo" class="modal fade bs-modal-sm" role="dialog"
-				aria-labelledby="mySmallModalLabel" aria-hidden="true"
-				style="width: 500px; max-width: 500px;" >
-			<div class="modal-dialog modal-sm" style="width: 500px; max-width: 500px;">
-				<div class="modal-content">
-					<div class="modal-header">
-						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-										&times;
-						</button>
-						<h4 class="modal-title">Diálogo de justificativa</h4>
-					</div>
-					<div class="modal-body" id="bdymodal">
-						<div class='row linha' style='margin-top: 10px; margin-left:30px;'>
-							<table id="tbmensg" cellspacing="50" border="2">
-							</table>
-						</div>
-						<div class='row linha' style='margin-top: 10px; margin-left:30px;'>
-							<h5>Nova mensagem</h5>
-							<input	style='width:90%;' class='input-small syss' 
-											id="novamens" title="mensagem a adicionar ao diálogo"/>
-							<a href='javascript:inclMensg();' class='btn btn-circle btn-primary btn-xs'>
-								<i class='typcn typcn-plus-outline'></i></a>
-							
-						</div>
-					</div>
-					<div class="modal-footer">
-					<center>
-						<button type="button" class="btn btn-primary"
-										onclick="javascript:dialogoOK()"
-										title="Persiste as eventuais modificações">
-										OK
-						</button>
-						<button type="button" class="btn btn-default"
-										onclick="javascript:dlgSairOK()"
-										title="Encerra alterações sem salvar eventuais alterações">
-										Cancelar
-						</button>
-					</center>
-					</div>
-				</div>
 		</div>
 	</div>
 		
@@ -188,485 +124,8 @@ include 'partes/Scripts.php';
 			{
 			}
 			
-		//	tratamento de presenças
-
-		//	verifica se há uma quantidade adequada de presenças no dialogo
-		function verHors()
-			{
-			var qtval	=	0;
-			for( var ix=0; ix<hors.length; ix++ )
-				{
-				if( opes[ix] == "0" || opes[ix] == "1" )
-					qtval++;
-				}
-			if( qtval%2 != 0 )
-				{
-				alert( "É necessário ter uma quantidade par de horários." );
-				return false;
-				}
-			return true;
-			}
-			
-		//	saiu do dialogo de presença pelo OK
-		function presSairOK()
-			{
-			if( flmod != 0 )
-				{
-				var resp = confirm("há alterações não salvas. Quer mesmo sair sem salvá-las?");
-				if( !resp )
-					return;
-				}
-			$("#modpresen").modal("hide");
-			}
-
-		//	saiu do dialogo de nova presença pelo OK
-		function presenOK()
-			{
-			if( !verHors() )
-				return;
-			var parms;
-			for( var ix=0; ix<hors.length; ix++ )
-				{
-				if( salvos[ix] != "s" )
-					{
-					flmod = 1;
-					
-					switch( stts[ix] )
-						{
-						case "e":										//	existente
-							if( opes[ix] == "0" )
-								parms	=	"&fdteid=" + fids[ix] + "&operid=NULL" + 
-												"&origid=" + orgs[ix]+ "&hora=" + dataatual + " " + hors[ix];
-							else
-								parms	=	"&fdteid=" + fids[ix] + "&operid=" + opes[ix] + 
-												"&origid=" + orgs[ix]+ "&hora=" + dataatual + " " + hors[ix];
-								
-							if( !Update( "upfdte", parms ))
-								{
-								alert( "falha ao atualizar horarios" );
-								montaPresTab();
-								return;
-								}
-							break;
-							
-						case "n":										//	novo
-							parms	=	"&fdtrid=" + fdtrid + "&operid=" + opes[ix] + 
-											"&origid=" + orgs[ix]+ "&hora=" + dataatual + " " + hors[ix];
-							if( !Insert( "infdte", parms ))
-								{
-								alert( "falha ao atualizar horarios" );
-								montaPresTab();
-								return;
-								}
-							break;
-
-					case "d":										//	deletado
-							if( fids[ix] != "" )
-								{
-								if( orgs[ix] == "1" )		//	biometria
-									{
-									opes[ix] = "2";
-									parms	=	"&fdteid=" + fids[ix] + "&operid=2" + 
-													"&origid=" + orgs[ix]+ "&hora=" + dataatual + " " + hors[ix];
-									if( !Update( "upfdte", parms ) )
-										{
-										alert( "falha ao atualizar horarios" );
-										montaPresTab();
-										return;
-										}
-									}
-								if( orgs[ix] == "2" )		//	funcionario
-									{
-									parms = "&fdteid=" + fids[ix];
-									if( !Update( "delfdte", parms ) )
-										{
-										alert( "falha ao remover horario" );
-										montaPresTab();
-										return;
-										}
-									}
-								}
-							break;
-						}
-					
-					salvos[ix] = "s";
-					stts[ix] = "e";
-					}
-				}
-			if( flmod != 0 )
-				{
-				parms = "&fdtrid=" + fdtrid + "&tsdt=4";
-				if( !Update( "settsdt", parms ) )
-					{
-					alert( "falha ao seta o estado de 'EM ANALISE'." );
-					montaPresTab();
-					return;
-					}
-				acum	=	0;
-				atuatab( false );
-				}
-			flmod = 0;
-			$("#modpresen").modal("hide");
-			}
-		
-		//	saiu do diálogo de digitação de nova presença pelo OK
-		function novapresOK()
-			{
-			var hora = $("#novohor").val();
-			if( hora.length != 5)
-				{
-				alert( "Horário inválido. Deve ser no formato hh:mm" );
-				return;
-				}
-			if( hora.substring( 2, 3 ) != ":" )
-				{
-				alert( "Horário inválido. Deve ser no formato hh:mm" );
-				return;
-				}
-			var hh = hora.substring( 0, 2 );
-			var mm = hora.substring( 3, 5);
-			if( Number(hh) < 0 || Number(hh) > 23 )
-				{
-				alert( "Horário inválido" );
-				return;
-				}
-			if( Number(mm) < 0 || Number(mm) > 59 )
-				{
-				alert( "Horário inválido" );
-				return;
-				}
-			
-			for( var ix=0; ix<hors.length; ix++ )
-				{
-				if( hora == hors[ix] )
-					{
-					if( opes[ix] == "2" )
-						{
-						if( orgs[ix] == "1" )
-							opes[ix] = "0";
-						else
-							opes[ix] = "1";
-						stts[ix] = "n";
-						salvos[ix] = "n";
-						flmod	=	1;
-						$("#novapres").modal("hide");
-						montaPresTab();
-						return;
-						}
-					else
-						{
-						alert( "Ja há este horário nesta data" );
-						return;
-						}
-					}
-				}
-			fids.push("");
-			hors.push(hora);
-			opes.push("1");
-			orgs.push("2");
-			salvos.push("n");
-			stts.push("n");
-			flmod	=	1;
-			$("#novapres").modal("hide");
-			montaPresTab();
-			}
-			
-		
-		//	exclui uma presença
-		function exclPres(ix)
-			{
-			opes[ix] = "2";
-			salvos[ix] = "n";
-			stts[ix] = "d";
-			montaPresTab();
-			}
-		//	inclui uma nova presença
-		function inclPres(ix)
-			{
-			if( orgs[ix] == "1" )								//	biometria
-				{
-				opes[ix] = "0";
-				stts[ix] = "e";
-				salvos[ix] = "n";
-				}
-			else
-				{
-				opes[ix] = "1";
-				salvos[ix] = "n";
-				if( fids[ix] == "" )
-					stts[ix] = "n";
-				else
-					stts[ix] = "e";
-				}
-			montaPresTab();
-			}
-		//	monta a tabela de presenças a partir das tabelas
-		function montaPresTab()
-			{
-			var vhtml =	"<thead><tr>" +
-									"<th align='center'><b>  Horário  </b></th>" +
-									"<th align='center'><b>  Orígem   </b></th>" +
-									"<th align='center'><b>  Tipo     </b></th>" +
-									"<th align='center'><b>  Ações    </b></th>" +
-									"</tr></thead>";
-
-			$("#idhorarios tbody tr").remove();
-			var aux = "<tbody>";
-			for( var ix=0; ix<hors.length; ix++ )
-				{
-				var acao = "";
-				aux	+=	"<tr><th>" + hors[ix] + "</th><th>";
-				switch( orgs[ix] )
-					{
-					case "1":
-						aux += "biometria</th><th>";
-						break;
-					case "2":
-						aux += "funcionário</th><th>";
-						break;
-					case "3":
-						aux += "automática</th><th>";
-						break;
-					}
-				switch( opes[ix] )
-					{
-					case "0":
-						aux += "</th>";
-						acao +=	"<a href='javascript:exclPres("+ix+");' class='btn btn-circle btn-warning btn-xs detalhes'>" +
-										"<i class='typcn typcn-minus-outline'></i></a>";
-						break;
-					case "1":
-						aux += "incluida</th>";
-						acao +=	"<a href='javascript:exclPres("+ix+");' class='btn btn-circle btn-warning btn-xs detalhes'>" +
-										"<i class='typcn typcn-minus-outline'></i></a>";
-						break;
-					case "2":
-						aux += "excluida</th>";
-						acao +=	"<a href='javascript:inclPres("+ix+");' class='btn btn-circle btn-primary btn-xs detalhes'>" +
-										"<i class='typcn typcn-plus-outline'></i></a>";
-						break;
-					}
-				aux += "<th>" + acao + "</th></tr>";
-				}
-			aux += "</tbody>";
-			vhtml += aux;
-			$("#tbhorarios").html(vhtml);
-			}
-
-		//	mostra o diálogo para alteração
-		function dshow( idfdtr, idfdtm, dlg )
-			{
-			$("#novamens").val("");
-			flmod = 0;
-			fdtmid = idfdtm;
-			fdtrid = idfdtr;
-			var aux = "<tbody><tr></tr>";
-			mensgs = [];
-			if( dlg != "" )
-				{
-				mensgs = dlg.split(";");
-				for( var ix=0; ix<mensgs.length; ix++ )
-					{
-					aux +=	"<tr><th>" + mensgs[ix] + "</th></tr>";
-					}
-				}
-			aux += "</tbody>";
-			$("#tbmensg").html(aux);
-			$("#moddialogo").modal("show");
-			}
-
-		function dlgSairOK()
-			{
-			if( flmod != 0 )
-				{
-				var resp = confirm("há alterações não salvas. Quer mesmo sair sem salvá-las?");
-				if( !resp )
-					return;
-				}
-			$("#moddialogo").modal("hide");
-			}
-
-		function dialogoOK()
-			{
-			if( flmod )
-				{
-				var aux = "";
-				for( var ix=0; ix<mensgs.length; ix++ )
-					{
-					if( mensgs[ix] == "" )
-						continue;
-					if( aux != "" )
-						aux += ";";
-					aux += mensgs[ix];
-					}
-				if( fdtmid == "" )
-					{
-					var parms = "&fdtrid=" + fdtrid + "&msg=" + aux;
-					if( !Insert( "indial", parms ))
-						{
-						alert( "falha ao criar diálogo" );
-						return;
-						}
-					}
-				else
-					{
-					var parms = "&fdtmid=" + fdtmid + "&msg=" + aux;
-					if( !Update( "updial", parms ))
-						{
-						alert( "falha ao atualizar diálogo" );
-						return;
-						}
-					}
-				parms = "&fdtrid=" + fdtrid + "&tsdt=4";
-				if( !Update( "settsdt", parms ) )
-					{
-					alert( "falha ao seta o estado de 'EM ANALISE'." );
-					montaPresTab();
-					return;
-					}
-				atuatab();
-				}
-			$("#moddialogo").modal("hide");
-			}
-			
-		function toHora( data )
-			{
-			var hh = data.getHours();
-			if( hh < 10 )
-				hh = "0" + hh;
-			var mm = data.getMinutes();
-			var mm = data.getHours();
-			if( mm < 10 )
-				mm = "0" + mm;
-			return hh + ":" + mm;
-			}
-			
-		function minToHHMM( minutos )
-			{
-			var hh = Math.floor(Math.abs(minutos)/60);
-			var mm = Math.abs(minutos)%60;
-			if( hh < 10 )
-				hh = "0" + hh;
-			if( mm < 10 )
-				mm = "0" + mm;
-			if( minutos < 0 )
-				return "-"+hh+":"+mm;
-			else
-				return hh+":"+mm;
-			}
-
-		function inclMensg()
-			{
-			var mens = $("#novamens").val();
-			if( mens.length < 1 )
-				{
-				dialogoOK();
-				return;
-				}
-			flmod = 1;
-			var agora = new Date();
-			var msg = "F " + $.datepicker.formatDate("dd/mm ", agora ) +
-								toHora(agora) + " - " + mens;
-			var html =	"<tr><th> " + msg +
-							"</th></tr>";
-			$("#tbmensg tr:last").after(html);
-			mensgs.push( msg );
-			$("#novamens").val("");
-			}
-
-		//	mostra os horários para alteração
-		function hshow( data, idfdtr, horarios, operacoes, origens, fdteids )
-			{
-			flmod	=	0;
-			fdtrid = idfdtr;
-			dataatual = data;
-			if( horarios == "" )
-				{
-				hors = [];
-				opes = [];
-				orgs = [];
-				fids = [];
-				stts = [];
-				salvos = [];
-				}
-			else
-				{
-				hors = horarios.split( ";" );
-				opes = operacoes.split( ";" );
-				orgs = origens.split( ";" );
-				fids = fdteids.split( ";" );
-				stts = [];
-				salvos = [];
-				for( var ix=0; ix<hors.length; ix++ )
-					{
-					salvos[ix] = "s";
-					stts[ix] = "e";
-					}
-				}
-			montaPresTab();
-			$("#modpresen").modal('show');
-			}
-			
-		function addHor()
-			{
-			$("#novohor").val("");
-			$("#novapres").modal("show");
-			}
-
-		//	tratamento inicial das datas e inicialização do datatables
-		function setAjax( del )
-			{
-			//
-			parms = "&funiid="+funiid+"&dtinic="+dtini;
-			var resu = Select( "saldoant", parms );
-			if( resu == null )
-				throw new Error("Problemas de acesso ao banco de dados. Por favor, tente mais tarde.");
-			//acum = Number( resu.dados[0].MINUTOS );
-			var sldant = minToHHMM( resu.dados[0].MINUTOS );
-			$("#sldant").val( sldant );
-
-			//
-			var dt = $("#dtini").datepicker("getDate");
-			dtini = $.datepicker.formatDate("yymmdd", dt );
-			dt = $("#dtfim").datepicker("getDate");
-			dtfim = $.datepicker.formatDate("yymmdd", dt );
-			if( del != 0 )
-				tableDestroy();
-			AjaxSource	=	"partes/tableData.php?query=funaces&sshd=" + sshd.toUpperCase() + 
-												"&dtini="+dtini+"&dtfim="+dtfim;
-			inicializa.init();
-			}
-			
-		$('#modpresen').on('keyup', function( ev )
-			{
-			if( ev.key == "Enter" )
-				presenOK();
-			});
-			
-		$('#novapres').on('shown.bs.modal', function () 
-			{
-			$("#novohor").focus();
-			});
-			
-		$('#novapres').on('keyup', function( ev )
-			{
-			if( ev.key == "Enter" )
-				novapresOK();
-			});
-			
-		$('#moddialogo').on('shown.bs.modal', function () 
-			{
-			$("#novamens").focus();
-			});
-			
-		$('#moddialogo').on('keyup', function( ev )
-			{
-			if( ev.key == "Enter" )
-				inclMensg();
-			});
-			
 		//	tratamento das datas 			
-		$( "#dtini" ).datepicker(
+		$( "#dtcor" ).datepicker(
 			{
 			dateFormat: "dd/mm/yy",
 			altFormat: "yymmdd",
@@ -677,128 +136,286 @@ include 'partes/Scripts.php';
 			todayHighlight: true			
 			}).on('change.dp', function(e)
 				{ 
-				var dt = $("#dtini").datepicker("getDate");
-				dtini = $.datepicker.formatDate("yymmdd", dt );
-				setAjax(1);
-				});
-		
-    $( "#dtfim" ).datepicker(
-			{
-			dateFormat: "dd/mm/yy",
-			altFormat: "yymmdd",
-			startView: 2,
-			todayBtn: true,
-			daysOfWeekHighlighted: "0,6",
-			autoclose: true,
-			todayHighlight: true			
-			}).on('change.dp', function(e)
-				{ 
-				var dt = $("#dtfim").datepicker("getDate");
-				dtfim = $.datepicker.formatDate("yymmdd", dt );
-				setAjax(1);
+				var dt = $("#dtcor").datepicker("getDate");
+				dtcor = $.datepicker.formatDate("yymmdd", dt );
 				});
 	
+	function setAjax(  )
+		{
+		//
+		tableDestroy();
+		ixtab = -1;
+		AjaxSource	=	"partes/tableData.php?query=correcs" + 
+				"&funiid=" + idfunc +
+				"&dtini=" + dtfrom +
+				"&dtfim=" + dthoje;
+		inicializa.init();
+		}
+		
+		function escodbcr( tipo, id, text )
+			{
+			dbcr = id;
+			}
+			
+		function calcTmp( tmp )
+			{
+			if( tmp.length < 4 || tmp.length > 6 )
+				{
+				alert( "O valor da correção deve ser dado em horas XXX:XX, XX:XX ou X:XX");
+				return -1;
+				}
+			if( tmp.length == 4 && tmp.substr( 1,1 ) != ':' )
+				{
+				alert( "O valor da correção deve ser dado em horas XXX:XX, XX:XX ou X:XX");
+				return -1;
+				}
+			if( tmp.length == 5 && tmp.substr( 2,1 ) != ':' )
+				{
+				alert( "O valor da correção deve ser dado em horas XXX:XX, XX:XX ou X:XX");
+				return -1;
+				}
+			if( tmp.length == 6 && tmp.substr( 3,1 ) != ':' )
+				{
+				alert( "O valor da correção deve ser dado em horas XXX:XX, XX:XX ou X:XX");
+				return -1;
+				}
+			let hh, mm;
+			if( tmp.length == 4 )
+				{
+				hh = Number( tmp.substr( 0, 1 ) );
+				mm = Number( tmp.substr( 2 ) );
+				}
+			if( tmp.length == 5 )
+				{
+				hh = Number( tmp.substr( 0, 2 ) );
+				mm = Number( tmp.substr( 3 ) );
+				}
+			if( tmp.length == 6 )
+				{
+				hh = Number( tmp.substr( 0, 3 ) );
+				mm = Number( tmp.substr( 4 ) );
+				}
+			if( mm > 59 )
+				{
+				alert( "A porção de minutos não pode exceder 59");
+				return -1;
+				}
+			return hh*60+mm;
+			}
+			
+		function altera( ix )
+			{
+			let row = Table.fnGetData( ix );
+			fucoid = row.FUCO_ID;
+			funcao = "A";		
+
+			let dt = toDate( row.DATA );
+			$("#dtcor").val( $.datepicker.formatDate("dd/mm/yy", dt ));
+			dtcor = $.datepicker.formatDate("yymmdd", dt );
+			
+			let url =	"selectData.php?query=dbcr";
+			SelInit( "#dbcr", url, 0, "Escolha Abaixo:", escodbcr );
+			dbcr = 0;
+			$('#obs').val(row.OBS);
+			$('#tmp').val(minToHHMM(row.TMP));
+		
+			$("#modcorrec").modal('show');
+			return;
+			}
+			
+		function remove( ix )
+			{
+			let row = Table.fnGetData( ix );
+			fucoid = row.FUCO_ID;
+			
+			let parms = "&fucoid="+fucoid;
+			if( !Delete( "delfuco", parms ))
+				{
+				alert( "falha ao remover correção" );
+				return;
+				}
+			setAjax();
+			return;
+			}
+			
+		function corrigir()
+			{
+			if( dbcr != 1 && dbcr != 2 )
+				{
+				alert( "Por favor escolha se as horas serão debitadas ou creditadas.");
+				return;
+				}
+			let mins = calcTmp( $('#tmp').val() );
+			if( mins < 0 )
+				return;
+			let obs = $('#obs').val();
+
+			if( funcao == "I" )
+				{
+				let parms = "&funiid="+idfunc+"&fuauid="+autorid+
+										"&dtref="+dtcor;
+				if( dbcr == 1 )
+					parms += "&dbcr=DB";
+				else
+					parms += "&dbcr=CR";
+				parms += "&mins="+mins;
+				
+				if( obs.length > 0 )
+					parms += "&obs="+obs;
+
+				if( !Insert( "infuco", parms ))
+					{
+					alert( "falha ao Inserir nova correção" );
+					return;
+					}
+				}
+				
+			if( funcao == "A" )
+				{
+				let parms = "&fucoid="+fucoid+"&fuauid="+autorid+
+										"&dtref="+dtcor;
+				if( dbcr == 1 )
+					parms += "&dbcr=DB";
+				else
+					parms += "&dbcr=CR";
+				parms += "&mins="+mins;
+				
+				if( obs.length > 0 )
+					parms += "&obs="+obs;
+
+				if( !Update( "updfuco", parms ))
+					{
+					alert( "falha ao atualizar correção" );
+					return;
+					}
+				}
+
+			$("#modcorrec").modal('hide');
+			setAjax();
+			return;
+			}
+		
+    $('#eddt_new').click(function( e )
+			{
+			e.stopImmediatePropagation();
+			$("#dtcor").val( $.datepicker.formatDate("dd/mm/yy", hoje ));
+			dtcor = $.datepicker.formatDate("yymmdd", hoje );
+			
+			let url =	"selectData.php?query=dbcr";
+			SelInit( "#dbcr", url, 0, "Escolha Abaixo:", escodbcr );
+			dbcr = 0;
+			$('#obs').val('');
+			$('#tmp').val('');
+			fucoid = -1;
+			funcao = "I";
+			$("#modcorrec").modal('show');
+			} );
+
 	/////////////// PRINCIPAL ////////////////////////
-	$('#eddt_new').hide();
 	//	tabelas de definição da tabela de presenças
-	var funiid = null;
-	var flmod = 0;
-	var dataatual;
-	var fdtrid;
-	var fdtmid;
-	var hors = [];				//	horários
-	var opes = [];				//	códigos de operação
-	var orgs = [];				//	código de origens
-	var fids = [];				//	id do fdte
-	var stts = [];				//	status e-existente, n-novo, d-deletado
-	var mensgs = [];			//	lista de mensagens
-	var salvos = [];			//	s-salvo
-	var acum = 0;
-		//	formatadores ligados ao datatables
-		//		ticamp:		tipo de campo t/n/l = texto, numérico ou legenda
-		//		inputs:		nomes dos campos no banco relativamente aos inputs
-		//		origem:		índice da coluna do Datatables que atualiza o campo no banco
-		//		editael:	indica se a coluna do datatable é editável
-		var notabel			=	"";								//	nome da tabela base
-		var	nocmpid			=	"";															//	nome do campo ID da tabela base
-		var sequence		= "";
-		var liNova			=
-						{
-						"DATA": "",
-						"Registros": "",
-						"Mensagens": "",
-						"Totais": ""
-						};
+	var dtcor = null;
+	var ixtab = 0;
+	var dbcr = "";
+	var fucoid = -1;
+	var funcao = "-";
+	
+		//	obtem dados do autorizador
 		var sshd = obterCookie( "user" );
 		if( sshd == null )
-			{
 			Deslogar();
-			}
 
-		//	acerta as datas
-		var hoje = new Date();
-		var dtfim = $.datepicker.formatDate("yymmdd", hoje );
-		$("#dtfim").val( $.datepicker.formatDate("dd/mm/yy", hoje ) );
-		hoje.setDate(1);
-		$("#dtini").val( $.datepicker.formatDate("dd/mm/yy", hoje ));
-		var dtini = $.datepicker.formatDate("yymmdd", hoje );
-
-		//	obtem FUNI_ID
 		var parms = "&sshd=" + sshd;
 		var resu = Select( "funiid", parms );
 		if( resu == null )
 			throw new Error("Problemas de acesso ao banco de dados. Por favor, tente mais tarde.");
-		funiid = resu.dados[0].FUNI_ID;
+		var autorid = resu.dados[0].FUNI_ID;
+
+		//	obtem dados do funcionário escolhido
+		var idfunc = obterCookie( "idfunc" );
+		if( idfunc == null || idfunc == "" )
+			{
+			window.location = "autTodosFunc.php";
+			}
+
+		var nofunc = obterCookie( "nofunc" );
+		if( nofunc == null || nofunc == "" )
+			{
+			window.location = "autTodosFunc.php";
+			}
+
+		var sshdfunc = obterCookie( "sshdfunc" );
+		if( sshdfunc == null || sshdfunc == "" )
+			{
+			window.location = "autTodosFunc.php";
+			}
+			
+		$("#titwidget").html( "Correções de horas de " + nofunc );
+
+		matarCookie( "sshdfunc" );
+		matarCookie( "nofunc" );
+		matarCookie( "idfunc" );
+		matarCookie( "iduorfunc" );
+
+		$( "#dtfrom" ).datepicker(					//	data inicial de pesquisa
+			{
+			dateFormat: "dd/mm/yy",
+			altFormat: "yymmdd",
+			startView: 2,
+			todayBtn: true,
+			daysOfWeekHighlighted: "0,6",
+			autoclose: true,
+			//minDate: dtufech,
+			todayHighlight: true			
+			}).on('change.dp', function(e)
+				{ 
+				var dt = $("#dtfrom").datepicker("getDate");
+				dtfrom = $.datepicker.formatDate("yymmdd", dt );
+				setAjax();
+				});
+
+		//	acha a data do último fechamento e acerta as datas iniciais
+		var parms = "&sshd=" + sshdfunc;
+		var resu = Select( "dtfecha", parms );
+		if( resu == null )
+			throw new Error("Problemas de acesso ao banco de dados. Por favor, tente mais tarde.");
+		var dtfecha = resu.dados[0].DTFECHA;
+		var dtufech = toDate( dtfecha );
+		dtfecha = $.datepicker.formatDate("yymmdd", dtufech );
+		$("#dtfrom").val( $.datepicker.formatDate("dd/mm/yy", dtufech ));
+		var dtfrom = $.datepicker.formatDate("yymmdd", dtufech );
+		$("#dtfecha").val( $.datepicker.formatDate("dd/mm/yy", dtufech ) );
+		var dtnext = new Date( dtufech.getYear()+1900, dtufech.getMonth(), dtufech.getDate()+1 );
+		$("#dtcor").datepicker( "option", "minDate", dtnext );
+
+		var hoje = new Date();
+		var dthoje = toStDate( hoje, 2 );
+
+		//	formatadores ligados ao datatables
+		var notabel			=	"BIOMETRIA.FUCO_FUNCCORRECAOHORAS";			//	nome da tabela base
+		var	nocmpid			=	"FUCO_ID";															//	nome do campo ID da tabela base
+		var sequence		= "";
+		var liNova			=
+						{
+						"DATA": "",
+						"OBS": "",
+						"DBCR": "",
+						"TMP": ""
+						};
 
 		//	monta o datatables
 		var	order	=	[];											//	sem classificação 
-		//	prepara a definiçao das colunas
+		//	colunas
 		var colDefs	=	[];
 		var	col	=	-1;
-		var aux	=
-			{
-			"tipo": "x",
-			"editavel": false,
-			"vanovo": "",
-			"width": "4%",
-			"aTargets": [ ++col ],
-			"mData": "TSDT_ID",
-			"sTitle":"Situação",
-			"defaultContent": " ",
-			"render": function( data, type, full )
-				{
-				var res = "";
-				if( data == "" )
-					{
-					res = "<button type='button' title='normal' class='btn btn-default  btn-md'>OK</button>";
-					}
-				if( data == "1" )
-					{
-					res = "<button type='button' title='Pendente' class='btn btn-primary  btn-md'>PEN</button>";
-					}
-				if( data == "2" )
-					{
-					res = "<button type='button' title='Aceita' class='btn btn-success  btn-md'>ACE</button>";
-					}
-				if( data == "3" )
-					{
-					res = "<button type='button' title='Negada' class='btn btn-danger  btn-md'>NEG</button>";
-					}
-				if( data == "4" )
-					{
-					res = "<button type='button' title='Em análise' class='btn btn-warning  btn-md'>ANA</button>";
-					}
-				return res;
-				}
-			};
-		colDefs.push( aux );
 		
+		
+
 		aux	=
 			{
 			"tipo": "x",
 			"editavel": false,
 			"vanovo": "",
-			"width": "6%",
+			"width": "10%",
 			"aTargets": [ ++col ],
 			"mData": "DATA",
 			"sTitle":"Data",
@@ -809,191 +426,12 @@ include 'partes/Scripts.php';
 		aux	=
 			{
 			"tipo": "x",
-			"editavel": false,
-			"vanovo": "",
-			"width": "15%",
-			"aTargets": [ ++col ],
-			"mData": "HORARIOS",
-			"sTitle":"Registros",
-			"defaultContent": " ",
-			"render": function( data, type, full )
-				{
-				if( full.TSDT_ID == "" || full.TSDT_ID == "1" || full.TSDT_ID == "4" )
-					var act	=	"<a href='javascript:hshow(\"" + full.DATA + "\",\"" + 
-									full.FDTR_ID + "\",\"" +
-									full.HORARIOS + "\",\"" + full.OPERACOES + "\",\"" + 
-									full.ORIGENS +"\",\"" + full.FDTEIDS +"\");' " +
-									"title=\"mostrar horarios\" >";
-				else
-					var act	=	"<a>";
-				if( data == "" )
-					{
-					act += "<b>sem registros</b></a>";
-					return act;
-					}
-				var lin1 = "";
-				var lin2 = "";
-				var orgs = full.ORIGENS.split(";");
-				var opes = full.OPERACOES.split(";");
-				var hors = full.HORARIOS.split(";");
-				for( var i=0; i<hors.length; i++ )
-					{
-					var aux = "<font color='";
-					if( orgs[i] == "1" )
-						aux	+= "green";
-					if( orgs[i] == "2" )
-						aux	+= "red";
-					if( orgs[i] == "3" )
-						aux	+= "yellow";
-
-					if( opes[i] == "2" )
-						{
-						if( lin2 != "" )
-							aux += "'>-" + hors[i] + "</font>";
-						else
-							aux += "'>" + hors[i] + "</font>";
-						lin2 += aux;
-						}
-					else
-						{
-						if( lin1 != "" )
-							aux += "'>-" + hors[i] + "</font>";
-						else
-							aux += "'>" + hors[i] + "</font>";
-						lin1 += aux;
-						}
-					}
-				if( lin1 != "" && lin2 != "" )
-					{
-					act +=	"<b>Válidos:</b>" + lin1 + "<br>" + 
-									"<b>Excluidos:</b>" + lin2;
-					}
-				if( lin1 != "" && lin2 == "" )
-					{
-					act += "<b>Válidos:</b>" + lin1;
-					}
-				if( lin1 == "" && lin2 != "" )
-					{
-					act += "<b>Excluidos:</b>" + lin2;
-					}
-				act += "</a>";
-
-				return act;
-				}
-			};
-		colDefs.push( aux );
-		
-		aux	=
-			{
-			"tipo": "x",
 			"editavel": true,
 			"vanovo": "",
-			"width": "13%",
+			"width": "50%",
 			"aTargets": [ ++col ],
-			"mData": "TIPOMENSAGEM",
-			"sTitle":"Mensagens",
-			"defaultContent": " ",
-			"render": function( data, type, full )
-				{
-				if( data == "" )
-					return data;
-				var seps = data.split( ";" );
-				var resu;
-				if( seps.length > 0 )
-					{
-					resu = seps[0];
-					for( var ix=1; ix<seps.length; ix++ )
-						{
-						resu += "<br>";
-						resu += seps[ix];
-						}
-					}
-				return resu;
-				}
-			};
-		colDefs.push( aux );
-		
-		aux	=
-			{
-			"tipo": "x",
-			"editavel": true,
-			"vanovo": "",
-			"width": "27%",
-			"aTargets": [ ++col ],
-			"mData": "FDTM_DLMENS",
-			"sTitle":"Diálogo",
-			"defaultContent": " ",
-			"render": function( data, type, full )
-				{
-				var seps = data.split( ";" );
-				var resu;
-				if( seps.length > 0 )
-					{
-					resu = seps[0];
-					for( var ix=1; ix<seps.length; ix++ )
-						{
-						resu += "<br>";
-						resu += seps[ix];
-						}
-					}
-				if( full.TSDT_ID == "" || full.TSDT_ID == "1" || full.TSDT_ID == "4" )
-					var act	=	"<a href='javascript:dshow(\"" + full.FDTR_ID + "\",\"" +  
-										full.FDTM_ID + "\",\"" + data + "\");' " +
-									"title=\"criar/complementar diálogo\" >";
-				else
-					var act	=	"<a>";
-					
-				if( data == "" )
-					act += "sem conteúdo</a>";
-				else
-					act += resu + "</a>";
-				return act;
-				}
-			};
-		colDefs.push( aux );
-		
-		aux	=
-			{
-			"tipo": "x",
-			"editavel": true,
-			"vanovo": "",
-			"width": "25%",
-			"aTargets": [ ++col ],
-			"mData": "AUTORIZADAS",
-			"sTitle":"",
-			"defaultContent": " ",
-			"render": function( data, type, full )
-				{
-				var resu = "";
-				if( full.AUTORIZADAS != "" )
-					{
-					var seps = data.split(";");
-					resu += seps[0];
-					for( var ix=1; ix<seps.length; ix++ )
-						{
-						resu += "<br>" + seps[ix];
-						}
-					}
-				if( full.CORRECAO != "" )
-					{
-					if( resu.length > 0 )
-						resu += "<br>";
-					resu += "Correção: " + full.CORRECAO;
-					}
-				return resu;
-				}
-			};
-		colDefs.push( aux );
-		
-		aux	=
-			{
-			"tipo": "x",
-			"editavel": true,
-			"vanovo": "",
-			"width": "5%",
-			"aTargets": [ ++col ],
-			"mData": "TOTAL",
-			"sTitle":"Dia",
+			"mData": "OBS",
+			"sTitle":"Observações",
 			"defaultContent": " "
 			};
 		colDefs.push( aux );
@@ -1003,36 +441,60 @@ include 'partes/Scripts.php';
 			"tipo": "x",
 			"editavel": true,
 			"vanovo": "",
-			"width": "5%",
+			"width": "10%",
 			"aTargets": [ ++col ],
-			"mData": "SALDO",
-			"sTitle":"Saldo",
-			"defaultContent": " ",
-			"render": function( data, type, full )
+			"mData": "DBCR",
+			"sTitle":"DB/CR",
+			"defaultContent": " "
+			};
+		colDefs.push( aux );
+		
+		aux	=
+			{
+			"tipo": "x",
+			"editavel": true,
+			"vanovo": "",
+			"width": "10%",
+			"aTargets": [ ++col ],
+			"mData": "TMP",
+			"sTitle":"Horas",
+			"defaultContent": " "
+			};
+		colDefs.push( aux );
+
+		aux	=	
+			{
+			"tipo": null,
+			"editavel": false,
+			"vanovo": "",
+			"sTitle":"",
+			"bSortable": false,
+			"searchable": false,
+			"aTargets": [ ++col ],
+			"orderable":false,
+			"mData": "action",
+			"width": "10%",
+			"render": function( data, type, row )
 				{
-				var calc;
-				//acum	+=	Number(data) - 480;
-				var hh	=	Math.floor(Math.abs(Number(data))/60);
-				var mm	=	Math.abs(Number(data))%60;
-				if( mm > 9 )
-					calc = hh + ":" + mm;
-				else
-					calc = hh + ":0" + mm;
-				if( Number(data) >= 0 )
-					return "<font color=blue>"+calc+"</font>";
-				else
-					return "<font color=red>"+calc+"</font>";
+				let dt = toDateInv( row.DATA );
+				ixtab++;
+
+				if( dtfecha >= dt )
+					return "";
+				
+				return	"<a href='#' onClick='javascript:altera(" + ixtab + ");' " +
+								"class='btn btn-circle btn-info btn-xs' " +
+								"title=\"Clique para alterar este período de autorização\" >" +
+								"<i class='glyphicon glyphicon-edit'></i></a>" +
+								"<a href='#' onClick='javascript:remove(" + ixtab + ");' " +
+								"class='btn btn-circle btn-info btn-xs' " +
+								"title=\"Clique para remover este período de autorização\" >" +
+								"<i class='glyphicon glyphicon-remove'></i></a>"
 				}
 			};
 		colDefs.push( aux );
-		//	linhas da tabela a mostra por tela
-		dlen		=	"22";
-		lens    = [[5, 15, 22, 30, -1],
-							[5, 15, 22, 30, "todos"]];
-		
-		///////////////////////////////////////////////////////////////////////
 
-		setAjax( 0 );
+		setAjax();
 				
 		</script>
 	</body>	

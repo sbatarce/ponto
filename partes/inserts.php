@@ -177,7 +177,8 @@ if( $qry == "infaau" )
 										TO_DATE( '$dtfim', 'YYYYMMDD' ), $mins )";
 	}
 
-//	insert FUCO
+//	infuco - insert FUCO
+//		funiid, fuauid, dtref, dbcr, mins [, obs]
 if( $qry == "infuco" )
 	{
 	if( !isset( $_GET["funiid"] ) )
@@ -205,18 +206,20 @@ if( $qry == "infuco" )
 		echo	'{ "status": "erro", "erro": "parametro mins obrigatorio" }';
 		return;
 		}
+	if( isset( $_GET["obs"] ) )
+		$obs = $_GET["obs"];
+	else
+		$obs = "";
 
 	$funiid = $_GET["funiid"];
-	$taauid = $_GET["taauid"];
 	$fuauid = $_GET["fuauid"];
 	$dtref = $_GET["dtref"];
 	$dbcr = $_GET["dbcr"];
 	$mins = $_GET["mins"];
 						
 	$sql	=	"INSERT INTO BIOMETRIA.FUCO_FUNCCORRECAOHORAS
-						( FUCO_ID, FUNI_ID, FUAU_ID, FUCO_DTREFERENCIA, FUCO_DCDBCR, FUCO_NITMP )
 						VALUES(	BIOMETRIA.SQ_FUCO.NEXTVAL, $funiid, $fuauid, 
-										TO_DATE( '$dtref', 'YYYYMMDD' ), '$dbcr', $mins )";
+										TO_DATE( '$dtref', 'YYYYMMDD' ), '$dbcr', $mins, '$obs' )";
 	}
 ////////////////////////////////////////////////////////////////////////////////
 if( isset( $_GET["debug"] ) )

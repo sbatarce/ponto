@@ -1,5 +1,7 @@
 <?php
 //	seleção de dados com retorno para o DataTables
+//	
+//	correcs			-	correções de um dado funcionário em um determinado período
 //	funcfuor		-	funcionários em uma UOR do ponto
 //	funuorbio		-	tabela de pessoas em uma UOR do SAU com contagem de BIOMETRIA
 //	autfuuor		-	tabela de funcionários de uma UOR para inclusão
@@ -38,40 +40,40 @@ if( $qry == "xpto" )
 	}
 	
 ////////////////////////////////////////////////////////////////////////////////
-//	funcfuor		-	funcionários em uma UOR do ponto
-//	
-if( $qry == "funcfuor" )
+//	correcs			-	correções de um dado funcionário em um determinado período
+//		funiid
+//		dtini
+//		dtfim
+if( $qry == "correcs" )
 	{
-	if( !isset( $_GET["uor"] ) )
+	if( !isset( $_GET["funiid"] ) )
 		{
-		echo	'{ "data": [{"erro": "parametro uor obrigatorio"}] }';
+		echo	'{ "data": [{"erro": "parametro funiid obrigatorio"}] }';
 		return;
 		}
-	$uor = $_GET["uor"];
-	$sql = "SELECT	FUNI.PMS_IDPMSPESSOA AS SSHD,
-									(SELECT PESS.NOME FROM SAU.VWPESSOA_SSHD PESS 
-										WHERE PESS.REGISTRO_FUNCIONAL_ATIVO = 1 AND
-													PESS.IUN = FUNI.PMS_IDPMSPESSOA AND
-													ROWNUM = 1) AS NOME,
-									TO_CHAR( FSHM.DTFECH, 'DD/MM/YYYY' ) AS FECHAMENTO, 
-									(SELECT TO_CHAR( MIN(FDTR.FDTR_DTREFERENCIA)-1, 'DD/MM/YYYY' )
-										FROM        BIOMETRIA.FRTR_FUNCIONARIOREGIMETRABALHO FRTR
-										INNER JOIN  BIOMETRIA.FDTR_FUNCIONARIODIATRABALHO FDTR ON
-																FDTR.FRTR_ID=FRTR.FRTR_ID
-										WHERE FDTR.TSDT_ID IN( 1, 4 ) AND 
-													FDTR.FDTR_DTREFERENCIA > FSHM.DTFECH AND
-													FRTR.FUNI_ID=FUNI.FUNI_ID ) AS DTMAX,
-									0 AS FECHAR
-						FROM        BIOMETRIA.FUOR_FUNCUNIDADEORGANIZACIONAL FUOR
-						INNER JOIN  BIOMETRIA.FUNI_FUNCIONARIO FUNI ON
-												FUNI.FUNI_ID=FUOR.FUNI_ID AND
-												FUNI.FUNI_STATIVO=1
-						INNER JOIN  ( SELECT FUNI_ID AS ID, MAX( FSHM_DTREFERENCIA ) AS DTFECH
-														FROM BIOMETRIA.FSHM_FUNCSALDOHORAMENSAL 
-														GROUP BY FUNI_ID) FSHM ON
-												FSHM.ID=FUNI.FUNI_ID
-						WHERE FUOR.FUOR_DTFIM IS NULL AND
-									FUOR.PMS_IDSAUUOR=$uor";
+	if( !isset( $_GET["dtini"] ) )
+		{
+		echo	'{ "data": [{"erro": "parametro dtini obrigatorio"}] }';
+		return;
+		}
+	if( !isset( $_GET["dtfim"] ) )
+		{
+		echo	'{ "data": [{"erro": "parametro dtfim obrigatorio"}] }';
+		return;
+		}
+	$funiid = $_GET["funiid"];
+	$dtini = $_GET["dtini"];
+	$dtfim = $_GET["dtfim"];
+	
+	$sql	=	"SELECT FUCO_ID, FUNI_ID, FUAU_ID, 
+									TO_CHAR( FUCO_DTREFERENCIA, 'DD/MM/YYYY' ) AS DATA, 
+									FUCO_DCDBCR AS DBCR, FUCO_DLOBS AS OBS, FUCO_NITMP AS TMP
+							FROM BIOMETRIA.FUCO_FUNCCORRECAOHORAS
+							WHERE FUNI_ID=$funiid 
+								AND FUCO_DTREFERENCIA BETWEEN 
+												TO_DATE( '$dtini', 'YYYYMMDD' )
+										AND TO_DATE( '$dtfim', 'YYYYMMDD' )
+							ORDER BY FUCO_DTREFERENCIA DESC";
 	}
 	
 ////////////////////////////////////////////////////////////////////////////////
@@ -156,7 +158,8 @@ if( $qry == "fuornapar" )
 		}
 	$fuor = $_GET["fuor"];
 	
-	$sql	=	"SELECT FUNI.FUNI_ID, FUNI.PMS_IDPMSPESSOA AS SSHD, VFAT.NOME, 
+	$sql	=	"SELECT FUNI.FUNI_ID, FUNI.PMS_IDPMSPESSOA AS SSHD,  
+									INITCAP(utl_raw.cast_to_varchar2(nlssort(VFAT.NOME, 'nls_sort=binary_ai'))) AS NOME,
 									VFAT.IDUOR AS IDUORSAU, VFAT.DCSIGLAUOR AS SIGLAUORSAU,
 									RETR.RETR_ID AS IDRETR, RETR.RETR_DLNOME AS REGIME,
 									FUOR.PMS_IDSAUUOR AS IDUORPONTO, 
@@ -218,7 +221,7 @@ if( $qry == "funcapar" )
 	
 	$sql	=	"SELECT	FUNI.FUNI_ID, FUNI.PMS_IDPMSPESSOA AS SSHD,
 									FUOR.PMS_IDSAUUOR AS FUOR, 
-									utl_raw.cast_to_varchar2(nlssort(PESS.DLNOMEPESSOA, 'nls_sort=binary_ai')) AS NOME, 
+									INITCAP(utl_raw.cast_to_varchar2(nlssort(PESS.DLNOMEPESSOA, 'nls_sort=binary_ai'))) AS NOME, 
 									VUOR.UOR_IDUNIDADEORGANIZACIONAL AS IDUORPONTO, 
 									VUOR.UOR_DLSIGLAUNIDADE AS SIGLAUORPONTO,
 									(SELECT COUNT(1) 

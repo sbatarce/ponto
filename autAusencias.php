@@ -15,33 +15,28 @@ include 'partes/Head.php';
 		<link rel="shortcut icon" href="/imagens/PMSICO.png">
 	</head>
 	
-	<body onload="javascript:titulo( '<h4>Lista de todos os usuários do Autorizador</h4>' );">
+	<body onload="javascript:titulo( '<h4>Ausências Autorizadas</h4>' );">
 <?php
 include 'partes/MenuPri.php';
 include 'partes/Cabec.php';
 include 'partes/pageheader.php';
 include 'partes/pagebody.php';
 ?>
-		<div class='row input-append date linha' style='margin-bottom: 10px; margin-left:4px'>
-			Início<input type="text" size="10" id="dtfrom" 
-									 style="margin-left: 20px; margin-right: 20px; "/>
-			<input type="text" size="10" id="dtfecha" 
-						 style="margin-left: 10px; margin-right: 20px; float: right;"/>
-			<label style="float: right;">Fechamento em</label>
-		</div>
-										<table class="table table-striped table-hover table-bordered" id="eddt">
-											<thead><tr role="row"></tr></thead>
-											<tfoot><tr role="row"></tr></tfoot>
-											<tbody></tbody>
-										</table>
-									</div> <!-- class="widget-body" -->
-								</div> <!-- class="col-xs-12 col-md-12" -->
-							</div> <!-- class="row" -->
-						</div> <!-- class="widget-body" -->
-					</div> <!-- class="page-body" id="conte" -->
-				</div> <!-- /Conteudo -->
-			</div> <!-- /Page Container -->
-		</div> <!-- Main Container -->
+	<div class='row input-append date linha' style='margin-bottom: 10px; margin-left:4px'>
+		Início<input type="text" size="10" id="dtfrom" 
+								 style="margin-left: 20px; margin-right: 20px; "/>
+		<input type="text" size="10" id="dtfecha" 
+					 style="margin-left: 10px; margin-right: 20px; float: right;"/>
+		<label style="float: right;">Fechamento em</label>
+	</div>
+	<table class="table table-striped table-hover table-bordered" id="eddt">
+		<thead><tr role="row"></tr></thead>
+		<tfoot><tr role="row"></tr></tfoot>
+		<tbody></tbody>
+	</table>
+<?php
+include 'partes/pagebodyfecha.php';
+?>
 		
 		<!-- modal de retificação de horários: adiciona e exclui horários do dia -->
 		<div id="modausen" class="modal fade bs-modal-sm" role="dialog"
