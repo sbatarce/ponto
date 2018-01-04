@@ -138,7 +138,8 @@ include 'partes/Scripts.php';
 			if( uorid <= 0 )
 				return;
 			tableDestroy();
-			AjaxSource	=	"partes/tableData.php?query=funcfuor&uor=" + uorid;
+			AjaxSource	=	"partes/tableData.php?query=funcfuor&uor=" + uorid +
+										"&dtfech="+dtfecha;
 			ixrow=0;
 			inicializa.init();
 			}
@@ -382,6 +383,7 @@ include 'partes/Scripts.php';
 				var dt = $("#dtfecha").datepicker("getDate");
 				dtfecha = $.datepicker.formatDate("yymmdd", dt );
 				dtudir = $.datepicker.formatDate("dd/mm/yy", dt );
+				setAjax();
 				});
 
 		//	obtem FUNI_ID do autorizador
@@ -465,6 +467,33 @@ include 'partes/Scripts.php';
 			"mData": "DTMAX",
 			"sTitle":"Maior Fechamento",
 			"defaultContent": " "
+			};
+		colDefs.push( aux );
+		
+		aux	=
+			{
+			"className": "centro",
+			"tipo": "x",
+			"editavel": true,
+			"vanovo": "",
+			"width": "10%",
+			"aTargets": [ ++col ],
+			"mData": "SALDO",
+			"sTitle":"Saldo na data",
+			"render": function( data, type, row, meta )
+				{
+				var calc;
+				var hh	=	Math.floor(Math.abs(Number(data))/60);
+				var mm	=	Math.abs(Number(data))%60;
+				if( mm > 9 )
+					calc = hh + ":" + mm;
+				else
+					calc = hh + ":0" + mm;
+				if( Number(data) >= 0 )
+					return "<font color=blue>"+calc+"</font>";
+				else
+					return "<font color=red>"+calc+"</font>";
+				}
 			};
 		colDefs.push( aux );
 		
