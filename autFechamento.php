@@ -14,6 +14,8 @@ include 'partes/Head.php';
 ?>
 		<!-- icone da PMS -->
 		<link rel="shortcut icon" href="/imagens/PMSICO.png">
+		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+		<link href="bootstrap-3.3.1/dist/css/bootstrap-switch.css" rel="stylesheet">
 	</head>
 	
 	<body onload="javascript:titulo( '<h4>Fechamento</h4>' );">
@@ -37,12 +39,21 @@ include 'partes/pagebody.php';
 			<div class="col-lg-6" style='width:100%; margin-top: 20px; '>
 				<input class="btn btn-danger" type="button" value="Executar"
 							 onclick="javascript:executar();"
-							 style="float: left; font-size: 20px; font-weight: bold; "
+							 style="margin-right: 20px; float: left; font-size: 20px; font-weight: bold; "
 							 title="Efetua todos os fechamentos marcados">
+
 				<input class="btn btn-primary" type="button" value="Inverter"
 							 onclick="javascript:inverter();"
 							 style="margin-left: 10px; float: right; "
 							 title="Desmarca os marcados e marca os desmarcado">
+					
+				<input id="ckcorr" type="checkbox" class="checkbox-inline make-switch has-switch"
+							 style="margin-left: 20px; float: right; "
+							 data-size="mini" data-label-text='Corrigir todos a zero antes de fechar'
+							 data-off-color="danger" data-on-color="success"
+							 data-off-text="Não" data-on-text="Sim" 
+							 title="Força uma correção de saldo de todos os marcados de forma a zerá-lo."/>
+					
 				<input class="btn btn-primary" type="button" value="Desmarcar"
 							 onclick="javascript:desmarcarTodos();"
 							 style="margin-left: 10px; float: right; "
@@ -50,8 +61,7 @@ include 'partes/pagebody.php';
 				<input class="btn btn-primary" type="button" value="Marcar"
 							 onclick="javascript:marcarTodos();"
 							 style="margin-left: 10px; float: right; "
-							 title="Marca todos os funcionário para fechamento">
-
+							 title="Marca todos os funcionário para fechamento">					
 				<input type="text" size="10" id="dtfecha" 
 						 style="margin-left: 20px; margin-right: 20px; float: right; "/>
 				<label style="float: right; font-weight: bold; ">Fechamento</label>
@@ -75,15 +85,16 @@ include 'partes/pagebody.php';
 include 'partes/Scripts.php';
 ?>
 
+	<script type="text/javascript" src="bootstrap-3.3.1/dist/js/bootstrap-switch.js"></script>
 	<script type="text/javascript" src="partes/geral.js" ></script>
 	<script type="text/javascript" src="partes/dteditavel.js" ></script>
 	<script type="text/javascript" >
-		/*
-		function logout()
+
+		$("#ckcorr").on( 'switchChange.bootstrapSwitch', function( evn, state )
 			{
-			Deslogar();
-			}
-		*/
+			flcorr = state;
+			});
+
 		function deleteRow( oTable, nRow )
 			{
 			if( DBDelete( oTable, nRow ) )
@@ -261,7 +272,11 @@ include 'partes/Scripts.php';
 			throw new Error("Problemas de acesso ao banco de dados. Por favor, tente mais tarde.");
 		let funiid = resu.dados[0].FUNI_ID;
 		//	verifica se o funcionário tem pendências anteriores à data de fechamento
-		let url = `partes/fechaFuncionario.php?funiid=${funiid}&data=${data}`;
+		let url;
+		if( flcorr )
+			url = `partes/fechaFuncionario.php?funiid=${funiid}&data=${data}&fuauid=${autoriz}&zerar`;
+		else 
+			url = `partes/fechaFuncionario.php?funiid=${funiid}&data=${data}`;
 		resu = remoto( url );
 		if( resu.status != "OK" )
 			return false;
@@ -274,7 +289,6 @@ include 'partes/Scripts.php';
 							"Por favor confirme...;"
 		if( !confirm( aux ) )
 			return;
-		bloqueia();
 		let qtlin = tableQtLins();
 		if( qtlin < 1 )
 			return;
@@ -337,7 +351,6 @@ include 'partes/Scripts.php';
 		var ixrow = 0;
 		var dtini = null;
 		var dtfim = null;
-		var fuauid = -1;
 		var parms, resu;
 		var sshd = obterCookie( "user" );
 		if( sshd == null )
@@ -353,7 +366,10 @@ include 'partes/Scripts.php';
 			
 		var tiuser = obterCookie( "tiuser" );
 
-//	obtenção de datas 
+		var flcorr = false;
+		$('#ckcorr').bootstrapSwitch( 'state', flcorr );
+
+		//	obtenção de datas 
 		var hoje = new Date();
 		parms = "";
 		resu = Select( "parametros", parms );
@@ -391,7 +407,7 @@ include 'partes/Scripts.php';
 		resu = Select( "funiid", parms );
 		if( resu == null )
 			throw new Error("Problemas de acesso ao banco de dados. Por favor, tente mais tarde.");
-		var autorid = resu.dados[0].FUNI_ID;
+		var autoriz = resu.dados[0].FUNI_ID;
 
 		$("#titwidget").html( "" );
 
@@ -482,6 +498,8 @@ include 'partes/Scripts.php';
 			"sTitle":"Saldo na data",
 			"render": function( data, type, row, meta )
 				{
+				if( typeof data == "undefined" )
+					return "";
 				var calc;
 				var hh	=	Math.floor(Math.abs(Number(data))/60);
 				var mm	=	Math.abs(Number(data))%60;
@@ -511,6 +529,8 @@ include 'partes/Scripts.php';
 			"width": "5%",
 			"render": function( data, type, row, meta )
 				{
+				if( data == "" )
+					return "";
 				if( data == "0" )
 					return	marcaFechar( "nao" );
 				else

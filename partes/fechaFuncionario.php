@@ -2,6 +2,7 @@
 //	fecha funcionário
 //	funiid	-	FUNI_ID
 //	data		-	data do fechamento
+//	zerar		-	 se presente indica que deve corrigir o saldo a zero
 
 if( !isset( $_GET["funiid"] ) )
 	{
@@ -17,6 +18,22 @@ if( !isset( $_GET["data"] ) )
 	return;
 	}
 $data = $_GET["data"];
+
+if( isset( $_GET["zerar"] ) )
+	$flzer = true;
+else
+	$flzer = false;
+
+//	se for zerar, tem que fornecer o FUAUID
+if( $flzer )
+	{
+	if( !isset( $_GET["fuauid"] ) )
+		{
+		echo	'{ "data": [{"erro": "parametro fuauid obrigatório para zerar"}] }';
+		return;
+		}
+	$fuauid = $_GET["fuauid"];
+	}
 //
 include '../partes/fmtErro.php';
 include '../partes/ambiente.php';
@@ -154,6 +171,33 @@ $ora->libStmt();
 
 //	inicia uma transação 
 $ora->beginTransaction();
+//	zera o saldo se solicitado
+if( $flzer )
+	{
+	$saldo = intval( $jres->dados[0]->SALDO );
+	if( $saldo < 0 )
+		$dbcr = 'CR';
+	else
+		$dbcr = 'DB';
+	$saldo = abs( $saldo );
+	$sql = "INSERT INTO BIOMETRIA.FUCO_FUNCCORRECAOHORAS VALUES
+						( BIOMETRIA.SQ_FUCO.NEXTVAL, $funiid, $fuauid, TO_DATE( '$data', 'YYYYMMDD' ), 
+							'$dbcr', $saldo, 'Correção de Fechamento' )";
+	$res = $ora->execInsert( $sql, 'BIOMETRIA.SQ_FUCO' );
+	$jres1 = json_decode( $res );
+	if( $dbg )
+		{
+		echo "INSERT de FUCO SQL=$sql/resultado:";
+		var_dump($jres1);
+		}
+	if( $jres1->status != "OK" )
+		{
+		fmtErro( "erro", "Inserindo FUCO: $jres1->erro" );
+		$ora->rollback();
+		$ora->disconnect();
+		return;
+		}	
+	}
 //	cria o FSHM novo
 $sql = "INSERT INTO BIOMETRIA.FSHM_FUNCSALDOHORAMENSAL VALUES
 					( BIOMETRIA.SQ_FSHM.NEXTVAL, $funiid, TO_DATE( '$data', 'YYYYMMDD' ), ".
