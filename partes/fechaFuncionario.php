@@ -172,9 +172,9 @@ $ora->libStmt();
 //	inicia uma transação 
 $ora->beginTransaction();
 //	zera o saldo se solicitado
+$saldo = intval( $jres->dados[0]->SALDO );
 if( $flzer )
 	{
-	$saldo = intval( $jres->dados[0]->SALDO );
 	if( $saldo < 0 )
 		$dbcr = 'CR';
 	else
@@ -197,11 +197,12 @@ if( $flzer )
 		$ora->disconnect();
 		return;
 		}	
+	$saldo = 0;
 	}
 //	cria o FSHM novo
 $sql = "INSERT INTO BIOMETRIA.FSHM_FUNCSALDOHORAMENSAL VALUES
 					( BIOMETRIA.SQ_FSHM.NEXTVAL, $funiid, TO_DATE( '$data', 'YYYYMMDD' ), ".
-						$jres->dados[0]->SALDO.", 0, 0, ".
+						"$saldo , 0, 0, ".
 						$jres->dados[0]->QTDENTRA.", ".$jres->dados[0]->MEDENTRA.",".
 						$jres->dados[0]->QTDINTER.", ".$jres->dados[0]->MEDINTER.",".
 						$jres->dados[0]->QTDVOLTA.", ".$jres->dados[0]->MEDVOLTA.",".
