@@ -1080,7 +1080,7 @@ include 'partes/Scripts.php';
 			"width": "25%",
 			"aTargets": [ ++col ],
 			"mData": "AUTORIZADAS",
-			"sTitle":"",
+			"sTitle":"Autorizações e correções",
 			"defaultContent": " ",
 			"render": function( data, type, full )
 				{
@@ -1098,7 +1098,7 @@ include 'partes/Scripts.php';
 					{
 					if( resu.length > 0 )
 						resu += "<br>";
-					resu += "Correção: " + full.CORRECAO;
+					resu += full.CORRECAO;
 					}
 				return resu;
 				}

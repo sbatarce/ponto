@@ -1080,7 +1080,7 @@ include 'partes/Scripts.php';
 					{
 					if( resu.length > 0 )
 						resu += "<br>";
-					resu += "Correção: " + full.CORRECAO;
+					resu += full.CORRECAO;
 					}
 				return resu;
 				}

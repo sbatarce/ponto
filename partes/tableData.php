@@ -792,9 +792,9 @@ if( $qry == "funaces" )
                         INNER JOIN	BIOMETRIA.TMEN_TIPOMENSAGEM TMEN ON
                                     TMEN.TMEN_ID = FDTN.TMEN_ID
                         WHERE FDTN.FDTR_ID = FDTR.FDTR_ID) AS TIPOMENSAGEM, 
-										FDTM_ID, FDTM.FDTM_DLMENS,
+										FDTM_ID, FDTM.FDTM_DLMENS, 
 										(SELECT	LISTAGG(	TAAU.TAAU_DLAUSENCIAAUTORIZADA || '=' || 
-																			FDTF.FDTF_NITMPREAL, ';')
+																			to_char( to_date( FDTF.FDTF_NITMPREAL*60, 'sssss' ), 'HH24:MI' ), ';')
 														WITHIN GROUP( ORDER BY FDTF.FDTF_NITMPREAL )
 											FROM				BIOMETRIA.FDTF_FUNCDIATRABALHO_FAAU FDTF
 											INNER JOIN	BIOMETRIA.FAAU_FUNCAUSENCIAAUTORIZADA FAAU ON 
@@ -803,8 +803,15 @@ if( $qry == "funaces" )
 																	TAAU.TAAU_ID=FAAU.TAAU_ID 
 											WHERE FDTR_ID=FDTR.FDTR_ID) AS AUTORIZADAS,
 										CASE FUCO_DCDBCR 
-														WHEN 'DB' THEN -FUCO_NITMP
-														WHEN 'CR' THEN FUCO_NITMP END  AS CORRECAO, 
+														WHEN 'DB' THEN 
+															'Débito: ' ||
+															to_char( to_date( FUCO_NITMP*60, 'sssss' ), 'HH24:MI' ) ||
+															' : ' || FUCO.FUCO_DLOBS
+														WHEN 'CR' THEN 
+															'Crédito: ' ||
+															to_char( to_date( FUCO_NITMP*60, 'sssss' ), 'HH24:MI' ) ||
+															' : ' || FUCO.FUCO_DLOBS
+														END  AS CORRECAO,
 										BIOMETRIA.SF_CALCULASALDOINICIAL( 
 															FUNI.FUNI_ID, FDTR.FDTR_DTREFERENCIA+1) AS SALDO
 							FROM        BIOMETRIA.FUNI_FUNCIONARIO FUNI

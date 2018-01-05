@@ -6,7 +6,7 @@ include '../partes/ORAConn.php';
 $meth = $_SERVER['REQUEST_METHOD'];
 if( $meth != 'POST' )
 	{
-	fmtErro( "erro", "HTTP-method GET não permitido" );
+	fmtErro( "erro", "Somente HTTP-method POST permitido" );
 	return;
 	}
 
