@@ -21,7 +21,7 @@ include 'partes/pagebody.php';
 											 style="margin-left: 20px; margin-right: 10px; "/>
 			a <input type="text" size="10" id="dtfim" 
 							 style="margin-left: 10px; margin-right: 10px; "/>
-			Saldo <input type="text" size="10" id="sldant" readonly
+			Saldo inicial<input type="text" size="10" id="sldant" readonly
 									 style="margin-left: 10px; margin-right: 10px; "/>
 			<input type="text" size="10" id="dtfecha" readonly
 											 style="margin-left: 5px; margin-right: 20px; float: right;"/>
@@ -698,6 +698,12 @@ include 'partes/Scripts.php';
 		function setAjax( del )
 			{
 			//
+			var dt = $("#dtini").datepicker("getDate");
+			dtini = $.datepicker.formatDate("yymmdd", dt );
+			dt = $("#dtfim").datepicker("getDate");
+			dtfim = $.datepicker.formatDate("yymmdd", dt );
+			
+			//
 			parms = "&funiid="+funiid+"&dtinic="+dtini;
 			var resu = Select( "saldoant", parms );
 			if( resu == null )
@@ -706,12 +712,6 @@ include 'partes/Scripts.php';
 			var sldant = minToHHMM( resu.dados[0].MINUTOS );
 			$("#sldant").val( sldant );
 
-			//
-			var dt = $("#dtini").datepicker("getDate");
-			dtini = $.datepicker.formatDate("yymmdd", dt );
-			dt = $("#dtfim").datepicker("getDate");
-			dtfim = $.datepicker.formatDate("yymmdd", dt );
-			
 			var pessoa = sshd.substr( 1 );
 			parms = "&pessoa="+pessoa+"&dtinic="+dthoje+"&dtterm="+dthoje;
 			var resu = Select( "reprpmspessoa", parms );
