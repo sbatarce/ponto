@@ -141,7 +141,7 @@
 						criarCookie("super", "1", 0, 10 );
 						$(".fun").show();
 						$(".aut").show();
-						$(".adm").show();
+						$(".adm").hide();
 						}
 					else
 						{

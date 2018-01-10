@@ -373,15 +373,6 @@ include 'partes/Scripts.php';
 				}
 			}
 
-		var url = "selectData.php?query=aparelhos";
-		SelInit( ".aparelhos", url, 0, "Escolha abaixo", escapar, 0 );
-
-		url = "selectData.php?query=uor";
-		SelInit( ".uors", url, 0, "Escolha abaixo", escuor, 0 );
-
-		var url = "selectData.php?query=funcfuni";
-		SelInit( ".pess", url, 0, "Escolha abaixo", escpess, 0 );
-
 		function deleteRow( oTable, nRow )
 			{
 			if( DBDelete( oTable, nRow ) )
@@ -432,41 +423,8 @@ include 'partes/Scripts.php';
 			else
 				return hh+":"+mm;
 			}
-			
-		/*
-		//	chama a página de pendências do funcionário
-		function pendencias( sshd )
-			{
-			criarCookie( "sshdfunc", sshd );
-			window.location = "autPenden.php";
-			}
-			
-		function ausencias( sshd, id, nome )
-			{
-			criarCookie( "idfunc", id );
-			criarCookie( "nofunc", nome );
-			criarCookie( "sshdfunc", sshd );
-			window.location = "autAusencias.php";
-			}
-			
-		function correcoes( sshd )
-			{
-			criarCookie( "idfunc", id );
-			criarCookie( "nofunc", nome );
-			criarCookie( "sshdfunc", sshd );
-			window.location = "autCorrecao.php";
-			}
-			
-		//	chama o detalhe de um funcionário escolhido
-		function detfunc( id, nome, sshd )
-			{
-			criarCookie( "idfunc", id );
-			criarCookie( "nofunc", nome );
-			criarCookie( "sshdfunc", sshd );
-			window.location = "autFuncio.php";
-			}
-		*/
-		/////////////// PRINCIPAL ////////////////////////
+
+/////////////// PRINCIPAL ////////////////////////
 		var idapalant = 0;
 		var noapalant = "Escolha abaixo";
 		var idapal = -1;
@@ -482,6 +440,17 @@ include 'partes/Scripts.php';
 			{
 			Deslogar();
 			}
+			
+		//
+		var url = "selectData.php?query=aparelhos";
+		SelInit( ".aparelhos", url, 0, "Escolha abaixo", escapar, 0 );
+
+		url = "selectData.php?query=fuors&sshd="+sshd;
+		SelInit( ".uors", url, 0, "Escolha abaixo", escuor, 0 );
+
+		url = "selectData.php?query=funcfuni";
+		SelInit( ".pess", url, 0, "Escolha abaixo", escpess, 0 );
+
 			
 		$("#eddt_new").hide();
 		//	tabelas de definição da tabela de presenças
