@@ -28,7 +28,8 @@
 		{
 		$(".fun").show();
 		var uorAut = obterCookie( "uoraut" );
-		if( uorAut != "" )
+		let tiuser = obterCookie( "tiuser" );
+		if( uorAut != "" || tiuser > 3 )
 			$(".aut").show();
 		else
 			$(".aut").hide();

@@ -694,14 +694,17 @@ include 'partes/Scripts.php';
 
 			if( stini == "" )
 				return "";
-			if( stnow <= stini )
+			if( stnow < stini )
 				return acalt+acrem;
 
 			if( stter == "" )
 				return acalt+acenc;
 
-			if( stnow <= stter )
+			if( stnow == stter )
 				return acalt;
+
+			if( stnow < stter )
+				return acalt+acenc;
 			return "";
 			}
 		};
