@@ -356,6 +356,8 @@ include 'partes/Scripts.php';
 		$(".uorpto").val( nouor )
 		$("#dtinialt").val( inidir );
 		let dt = $(".dtinialt").datepicker("getDate");
+		let px = new Date(dt);
+		px.setDate( dt.getDate()+1 );
 		if( dt < hoje )
 			$("#dtinialt").datepicker( "option", "minDate", dt );
 		else
@@ -368,10 +370,7 @@ include 'partes/Scripts.php';
 		if( dt < hoje )
 			$("#dtfimalt").datepicker( "option", "minDate", hoje );
 		else
-			{
-			dt.setDate(dt.getDate()+1);
 			$("#dtfimalt").datepicker( "option", "minDate", dt );
-			}
 
 		$("#altautors").val( nome );
 		dtini = null;
@@ -404,9 +403,10 @@ include 'partes/Scripts.php';
 		//
 		$("#uorpto").val( nouor )
 		$("#dtinicria").val( $.datepicker.formatDate("dd/mm/yy", hoje ) );
-		let amanha = hoje;
+		$("#dtinicria").datepicker( "option", "minDate", hoje );
+		let amanha = new Date(hoje);
 		amanha.setDate(hoje.getDate()+1);
-		$("#dtfimcria").datepicker( "option", "minDate", amanha );
+		$("#dtfimcria").datepicker( "option", "minDate", hoje );
 		$("#dtfimcria").val( "" );
 		$(".autors").select2('val', 0 );
 		$("#modcriaautor").modal('show');
@@ -497,9 +497,11 @@ include 'partes/Scripts.php';
 		todayHighlight: true			
 		}).on('change.dp', function(e)
 			{ 
-			var dt = $(".dtinicria").datepicker("getDate");
+			let dt = $(".dtinicria").datepicker("getDate");
+			let px = new Date(dt);
+			px.setDate( dt.getDate()+1 );
 			dtini = $.datepicker.formatDate("yymmdd", dt );
-			$("#dtfimcria").datepicker( "option", "minDate", dt.getDate()+1 );
+			$("#dtfimcria").datepicker( "option", "minDate", dt );
 			$("#dtfimcria").val( "" );
 			});
 
@@ -531,8 +533,9 @@ include 'partes/Scripts.php';
 		}).on('change.dp', function(e)
 			{ 
 			let dt = $(".dtinialt").datepicker("getDate");
+			let px = new Date(dt);
+			px.setDate( dt.getDate()+1 );
 			dtini = $.datepicker.formatDate("yymmdd", dt );
-			dt.setDate(dt.getDate()+1);
 			$("#dtfimalt").datepicker( "option", "minDate", dt );
 			$(".dtfimalt").val( "" );
 			});

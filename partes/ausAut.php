@@ -199,8 +199,8 @@ $ora->libStmt();
 
 //	obtem o fuauid usando id do autorizador e iduor
 $sql = "SELECT  FUAU_ID AS FUAUID FROM BIOMETRIA.FUAU_FUNCIONARIOAUTORIZADOR
-					WHERE FUAU_DTINICIO<=SYSDATE AND 
-								(FUAU_DTFIM>=SYSDATE OR FUAU_DTFIM IS NULL) AND
+					WHERE FUAU_DTINICIO<=TRUNC(SYSDATE) AND 
+								(FUAU_DTFIM>=TRUNC(SYSDATE) OR FUAU_DTFIM IS NULL) AND
 								FUNI_ID=$autid 
 								AND PMS_IDSAUUOR=$iduor";
 $res = $ora->execSelect($sql);
