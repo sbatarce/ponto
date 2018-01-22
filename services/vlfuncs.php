@@ -39,7 +39,7 @@ if( $json == null )
 	return;
 	}
 //	obtem e verifica o usuario e senha do funcionario
-$sshd = $json->sshd;
+$sshd = strtoupper($json->sshd);
 //	verifica o SSHD
 $conn = @oci_connect( $userb, $passb, $amb, $chset, OCI_DEFAULT );
 if( !$conn )
@@ -82,4 +82,4 @@ if( !$row )
 $funiid = $row['FUNI_ID'];
 oci_free_statement( $stid );
 oci_close( $conn );
-echo "{ \"status\": \"OK\", \"id\": \"$funiid\" }";
+echo "{ \"status\": \"OK\", \"id\": \"$funiid\", \"nomealvo\": \"\" }";
