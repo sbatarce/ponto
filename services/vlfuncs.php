@@ -9,11 +9,6 @@ if( isset( $_SERVER['PHP_AUTH_USER'] ) )
 	$userb = $_SERVER['PHP_AUTH_USER'];
 	$passb = $_SERVER['PHP_AUTH_PW'];
 	}
-else
-	{
-	echo "{ \"status\": \"erro\", \"erro\": \"Acesso negado. Falta Authentication-basic\" }";
-	return;
-	}
 
 //	verifica o method
 $meth = $_SERVER['REQUEST_METHOD'];
