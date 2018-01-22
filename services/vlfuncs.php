@@ -82,4 +82,4 @@ if( !$row )
 $funiid = $row['FUNI_ID'];
 oci_free_statement( $stid );
 oci_close( $conn );
-echo "{ \"status\": \"OK\", \"id\": \"$funiid\", \"nomealvo\": \"\" }";
+echo "{ \"status\": \"OK\", \"id\": \"$funiid\", \"nomealvo\": \"$sshd\" }";
