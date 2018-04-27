@@ -38,6 +38,11 @@ if( $json == null )
 	fmtErro( "erro", "falta o JSON no corpo da mensagem" );
 	return;
 	}
+if( !isset( $json->sshd ) )
+	{
+	fmtErro( "erro", "Campo sshd no json de entrada obrigatório" );
+	return;
+	}
 //	obtem e verifica o usuario e senha do funcionario
 $sshd = strtoupper($json->sshd);
 //	verifica o SSHD
@@ -70,7 +75,7 @@ if( !$r )
   {
   $e = oci_error($stid);
   $mes = $e[ 'message' ];
-  echo "{ \"status\": \"erro\", \"erro\":\"$mes\", \"local\": \"oci_execute\" }";
+  echo "{ \"status\": \"erro\", \"erro\":\"oci_execute $mes\" }";
   return;
   }
 $row = oci_fetch_array( $stid, OCI_ASSOC + OCI_RETURN_NULLS );
@@ -82,4 +87,4 @@ if( !$row )
 $funiid = $row['FUNI_ID'];
 oci_free_statement( $stid );
 oci_close( $conn );
-echo "{ \"status\": \"OK\", \"id\": \"$funiid\", \"nomealvo\": \"$sshd\" }";
+echo "{ \"status\": \"OK\", \"id\": \"$funiid\", \"nomealvo\": \"Ponto-$sshd\" }";

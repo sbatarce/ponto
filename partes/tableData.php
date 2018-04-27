@@ -789,13 +789,9 @@ if( $qry == "funaces" )
 											WHERE FDTR_ID=FDTR.FDTR_ID) AS AUTORIZADAS,
 										CASE FUCO_DCDBCR 
 														WHEN 'DB' THEN 
-															'Débito: ' ||
-															to_char( to_date( FUCO_NITMP*60, 'sssss' ), 'HH24:MI' ) ||
-															' : ' || FUCO.FUCO_DLOBS
+															'Débito de '||TO_HHMM( FUCO_NITMP)||' ' || FUCO.FUCO_DLOBS
 														WHEN 'CR' THEN 
-															'Crédito: ' ||
-															to_char( to_date( FUCO_NITMP*60, 'sssss' ), 'HH24:MI' ) ||
-															' : ' || FUCO.FUCO_DLOBS
+															'Crédito de '||TO_HHMM( FUCO_NITMP)||' ' || FUCO.FUCO_DLOBS
 														END  AS CORRECAO,
 										BIOMETRIA.SF_CALCULASALDOINICIAL( 
 															FUNI.FUNI_ID, FDTR.FDTR_DTREFERENCIA+1) AS SALDO
