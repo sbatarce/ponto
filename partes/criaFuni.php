@@ -132,8 +132,8 @@ $ora->libStmt();
 $ora->beginTransaction();
 
 //	insere FUNI
-$sql = "INSERT INTO BIOMETRIA.FUNI_FUNCIONARIO VALUES
-				  ( BIOMETRIA.SQ_FUNI.NEXTVAL, '$sshd', 1 )";
+$sql = "INSERT INTO BIOMETRIA.FUNI_FUNCIONARIO VALUES ( FUNI_ID, PMS_IDPMSPESSOA, FUNI_STATIVO, FUNI_STMENS )
+				  ( BIOMETRIA.SQ_FUNI.NEXTVAL, '$sshd', 1, 0 )";
 $res = $ora->execInsert( $sql, "BIOMETRIA.SQ_FUNI" );
 $jres = json_decode( $res );
 if( $dbg )
