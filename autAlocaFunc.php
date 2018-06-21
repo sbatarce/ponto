@@ -174,6 +174,12 @@ include 'partes/Scripts.php';
 				$(".uors").select2('val', 0 );
 				return;
 				}
+			if( id === idualo )
+				{
+				alert( "A UOR de ponto e UOR da qual adicionar não devem ser iguais" );
+				return;
+				}
+				
 			if( id > 0 )
 				{
 				iduor	=	id;

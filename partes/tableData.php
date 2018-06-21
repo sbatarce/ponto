@@ -100,7 +100,8 @@ if( $qry == "funcfuor" )
 													PESS.IUN = FUNI.PMS_IDPMSPESSOA AND
 													ROWNUM = 1) AS NOME,
 									TO_CHAR( FSHM.DTFECH, 'DD/MM/YYYY' ) AS FECHAMENTO, 
-									(SELECT TO_CHAR( MIN(FDTR.FDTR_DTREFERENCIA)-1, 'DD/MM/YYYY' )
+									(SELECT NVL(  TO_CHAR( MIN(FDTR.FDTR_DTREFERENCIA)-1, 'DD/MM/YYYY' ),
+                                TO_CHAR( TO_DATE( '$dtfech', 'YYYYMMDD' ), 'DD/MM/YYYY' ) )
 										FROM        BIOMETRIA.FRTR_FUNCIONARIOREGIMETRABALHO FRTR
 										INNER JOIN  BIOMETRIA.FDTR_FUNCIONARIODIATRABALHO FDTR ON
 																FDTR.FRTR_ID=FRTR.FRTR_ID
@@ -497,7 +498,8 @@ if( $qry == "funcindex" )
 										VUPU.UOR_DLSIGLAUNIDADE AS UNIDADE, FUOR.PMS_IDSAUUOR AS IDUORFUNC,
 										(SELECT VPSS.NOME 
 											FROM SAU.VWPESSOA_SSHD VPSS 
-											WHERE VPSS.REGISTRO_FUNCIONAL_ATIVO = 1 AND 
+											-- comentado abaixo para evitar nomes em branco
+											WHERE --VPSS.REGISTRO_FUNCIONAL_ATIVO = 1 AND 
 														VPSS.IUN = FUNI.PMS_IDPMSPESSOA AND 
 														ROWNUM = 1) AS NOFUNC, 
 										TO_CHAR(FSHM.FSHM_DTREFERENCIA, 'DD/MM/YYYY') AS DTUFECHAMENTO, 
@@ -547,7 +549,8 @@ if( $qry == "funcindex" )
 										VUPU.UOR_DLSIGLAUNIDADE AS UNIDADE, FUOR.PMS_IDSAUUOR AS IDUORFUNC,
 										(SELECT VPSS.NOME 
 											FROM SAU.VWPESSOA_SSHD VPSS 
-											WHERE VPSS.REGISTRO_FUNCIONAL_ATIVO = 1 AND 
+											-- comentado abaixo para evitar nomes em branco
+											WHERE --VPSS.REGISTRO_FUNCIONAL_ATIVO = 1 AND 
 														VPSS.IUN = FUNI.PMS_IDPMSPESSOA AND 
 														ROWNUM = 1) AS NOFUNC, 
 										TO_CHAR(FSHM.FSHM_DTREFERENCIA, 'DD/MM/YYYY') AS DTUFECHAMENTO, 

@@ -1009,7 +1009,8 @@ include 'partes/Scripts.php';
 						resu += seps[ix];
 						}
 					}
-				if( full.TSDT_ID == "" || full.TSDT_ID == "1" || full.TSDT_ID == "4" )
+				if( full.TSDT_ID == "" || full.TSDT_ID == "1" || 
+						full.TSDT_ID == "2" || full.TSDT_ID == "4" )
 					var act	=	"<a href='javascript:dshow(\"" + full.FDTR_ID + "\",\"" +  
 										full.FDTM_ID + "\",\"" + data + "\");' " +
 									"title=\"criar/complementar diálogo\" >";
